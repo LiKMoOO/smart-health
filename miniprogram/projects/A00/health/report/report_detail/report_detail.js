@@ -1,5 +1,5 @@
-const cloudHelper = require('../../../../helper/cloud_helper.js');
-const pageHelper = require('../../../../helper/page_helper.js');
+const cloudHelper = require('../../../../../helper/cloud_helper.js');
+const pageHelper = require('../../../../../helper/page_helper.js');
 
 Page({
   data: {

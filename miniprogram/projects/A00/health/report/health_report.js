@@ -1,7 +1,7 @@
 // projects/A00/health/report/health_report.js
-const pageHelper = require('../../../helper/page_helper.js');
-const helper = require('../../../helper/helper.js');
-const cloudHelper = require('../../../helper/cloud_helper.js');
+const pageHelper = require('../../../../helper/page_helper.js');
+const helper = require('../../../../helper/helper.js');
+const cloudHelper = require('../../../../helper/cloud_helper.js');
 
 Page({
 	/**
@@ -248,7 +248,7 @@ Page({
 	 */
 	bindUploadTap: function () {
 		wx.navigateTo({
-			url: './report_upload/report_upload',
+			url: '/projects/A00/health/report/report_upload/report_upload',
 		});
 	},
 
@@ -258,7 +258,7 @@ Page({
 	bindViewTap: function (e) {
 		const id = pageHelper.dataset(e, 'id');
 		wx.navigateTo({
-			url: './report_detail/report_detail?id=' + id,
+			url: '/projects/A00/health/report/report_detail/report_detail?id=' + id,
 		});
 	}
 })

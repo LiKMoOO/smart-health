@@ -134,7 +134,10 @@ Page({
 			}
 
 			// 调用云函数获取数据
-			let res = await cloudHelper.callCloudData('medical_report/get_report_list', params);
+			let res = await cloudHelper.callCloudData('medicalReport', {
+				action: 'getReportList',
+				params
+			});
 
 			// 处理返回的数据，格式化日期显示
 			for (let k in res.list) {
@@ -144,8 +147,8 @@ Page({
 			// 更新页面数据
 			this.setData({
 				isLoad: true,
-				list: res.list,
-				isAllList: res.list.length < 20 // 如果返回数据不足20条，表示已加载全部
+				list: res.data || [], // 修改这里，使用res.data而不是res.list
+				isAllList: (res.data || []).length < 20 // 如果返回数据不足20条，表示已加载全部
 			});
 
 			// 关闭加载提示

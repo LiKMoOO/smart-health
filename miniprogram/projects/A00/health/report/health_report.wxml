@@ -1,48 +1,45 @@
 <!--projects/A00/health/report/health_report.wxml-->
 <view class="main">
-  <view class="top-bar bar">
-    <view class="title">体检报告</view>
+  <!-- 顶部搜索栏 -->
+  <view class="search-bar" style="position: fixed; left: 29rpx; top: 31rpx; width: 699rpx; height: 114rpx; display: block; box-sizing: border-box">
+    <view class="search-box">
+      <image class="icon-search" src="/images/icon/search.png"></image>
+      <input type="text" placeholder="搜索体检报告" model:value="{{search}}" bindinput="bindSearchInput" confirm-type="search"></input>
+    </view>
   </view>
 
-  <view class="reports">
-    <view wx:if="{{isLoad && reportList.length == 0}}" class="no-data">
-      <view class="icon-no-data">
-        <image src="../../../images/icon/no-data.png" mode="aspectFit"></image>
+  <!-- 报告列表 -->
+  <view class="report-list">
+    <block wx:if="{{!list || list.length == 0}}">
+      <view class="no-data">
+        <image class="icon-empty" src="/images/icon/empty.png"></image>
+        <text class="hint" style="position: relative; left: -100rpx; top: -120rpx">暂无体检报告</text>
       </view>
-      <view class="text-no-data">暂无体检报告记录</view>
-    </view>
-
-    <view wx:if="{{isLoad && reportList.length > 0}}" class="report-list">
-      <view class="report-card" wx:for="{{reportList}}" wx:key="_id" bindtap="bindViewTap" data-id="{{item._id}}">
+    </block>
+    <block wx:else>
+      <view class="report-item" wx:for="{{list}}" wx:key="_id" bindtap="bindReportTap" data-id="{{item._id}}">
         <view class="report-header">
-          <view class="report-type">{{item.reportType}}</view>
-          <view class="report-date">{{item.reportDate}}</view>
+          <view class="hospital">{{item.hospital}}</view>
+          <view class="date">{{item.reportDate}}</view>
         </view>
         <view class="report-content">
-          <view class="report-hospital">
-            <text class="label">医院：</text>
-            <text class="value">{{item.hospital}}</text>
-          </view>
-          <view class="report-summary">
-            <text class="label">摘要：</text>
-            <text class="value">{{item.summary || '暂无摘要'}}</text>
-          </view>
-          <view class="report-ai-analysis" wx:if="{{item.aiAnalysis}}">
-            <text class="label">AI分析：</text>
-            <text class="value">{{item.aiAnalysis.suggestion || '暂无AI分析'}}</text>
-          </view>
+          <view class="type">{{item.reportType}}</view>
+          <view class="summary">{{item.summary}}</view>
         </view>
         <view class="report-footer">
-          <text class="report-more">点击查看详情 ></text>
+          <view class="status {{item.status == 1 ? 'warning' : ''}}">
+            {{item.status == 1 ? '需要关注' : '正常'}}
+          </view>
+          <view class="view-detail">查看详情 ></view>
         </view>
       </view>
-    </view>
+    </block>
   </view>
 
-  <view class="btn-add-wrap">
-    <button class="btn-add" bindtap="bindUploadTap">
-      <text class="icon-add">+</text> 上传体检报告
-    </button>
+  <!-- 底部上传按钮 -->
+  <view class="float-btn" bindtap="bindUploadTap">
+    <image class="icon-add" src="/images/icon/add.png"></image>
+    <text>上传体检报告</text>
   </view>
 </view>
 
