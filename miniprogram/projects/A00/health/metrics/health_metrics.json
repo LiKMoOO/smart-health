@@ -1,0 +1,6 @@
+{
+  "usingComponents": {},
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f6fa",
+  "navigationBarTitleText": "健康指标"
+} 

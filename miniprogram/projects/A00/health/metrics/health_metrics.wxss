@@ -1,0 +1,411 @@
+/* projects/A00/health/metrics/health_metrics.wxss */
+
+.container {
+  min-height: 100vh;
+  background-color: #f5f6fa;
+  padding-bottom: 30rpx;
+}
+
+/* 顶部标题 */
+.header {
+  background: linear-gradient(135deg, #4168E0 0%, #2858DF 100%);
+  padding: 40rpx 30rpx 50rpx;
+  color: #fff;
+  border-radius: 0 0 30rpx 30rpx;
+}
+
+.title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.desc {
+  font-size: 26rpx;
+  opacity: 0.8;
+}
+
+/* 指标类型选择 */
+.type-selector {
+  margin: -30rpx 20rpx 20rpx;
+  position: relative;
+  z-index: 10;
+}
+
+.type-scroll {
+  background-color: #fff;
+  border-radius: 15rpx;
+  padding: 15rpx 0;
+  box-shadow: 0 5rpx 20rpx rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+  display: flex;
+}
+
+.type-item {
+  display: inline-flex;
+  padding: 15rpx 30rpx;
+  font-size: 28rpx;
+  color: #666;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.type-item.active {
+  color: #2858DF;
+  font-weight: bold;
+}
+
+.type-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30rpx;
+  height: 6rpx;
+  background-color: #2858DF;
+  border-radius: 3rpx;
+}
+
+/* 操作按钮栏 */
+.action-bar {
+  margin: 20rpx;
+  display: flex;
+  justify-content: space-between;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 15rpx 0;
+  background-color: #fff;
+  border-radius: 10rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+  margin: 0 10rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.action-btn:first-child {
+  margin-left: 0;
+}
+
+.action-btn:last-child {
+  margin-right: 0;
+}
+
+.icon-add, .icon-filter, .icon-chart {
+  font-size: 32rpx;
+  margin-bottom: 5rpx;
+}
+
+.icon-add {
+  color: #2858DF;
+}
+
+.icon-filter {
+  color: #ff8c00;
+}
+
+.icon-chart {
+  color: #3366cc;
+}
+
+/* 列表展示 */
+.list-view {
+  margin: 20rpx;
+}
+
+.record-list {
+  margin-bottom: 20rpx;
+}
+
+.record-item {
+  background-color: #fff;
+  border-radius: 15rpx;
+  padding: 20rpx;
+  margin-bottom: 15rpx;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.record-date {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10rpx;
+}
+
+.date {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.record-value {
+  font-size: 38rpx;
+  color: #2858DF;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.unit {
+  font-size: 24rpx;
+  color: #999;
+  margin-left: 5rpx;
+  font-weight: normal;
+}
+
+.record-notes {
+  font-size: 24rpx;
+  color: #666;
+  background-color: #f9f9f9;
+  padding: 10rpx 15rpx;
+  border-radius: 8rpx;
+}
+
+/* 图表展示 */
+.chart-view {
+  margin: 20rpx;
+  background-color: #fff;
+  border-radius: 15rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  height: 400rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #999;
+}
+
+.chart-desc {
+  font-size: 24rpx;
+  margin-top: 10rpx;
+}
+
+/* 空态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+  background-color: #fff;
+  border-radius: 15rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.empty-image {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 加载中 */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.loading-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border: 8rpx solid #f3f3f3;
+  border-top: 8rpx solid #2858DF;
+  border-radius: 50%;
+  margin-bottom: 20rpx;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 弹窗样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  position: relative;
+  width: 85%;
+  max-height: 85vh;
+  background-color: #fff;
+  border-radius: 15rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.modal-header {
+  padding: 25rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  border-bottom: 1rpx solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  font-size: 40rpx;
+  color: #999;
+}
+
+.modal-body {
+  flex: 1;
+  padding: 25rpx;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 20rpx 25rpx;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+/* 表单样式 */
+.form-group {
+  margin-bottom: 20rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.value-input-group {
+  display: flex;
+  align-items: center;
+}
+
+.form-input, .form-picker, .form-textarea {
+  flex: 1;
+  height: 80rpx;
+  border: 1rpx solid #e5e5e5;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+  font-size: 28rpx;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+.unit-text {
+  margin-left: 10rpx;
+  font-size: 28rpx;
+  color: #666;
+  width: 80rpx;
+}
+
+.form-picker {
+  display: flex;
+  align-items: center;
+}
+
+.form-textarea {
+  height: 160rpx;
+  padding: 20rpx;
+  line-height: 1.5;
+}
+
+.btn-cancel, .btn-submit, .btn-delete, .btn-close {
+  padding: 15rpx 30rpx;
+  font-size: 28rpx;
+  border-radius: 8rpx;
+  margin-left: 20rpx;
+}
+
+.btn-cancel, .btn-close {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.btn-submit {
+  background-color: #2858DF;
+  color: #fff;
+}
+
+.btn-delete {
+  background-color: #ff6b6b;
+  color: #fff;
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* 详情样式 */
+.detail-item {
+  display: flex;
+  padding: 15rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  width: 180rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.detail-value {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+} 

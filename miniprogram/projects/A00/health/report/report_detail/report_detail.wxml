@@ -1,0 +1,98 @@
+<view class="main">
+  <view class="top-bar bar">
+    <view class="title">体检报告详情</view>
+  </view>
+
+  <view wx:if="{{!isLoad}}" class="loading">
+    <view class="loading-icon"></view>
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <block wx:elif="{{isLoad && report}}">
+    <view class="report-header">
+      <view class="report-type">{{report.reportType}}</view>
+      <view class="report-date">{{report.reportDate}}</view>
+      <view class="report-hospital">体检医院：{{report.hospital}}</view>
+    </view>
+
+    <view class="report-section">
+      <view class="section-title">报告摘要</view>
+      <view class="section-content">
+        {{report.summary || '无报告摘要'}}
+      </view>
+    </view>
+
+    <view class="report-section" wx:if="{{report.reportItems && report.reportItems.length > 0}}">
+      <view class="section-title">检测项目</view>
+      <view wx:for="{{report.reportItems}}" wx:key="name" class="item-category">
+        <view class="category-name">{{item.name}}</view>
+        <view class="item-list">
+          <view wx:for="{{item.items}}" wx:key="name" wx:for-item="subItem" class="test-item {{subItem.abnormal ? 'abnormal' : ''}}">
+            <view class="item-name">{{subItem.name}}</view>
+            <view class="item-value">
+              {{subItem.value}}
+              <text wx:if="{{subItem.unit}}" class="item-unit">{{subItem.unit}}</text>
+            </view>
+            <view class="item-range">参考范围：{{subItem.referenceRange || '-'}}</view>
+            <view wx:if="{{subItem.abnormal}}" class="item-status">异常</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="report-section" wx:if="{{report.aiAnalysis}}">
+      <view class="section-title">AI分析</view>
+      <view class="section-content ai-analysis" bindtap="bindViewAiResult">
+        <view class="ai-suggestion">{{report.aiAnalysis.suggestion}}</view>
+        <view class="ai-risk">
+          <text class="label">健康风险：</text>
+          <text class="value {{report.aiAnalysis.riskLevel === '高' ? 'high' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'low')}}">{{report.aiAnalysis.riskLevel}}</text>
+        </view>
+        <view class="ai-more">点击查看详细分析</view>
+      </view>
+    </view>
+
+    <view class="btn-group">
+      <button class="btn-primary" bindtap="bindViewFileTap">查看原始报告</button>
+      <button class="btn-default" bindtap="bindAnalyzeByAI" wx:if="{{!report.aiAnalysis}}">AI 智能分析</button>
+      <button class="btn-default" bindtap="bindViewAiResult" wx:else>查看 AI 分析结果</button>
+    </view>
+  </block>
+
+  <view wx:elif="{{isLoad && !report}}" class="no-data">
+    <view class="icon-no-data">
+      <image src="../../../../images/icon/no-data.png" mode="aspectFit"></image>
+    </view>
+    <view class="text-no-data">报告不存在或已被删除</view>
+  </view>
+
+  <!-- AI分析结果弹窗 -->
+  <view class="modal" wx:if="{{showAiResult && report.aiAnalysis}}">
+    <view class="modal-mask" bindtap="bindCloseAiResult"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <view class="modal-title">AI 健康分析报告</view>
+        <view class="modal-close" bindtap="bindCloseAiResult">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="ai-result-section">
+          <view class="ai-result-title">健康建议</view>
+          <view class="ai-result-content">{{report.aiAnalysis.suggestion}}</view>
+        </view>
+        <view class="ai-result-section">
+          <view class="ai-result-title">健康风险</view>
+          <view class="ai-result-content">
+            <text class="ai-risk-level {{report.aiAnalysis.riskLevel === '高' ? 'high' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'low')}}">{{report.aiAnalysis.riskLevel}}</text>
+          </view>
+        </view>
+        <view class="ai-result-section">
+          <view class="ai-result-title">详细分析</view>
+          <view class="ai-result-content ai-details">{{report.aiAnalysis.details}}</view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-close" bindtap="bindCloseAiResult">关闭</button>
+      </view>
+    </view>
+  </view>
+</view> 

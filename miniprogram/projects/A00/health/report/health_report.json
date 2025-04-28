@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    
+  },
+  "enablePullDownRefresh": true,
+  "navigationBarTitleText": "体检报告",
+  "navigationBarBackgroundColor": "#3894FF",
+  "navigationBarTextStyle": "white"
+} 

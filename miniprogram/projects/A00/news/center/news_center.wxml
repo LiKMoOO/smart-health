@@ -1,0 +1,32 @@
+<view class="main">
+  <view class="top-bar">
+    <view class="header">
+      <view class="title">最新动态</view>
+      <view class="nav-btn" bindtap="gotoHealthKnowledge">
+        <text>体检知识</text>
+        <text class="icon">></text>
+      </view>
+    </view>
+  </view>
+
+  <view class="content">
+    <!-- 最新动态列表 -->
+    <view wx:if="{{!newsList || newsList.length == 0}}" class="no-data">
+      <text class="no-data-text">暂无最新动态</text>
+    </view>
+    <block wx:else>
+      <view class="news-list">
+        <view class="news-item" wx:for="{{newsList}}" wx:key="index" bindtap="gotoDetail" data-id="{{item._id}}">
+          <view class="news-pic">
+            <image class="loading" mode="aspectFill" src="{{item.pic}}"></image>
+          </view>
+          <view class="news-info">
+            <view class="news-title">{{item.title}}</view>
+            <view class="news-desc">{{item.desc}}</view>
+            <view class="news-time">{{item.time}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view> 

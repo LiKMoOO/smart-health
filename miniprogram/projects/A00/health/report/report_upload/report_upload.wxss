@@ -1,0 +1,145 @@
+page {
+  --primary-color: #0080ff;
+  --bg-color: #f5f7fa;
+  --text-color: #333;
+  --text-secondary: #666;
+  --border-color: #eee;
+}
+
+.main {
+  padding: 0 0 100rpx;
+  background-color: var(--bg-color);
+  min-height: 100vh;
+}
+
+.top-bar {
+  background-color: #fff;
+  padding: 20rpx 30rpx;
+  display: flex;
+  align-items: center;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.top-bar .title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.form-box {
+  margin: 30rpx;
+  background-color: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.form-group {
+  position: relative;
+  padding: 30rpx;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.form-group:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-bottom: 10rpx;
+}
+
+.form-input {
+  font-size: 32rpx;
+  color: var(--text-color);
+  width: 100%;
+  padding: 10rpx 0;
+}
+
+.form-textarea {
+  font-size: 32rpx;
+  color: var(--text-color);
+  width: 100%;
+  min-height: 180rpx;
+  padding: 10rpx 0;
+}
+
+.icon-arrow {
+  position: absolute;
+  right: 30rpx;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.icon-right {
+  color: #ccc;
+  font-weight: bold;
+}
+
+.file-upload-box {
+  margin-top: 10rpx;
+  border: 2rpx dashed #ccc;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  text-align: center;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-icon {
+  font-size: 48rpx;
+  color: #ccc;
+  font-weight: bold;
+}
+
+.upload-text {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-top: 10rpx;
+}
+
+.uploaded-file {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-name {
+  font-size: 28rpx;
+  color: var(--text-color);
+  max-width: 450rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-status {
+  font-size: 24rpx;
+  color: var(--primary-color);
+}
+
+.btn-submit-wrap {
+  padding: 30rpx;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.btn-submit {
+  background-color: var(--primary-color);
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 12rpx;
+  width: 100%;
+  padding: 20rpx 0;
+  text-align: center;
+} 

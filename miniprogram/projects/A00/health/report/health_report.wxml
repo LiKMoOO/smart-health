@@ -1,0 +1,118 @@
+<!--projects/A00/health/report/health_report.wxml-->
+<view class="main">
+  <view class="top-bar bar">
+    <view class="title">体检报告</view>
+  </view>
+
+  <view class="reports">
+    <view wx:if="{{isLoad && reportList.length == 0}}" class="no-data">
+      <view class="icon-no-data">
+        <image src="../../../images/icon/no-data.png" mode="aspectFit"></image>
+      </view>
+      <view class="text-no-data">暂无体检报告记录</view>
+    </view>
+
+    <view wx:if="{{isLoad && reportList.length > 0}}" class="report-list">
+      <view class="report-card" wx:for="{{reportList}}" wx:key="_id" bindtap="bindViewTap" data-id="{{item._id}}">
+        <view class="report-header">
+          <view class="report-type">{{item.reportType}}</view>
+          <view class="report-date">{{item.reportDate}}</view>
+        </view>
+        <view class="report-content">
+          <view class="report-hospital">
+            <text class="label">医院：</text>
+            <text class="value">{{item.hospital}}</text>
+          </view>
+          <view class="report-summary">
+            <text class="label">摘要：</text>
+            <text class="value">{{item.summary || '暂无摘要'}}</text>
+          </view>
+          <view class="report-ai-analysis" wx:if="{{item.aiAnalysis}}">
+            <text class="label">AI分析：</text>
+            <text class="value">{{item.aiAnalysis.suggestion || '暂无AI分析'}}</text>
+          </view>
+        </view>
+        <view class="report-footer">
+          <text class="report-more">点击查看详情 ></text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="btn-add-wrap">
+    <button class="btn-add" bindtap="bindUploadTap">
+      <text class="icon-add">+</text> 上传体检报告
+    </button>
+  </view>
+</view>
+
+<!-- 上传报告弹窗 -->
+<view class="modal" wx:if="{{showUploadModal}}">
+  <view class="modal-content">
+    <view class="modal-header">
+      <text>上传体检报告</text>
+      <view class="close-btn" bindtap="onCloseUploadModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">体检日期</text>
+        <picker mode="date" value="{{formReport.reportDate}}" bindchange="onReportInput" data-field="reportDate">
+          <view class="picker">{{formReport.reportDate || '请选择体检日期'}}</view>
+        </picker>
+      </view>
+      <view class="form-group">
+        <text class="form-label">医院/机构</text>
+        <input class="form-input" value="{{formReport.hospital}}" bindinput="onReportInput" data-field="hospital" placeholder="请输入医院或体检机构名称" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">体检类型</text>
+        <input class="form-input" value="{{formReport.reportType}}" bindinput="onReportInput" data-field="reportType" placeholder="如: 年度体检、入职体检等" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">报告概述</text>
+        <textarea class="form-textarea" value="{{formReport.summary}}" bindinput="onReportInput" data-field="summary" placeholder="简要描述体检结果，如有异常项可在此说明" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">报告文件</text>
+        <view class="file-selector" bindtap="chooseReportFile">
+          <text class="file-name" wx:if="{{reportFileName}}">{{reportFileName}}</text>
+          <text class="file-placeholder" wx:else>点击选择文件(PDF/图片)</text>
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-cancel" bindtap="onCloseUploadModal">取消</button>
+      <button class="btn-save" bindtap="onSaveReport">保存</button>
+    </view>
+  </view>
+</view>
+
+<!-- 异常分析弹窗 -->
+<view class="modal" wx:if="{{showAnalysisModal}}">
+  <view class="modal-content">
+    <view class="modal-header">
+      <text>异常项目分析</text>
+      <view class="close-btn" bindtap="onCloseAnalysisModal">×</view>
+    </view>
+    <view class="modal-body">
+      <view class="abnormal-list">
+        <view class="abnormal-item" wx:for="{{abnormalItems}}" wx:key="name">
+          <view class="abnormal-header">
+            <text class="category">{{item.category}}</text>
+            <text class="name">{{item.name}}</text>
+          </view>
+          <view class="abnormal-value">
+            <text>检测值: {{item.value}}{{item.unit}}</text>
+            <text>参考范围: {{item.referenceRange}}</text>
+          </view>
+          <view class="abnormal-analysis">
+            <text>{{item.analysis || '暂无分析建议'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn-ok" bindtap="onCloseAnalysisModal">确定</button>
+    </view>
+  </view>
+</view>

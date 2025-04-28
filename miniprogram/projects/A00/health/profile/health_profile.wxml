@@ -1,0 +1,236 @@
+<!--projects/A00/health/profile/health_profile.wxml-->
+<view class="main">
+  <!-- 页面标题 -->
+  <view class="top-header" style="width: 671rpx; height: 220rpx; display: block; box-sizing: border-box; left: 0rpx; top: 0rpx">
+    <view class="header-content">
+      <view class="title">健康档案</view>
+      <view class="desc">记录您的基本健康信息</view>
+    </view>
+    <!-- 添加装饰元素 -->
+    <view class="header-decoration">
+      <view class="circle-1"></view>
+      <view class="circle-2"></view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{!isLoad}}">
+    <view class="loading-icon"></view>
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 主要内容区域 -->
+  <block wx:if="{{isLoad}}">
+    <!-- 基本信息 -->
+    <view class="card basic-info">
+      <view class="card-title">
+        <view class="title-text">基本信息</view>
+        <view class="edit-btn" bindtap="onEditBasicInfo">
+          <text class="icon-edit"></text>编辑
+        </view>
+      </view>
+      <view class="card-content" wx:if="{{!editBasicInfo}}">
+        <view class="info-item">
+          <text class="label">身高</text>
+          <text class="value">{{profile.basicInfo.height || '--'}} cm</text>
+        </view>
+        <view class="info-item">
+          <text class="label">体重</text>
+          <text class="value">{{profile.basicInfo.weight || '--'}} kg</text>
+        </view>
+        <view class="info-item">
+          <text class="label">出生日期</text>
+          <text class="value">{{profile.basicInfo.birthDate || '--'}}</text>
+        </view>
+        <view class="info-item">
+          <text class="label">性别</text>
+          <text class="value">{{profile.basicInfo.gender === 'male' ? '男' : (profile.basicInfo.gender === 'female' ? '女' : '--')}}</text>
+        </view>
+        <view class="info-item">
+          <text class="label">血型</text>
+          <text class="value">{{profile.basicInfo.bloodType || '--'}}</text>
+        </view>
+      </view>
+      <view class="card-edit" wx:if="{{editBasicInfo}}">
+        <view class="form-group">
+          <text class="form-label">身高 (cm)</text>
+          <input class="form-input" type="digit" value="{{formBasicInfo.height}}" bindinput="onBasicInfoInput" data-field="height" placeholder="请输入身高" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">体重 (kg)</text>
+          <input class="form-input" type="digit" value="{{formBasicInfo.weight}}" bindinput="onBasicInfoInput" data-field="weight" placeholder="请输入体重" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">出生日期</text>
+          <picker mode="date" value="{{formBasicInfo.birthDate}}" bindchange="onBasicInfoInput" data-field="birthDate">
+            <view class="picker">{{formBasicInfo.birthDate || '请选择出生日期'}}</view>
+          </picker>
+        </view>
+        <view class="form-group">
+          <text class="form-label">性别</text>
+          <picker range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+            <view class="picker">{{genderOptions[genderIndex]}}</view>
+          </picker>
+        </view>
+        <view class="form-group">
+          <text class="form-label">血型</text>
+          <picker range="{{bloodTypeOptions}}" value="{{bloodTypeIndex}}" bindchange="onBloodTypeChange">
+            <view class="picker">{{bloodTypeOptions[bloodTypeIndex]}}</view>
+          </picker>
+        </view>
+        <view class="form-actions">
+          <button class="btn-cancel" bindtap="onCancelBasicInfo">取消</button>
+          <button class="btn-save" bindtap="onSaveBasicInfo">保存</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 既往病史 -->
+    <view class="card medical-history">
+      <view class="card-title">
+        <view class="title-text">既往病史</view>
+        <view class="add-btn" bindtap="onAddMedicalHistory">
+          <text class="icon-add"></text>添加
+        </view>
+      </view>
+      <view class="card-content">
+        <view class="empty-tip" wx:if="{{!profile.medicalHistory || profile.medicalHistory.length === 0}}">
+          <text>暂无既往病史记录</text>
+        </view>
+        <view class="history-list" wx:else>
+          <view class="history-item" wx:for="{{profile.medicalHistory}}" wx:key="index">
+            <view class="history-info">
+              <view class="history-name">{{item.condition}}</view>
+              <view class="history-date">确诊时间: {{item.diagnosisDate || '未知'}}</view>
+              <view class="history-notes" wx:if="{{item.notes}}">备注: {{item.notes}}</view>
+            </view>
+            <view class="history-actions">
+              <view class="action-btn edit" bindtap="onEditMedicalHistory" data-index="{{index}}">编辑</view>
+              <view class="action-btn delete" bindtap="onDeleteMedicalHistory" data-index="{{index}}">删除</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 过敏史 -->
+    <view class="card allergies">
+      <view class="card-title">
+        <view class="title-text">过敏史</view>
+        <view class="add-btn" bindtap="onAddAllergy">
+          <text class="icon-add"></text>添加
+        </view>
+      </view>
+      <view class="card-content">
+        <view class="empty-tip" wx:if="{{!profile.allergies || profile.allergies.length === 0}}">
+          <text>暂无过敏史记录</text>
+        </view>
+        <view class="allergy-list" wx:else>
+          <view class="allergy-item" wx:for="{{profile.allergies}}" wx:key="index">
+            <text>{{item}}</text>
+            <view class="delete-btn" bindtap="onDeleteAllergy" data-index="{{index}}">
+              <text class="icon-delete"></text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 紧急联系人 -->
+    <view class="card emergency-contact">
+      <view class="card-title">
+        <view class="title-text">紧急联系人</view>
+        <view class="edit-btn" bindtap="onEditEmergencyContact">
+          <text class="icon-edit"></text>编辑
+        </view>
+      </view>
+      <view class="card-content" wx:if="{{!editEmergencyContact}}">
+        <view class="empty-tip" wx:if="{{!profile.emergencyContact || !profile.emergencyContact.name}}">
+          <text>暂未设置紧急联系人</text>
+        </view>
+        <block wx:else>
+          <view class="info-item">
+            <text class="label">姓名</text>
+            <text class="value">{{profile.emergencyContact.name}}</text>
+          </view>
+          <view class="info-item">
+            <text class="label">关系</text>
+            <text class="value">{{profile.emergencyContact.relation}}</text>
+          </view>
+          <view class="info-item">
+            <text class="label">电话</text>
+            <text class="value">{{profile.emergencyContact.phone}}</text>
+          </view>
+        </block>
+      </view>
+      <view class="card-edit" wx:if="{{editEmergencyContact}}">
+        <view class="form-group">
+          <text class="form-label">姓名</text>
+          <input class="form-input" value="{{formEmergencyContact.name}}" bindinput="onEmergencyContactInput" data-field="name" placeholder="请输入联系人姓名" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">关系</text>
+          <input class="form-input" value="{{formEmergencyContact.relation}}" bindinput="onEmergencyContactInput" data-field="relation" placeholder="请输入与联系人关系" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">电话</text>
+          <input class="form-input" type="number" value="{{formEmergencyContact.phone}}" bindinput="onEmergencyContactInput" data-field="phone" placeholder="请输入联系人电话" />
+        </view>
+        <view class="form-actions">
+          <button class="btn-cancel" bindtap="onCancelEmergencyContact">取消</button>
+          <button class="btn-save" bindtap="onSaveEmergencyContact">保存</button>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 医疗历史添加/编辑弹窗 -->
+  <view class="modal" wx:if="{{showMedicalHistoryModal}}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <text>{{editMedicalHistoryIndex !== null ? '编辑病史' : '添加病史'}}</text>
+        <view class="close-btn" bindtap="onCloseMedicalHistoryModal">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">疾病名称</text>
+          <input class="form-input" value="{{formMedicalHistory.condition}}" bindinput="onMedicalHistoryInput" data-field="condition" placeholder="请输入疾病名称" />
+        </view>
+        <view class="form-group">
+          <text class="form-label">确诊时间</text>
+          <picker mode="date" value="{{formMedicalHistory.diagnosisDate}}" bindchange="onMedicalHistoryInput" data-field="diagnosisDate">
+            <view class="picker">{{formMedicalHistory.diagnosisDate || '请选择确诊日期'}}</view>
+          </picker>
+        </view>
+        <view class="form-group">
+          <text class="form-label">备注</text>
+          <textarea class="form-textarea" value="{{formMedicalHistory.notes}}" bindinput="onMedicalHistoryInput" data-field="notes" placeholder="请输入备注信息" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="onCloseMedicalHistoryModal">取消</button>
+        <button class="btn-save" bindtap="onSaveMedicalHistory">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 过敏史添加弹窗 -->
+  <view class="modal" wx:if="{{showAllergyModal}}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <text>添加过敏史</text>
+        <view class="close-btn" bindtap="onCloseAllergyModal">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">过敏物</text>
+          <input class="form-input" value="{{formAllergy}}" bindinput="onAllergyInput" placeholder="请输入过敏物名称" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="onCloseAllergyModal">取消</button>
+        <button class="btn-save" bindtap="onSaveAllergy">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

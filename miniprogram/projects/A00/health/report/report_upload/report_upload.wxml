@@ -1,0 +1,55 @@
+<view class="main">
+  <view class="top-bar bar">
+    <view class="title">上传体检报告</view>
+  </view>
+
+  <view class="form-box">
+    <view class="form-group">
+      <view class="form-label">体检日期</view>
+      <picker mode="date" value="{{reportDate}}" bindchange="bindDateChange">
+        <view class="form-input">{{reportDate || '请选择体检日期'}}</view>
+      </picker>
+      <view class="icon-arrow">
+        <text class="icon-right">></text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">医院名称</view>
+      <input class="form-input" placeholder="请输入医院名称" value="{{hospital}}" bindinput="bindHospitalInput"></input>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">报告类型</view>
+      <picker mode="selector" range="{{reportTypeOptions}}" bindchange="bindReportTypeChange">
+        <view class="form-input">{{reportType || '请选择报告类型'}}</view>
+      </picker>
+      <view class="icon-arrow">
+        <text class="icon-right">></text>
+      </view>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">报告摘要</view>
+      <textarea class="form-textarea" placeholder="请输入报告概述或主要结论" value="{{summary}}" bindinput="bindSummaryInput" maxlength="200"></textarea>
+    </view>
+
+    <view class="form-group">
+      <view class="form-label">上传报告文件</view>
+      <view class="file-upload-box" bindtap="bindChooseFile">
+        <view wx:if="{{!reportFileId}}" class="upload-placeholder">
+          <view class="upload-icon">+</view>
+          <view class="upload-text">点击上传PDF/图片文件</view>
+        </view>
+        <view wx:else class="uploaded-file">
+          <view class="file-name">{{reportFileName}}</view>
+          <view class="file-status">已上传</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="btn-submit-wrap">
+    <button class="btn-submit" bindtap="bindFormSubmit">提交</button>
+  </view>
+</view> 

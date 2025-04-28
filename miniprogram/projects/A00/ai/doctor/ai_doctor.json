@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "AI医生助手",
+  "enablePullDownRefresh": false,
+  "navigationBarBackgroundColor": "#2858DF",
+  "navigationBarTextStyle": "white",
+  "usingComponents": {
+  }
+} 

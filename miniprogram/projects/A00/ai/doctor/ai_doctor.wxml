@@ -1,0 +1,38 @@
+<view class="main">
+  <scroll-view scroll-y="{{true}}" class="chat-container" scroll-into-view="{{lastId}}" scroll-with-animation="{{true}}">
+    <view class="chat-list">
+      <block wx:for="{{chatList}}" wx:key="index">
+        <view id="msg-{{index}}" class="chat-item {{item.role === 'user' ? 'chat-item-user' : 'chat-item-ai'}}">
+          <view class="avatar">
+            <image src="{{item.role === 'user' ? userAvatar : botAvatar}}"></image>
+          </view>
+          <view class="content">
+            <text>{{item.content}}</text>
+          </view>
+        </view>
+      </block>
+      <view class="loading" wx:if="{{loading}}">
+        <text>AI医生正在思考中...</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="input-container">
+    <view class="input-area">
+      <input class="input" value="{{inputContent}}" bindinput="inputChange" bindconfirm="onKeyboardConfirm" placeholder="请在此输入您的健康问题..." confirm-type="send" cursor-spacing="10"></input>
+    </view>
+    <view class="send-btn {{inputContent ? 'active' : ''}}" bindtap="sendMessage">
+      <text class="send-text">发送</text>
+    </view>
+  </view>
+
+  <view class="hint-container">
+    <view class="hint-title">您可以问AI医生:</view>
+    <view class="hint-items">
+      <view class="hint-item" bindtap="tapHint" data-text="我最近老是感到疲劳，可能是什么原因？">我最近老是感到疲劳，可能是什么原因？</view>
+      <view class="hint-item" bindtap="tapHint" data-text="体检前需要空腹吗？">体检前需要空腹吗？</view>
+      <view class="hint-item" bindtap="tapHint" data-text="体检报告中肝功能指标偏高怎么办？">体检报告中肝功能指标偏高怎么办？</view>
+      <view class="hint-item" bindtap="tapHint" data-text="哪些生活习惯有助于保持健康？">哪些生活习惯有助于保持健康？</view>
+    </view>
+  </view>
+</view> 
