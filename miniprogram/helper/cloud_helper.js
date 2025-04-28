@@ -104,8 +104,6 @@
  			})
  	}
 
-
-
  	let token = '';
  	// 管理员token
  	if (route.indexOf('admin/') > -1) {
@@ -121,14 +119,19 @@
 
  		let PID = pageHelper.getPID();
 
+ 		// 修正：将params对象的内容平铺到data中，避免多包一层params
+ 		let data = {
+ 			route: route,
+ 			token,
+ 			PID
+ 		};
+ 		if (params && typeof params === 'object') {
+ 			Object.assign(data, params);
+ 		}
+
  		wx.cloud.callFunction({
  			name: 'cloud',
- 			data: {
- 				route: route,
- 				token,
- 				PID,
- 				params
- 			},
+ 			data: data,
  			success: function (res) {
  				if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA) {
  					console.log(res)
