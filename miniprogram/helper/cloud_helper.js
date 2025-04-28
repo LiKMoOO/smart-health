@@ -119,13 +119,22 @@
 
  		let PID = pageHelper.getPID();
 
- 		// 修正：确保params作为单独字段传递
+ 		// 统一使用params字段传递所有参数
  		let data = {
- 			route: route,
+ 			route, // 实际路由
  			token,
- 			PID,
- 			params // 将params作为单独字段传递
+ 			PID
  		};
+
+ 		// 区分不同模块的参数处理方式
+ 		if (route === 'medicalReport') {
+ 			// medicalReport模块使用action和params参数
+ 			data.action = params.action;
+ 			data.params = params.params || {};
+ 		} else {
+ 			// 其他模块直接将params作为参数
+ 			data.params = params;
+ 		}
 
  		wx.cloud.callFunction({
  			name: 'cloud',

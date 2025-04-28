@@ -6,6 +6,20 @@ const TcbRouter = require('tcb-router');
 
 // 云函数入口函数
 exports.main = async (event, context) => {
+	console.log(event);
+	
+	// 处理cloud路由请求，从params中获取真正的路由
+	if (event.route === 'cloud' && event.params && event.params.route) {
+		// 修改event对象的route，使其指向真正的目标路由
+		event.route = event.params.route;
+		
+		// 如果是medicalReport模块，将action和params提取到顶层
+		if (event.params.route === 'medicalReport') {
+			event.action = event.params.action;
+			event.params = event.params.params || {};
+		}
+	}
+	
 	// 添加AI医生路由
 	if (event.route == 'ai/doctor') {
 		try {
@@ -45,7 +59,7 @@ exports.main = async (event, context) => {
 			
 			// 注入用户ID，确保每个请求都有用户标识
 			// 优先使用params中的userId，如果没有则使用token或微信OPENID
-			if (!params.userId) {
+			if (params && !params.userId) {
 				params.userId = event.token || wxContext.OPENID || '';
 			}
 			
@@ -55,25 +69,25 @@ exports.main = async (event, context) => {
 					// 动态引入控制器，避免启动时加载错误
 					// 该控制器负责获取用户的体检报告列表，支持分页
 					const getReportList = require('./project/controller/medical_report/get_report_list');
-					return await getReportList.main(params);
+					return await getReportList.main(params || {});
 					
 				case 'uploadReport':
 					// 该控制器负责处理用户上传的体检报告
 					// 包括保存报告基本信息和文件ID
 					const uploadReport = require('./project/controller/medical_report/upload_report');
-					return await uploadReport.main(params);
+					return await uploadReport.main(params || {});
 					
 				case 'getReportDetail':
 					// 该控制器负责获取单个体检报告的详细信息
 					// 包括基本信息、检查项目和AI分析结果(如果有)
 					const getReportDetail = require('./project/controller/medical_report/get_report_detail');
-					return await getReportDetail.main(params);
+					return await getReportDetail.main(params || {});
 					
 				case 'analyzeReportByAI':
 					// 该控制器负责对体检报告进行AI分析
 					// 生成健康评估和建议
 					const analyzeReportByAI = require('./project/controller/medical_report/analyze_report_by_ai');
-					return await analyzeReportByAI.main(params);
+					return await analyzeReportByAI.main(params || {});
 					
 				default:
 					// 处理未知操作类型

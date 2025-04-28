@@ -65,13 +65,13 @@ module.exports = Behavior({
       }
       try {
         wx.showLoading({ title: '上传中...', mask: true });
-        const params = { userId, reportDate, hospital, reportType, summary, reportFileId };
-        const result = await cloudHelper.callCloudData('cloud', {
-          PID: 'A00',
-          route: 'medicalReport',
+        // 准备参数
+        const params = {
           action: 'uploadReport',
-          params
-        });
+          params: { userId, reportDate, hospital, reportType, summary, reportFileId }
+        };
+        // 使用新的方式调用云函数
+        const result = await cloudHelper.callCloudData('medicalReport', params);
         wx.hideLoading();
         if (result && result.code === 0) {
           pageHelper.showSuccToast('上传成功');
