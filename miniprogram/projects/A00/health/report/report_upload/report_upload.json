@@ -1,5 +1,6 @@
 {
   "usingComponents": {},
   "navigationBarTitleText": "上传体检报告",
-  "enablePullDownRefresh": false
+  "navigationBarBackgroundColor": "#3894FF",
+  "navigationBarTextStyle": "white"
 } 

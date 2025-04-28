@@ -119,15 +119,13 @@
 
  		let PID = pageHelper.getPID();
 
- 		// 修正：将params对象的内容平铺到data中，避免多包一层params
+ 		// 修正：确保params作为单独字段传递
  		let data = {
  			route: route,
  			token,
- 			PID
+ 			PID,
+ 			params // 将params作为单独字段传递
  		};
- 		if (params && typeof params === 'object') {
- 			Object.assign(data, params);
- 		}
 
  		wx.cloud.callFunction({
  			name: 'cloud',

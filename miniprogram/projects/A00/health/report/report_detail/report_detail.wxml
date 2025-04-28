@@ -10,60 +10,22 @@
 
   <block wx:elif="{{isLoad && report}}">
     <view class="report-header">
-      <view class="report-type">{{report.reportType}}</view>
-      <view class="report-date">{{report.reportDate}}</view>
-      <view class="report-hospital">体检医院：{{report.hospital}}</view>
+      <view class="hospital">{{report.hospital}}</view>
+      <view class="date">{{report.reportDate}}</view>
     </view>
-
-    <view class="report-section">
-      <view class="section-title">报告摘要</view>
-      <view class="section-content">
-        {{report.summary || '无报告摘要'}}
-      </view>
+    <view class="report-content">
+      <view class="type">{{report.reportType}}</view>
+      <view class="summary">{{report.summary}}</view>
     </view>
-
-    <view class="report-section" wx:if="{{report.reportItems && report.reportItems.length > 0}}">
-      <view class="section-title">检测项目</view>
-      <view wx:for="{{report.reportItems}}" wx:key="name" class="item-category">
-        <view class="category-name">{{item.name}}</view>
-        <view class="item-list">
-          <view wx:for="{{item.items}}" wx:key="name" wx:for-item="subItem" class="test-item {{subItem.abnormal ? 'abnormal' : ''}}">
-            <view class="item-name">{{subItem.name}}</view>
-            <view class="item-value">
-              {{subItem.value}}
-              <text wx:if="{{subItem.unit}}" class="item-unit">{{subItem.unit}}</text>
-            </view>
-            <view class="item-range">参考范围：{{subItem.referenceRange || '-'}}</view>
-            <view wx:if="{{subItem.abnormal}}" class="item-status">异常</view>
-          </view>
-        </view>
-      </view>
-    </view>
-
-    <view class="report-section" wx:if="{{report.aiAnalysis}}">
-      <view class="section-title">AI分析</view>
-      <view class="section-content ai-analysis" bindtap="bindViewAiResult">
-        <view class="ai-suggestion">{{report.aiAnalysis.suggestion}}</view>
-        <view class="ai-risk">
-          <text class="label">健康风险：</text>
-          <text class="value {{report.aiAnalysis.riskLevel === '高' ? 'high' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'low')}}">{{report.aiAnalysis.riskLevel}}</text>
-        </view>
-        <view class="ai-more">点击查看详细分析</view>
-      </view>
-    </view>
-
-    <view class="btn-group">
+    <view class="report-footer">
       <button class="btn-primary" bindtap="bindViewFileTap">查看原始报告</button>
-      <button class="btn-default" bindtap="bindAnalyzeByAI" wx:if="{{!report.aiAnalysis}}">AI 智能分析</button>
-      <button class="btn-default" bindtap="bindViewAiResult" wx:else>查看 AI 分析结果</button>
+      <button class="btn-default" bindtap="bindAnalyzeByAI">AI 智能分析</button>
     </view>
   </block>
 
   <view wx:elif="{{isLoad && !report}}" class="no-data">
-    <view class="icon-no-data">
-      <image src="../../../../images/icon/no-data.png" mode="aspectFit"></image>
-    </view>
-    <view class="text-no-data">报告不存在或已被删除</view>
+    <image class="icon-empty" src="/images/icon/empty.png"></image>
+    <view class="hint">报告不存在或已被删除</view>
   </view>
 
   <!-- AI分析结果弹窗 -->

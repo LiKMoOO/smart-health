@@ -15,9 +15,9 @@ const reportCollection = 'medical_report'
  * @param {String} params.reportDate - 体检日期
  * @param {String} params.hospital - 医院名称
  * @param {String} params.reportType - 报告类型
- * @param {Array} params.reportItems - 报告项目数组
- * @param {String} params.reportFileId - 报告文件云存储ID
  * @param {String} params.summary - 报告摘要
+ * @param {String} params.reportFileId - 报告文件云存储ID
+ * @param {Array} params.reportItems - 报告项目数组（可选）
  * @param {Object} wxContext - 微信上下文
  * @returns {Object} - 返回结果
  */
@@ -46,9 +46,9 @@ exports.main = async (params, wxContext) => {
       reportDate: params.reportDate,
       hospital: params.hospital,
       reportType: params.reportType,
-      reportItems: params.reportItems || [],
-      reportFileId: params.reportFileId,
       summary: params.summary || '',
+      reportFileId: params.reportFileId,
+      reportItems: params.reportItems || [],
       createTime: db.serverDate()
     }
 
