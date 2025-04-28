@@ -127,7 +127,7 @@ Page({
   async _getHealthData() {
     try {
       // 调用云函数获取健康数据
-      const healthData = await cloudHelper.callCloudData('health/gethealthindex', {});
+      // const healthData = await cloudHelper.callCloudData('health/gethealthindex', {});
       
       // 防御性检查，确保返回数据不为空
       if (!healthData) {

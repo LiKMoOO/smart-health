@@ -1,12 +1,13 @@
-const cloudHelper = require('../../../../helper/cloud_helper.js');
-const pageHelper = require('../../../../helper/page_helper.js');
+const cloudHelper = require('../../../../../helper/cloud_helper.js');
+const pageHelper = require('../../../../../helper/page_helper.js');
 
 Page({
   data: {
     isLoad: false,
     reportId: '',
     report: null,
-    showAiResult: false
+    showAiResult: false,
+    isAnalyzing: false
   },
 
   /**
@@ -51,6 +52,18 @@ Page({
         action: 'getReportDetail',
         params
       }, options);
+
+      // 处理风险等级翻译
+      if (result.data && result.data.aiAnalysis && result.data.aiAnalysis.riskLevel) {
+        const riskLevel = result.data.aiAnalysis.riskLevel;
+        let riskLevelZh = '低';
+        if (riskLevel === 'high') {
+          riskLevelZh = '高';
+        } else if (riskLevel === 'medium') {
+          riskLevelZh = '中';
+        }
+        result.data.aiAnalysis.riskLevelZh = riskLevelZh;
+      }
 
       this.setData({
         report: result.data,
@@ -123,8 +136,16 @@ Page({
    * 开始AI分析
    */
   bindAnalyzeByAI: async function () {
+    if (this.data.isAnalyzing) {
+      return;
+    }
+    
+    this.setData({
+      isAnalyzing: true
+    });
+    
     try {
-      pageHelper.showLoading('AI分析中');
+      pageHelper.showLoading('DeepSeek AI分析中');
 
       // 准备要分析的内容
       let reportContent = '';
@@ -159,13 +180,19 @@ Page({
 
       // 显示AI分析结果
       this.setData({
-        showAiResult: true
+        showAiResult: true,
+        isAnalyzing: false
       });
+      
+      pageHelper.showSuccToast('AI分析完成');
 
     } catch (err) {
       pageHelper.hideLoading();
       console.error(err);
       pageHelper.showModal('AI分析失败，请重试');
+      this.setData({
+        isAnalyzing: false
+      });
     }
   },
 
@@ -185,5 +212,15 @@ Page({
     this.setData({
       showAiResult: false
     });
+  },
+  
+  /**
+   * 分享
+   */
+  onShareAppMessage() {
+    return {
+      title: '我的体检报告',
+      path: '/projects/A00/health/report/report_detail/report_detail?id=' + this.data.reportId
+    }
   }
 }) 

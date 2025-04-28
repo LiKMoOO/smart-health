@@ -1,75 +1,72 @@
 page {
-  --primary-color: #0080ff;
-  --bg-color: #f5f7fa;
+  --primary-color: #3894FF;
+  --bg-color: #f5f6fa;
   --text-color: #333;
   --text-secondary: #666;
-  --border-color: #eee;
+  --border-color: #eaeaea;
 }
 
 .main {
   padding: 0 0 100rpx;
   background-color: var(--bg-color);
   min-height: 100vh;
+  padding-bottom: 120rpx;
 }
 
 .top-bar {
-  background-color: #fff;
-  padding: 20rpx 30rpx;
-  display: flex;
-  align-items: center;
-  border-bottom: 1rpx solid var(--border-color);
-}
-
-.top-bar .title {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 40rpx 30rpx;
+  text-align: center;
   font-size: 36rpx;
   font-weight: bold;
-  color: var(--text-color);
+  border-radius: 0 0 30rpx 30rpx;
 }
 
 .form-box {
-  margin: 30rpx;
+  margin: 30rpx 25rpx;
   background-color: #fff;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  border-radius: 20rpx;
+  box-shadow: 0 5rpx 15rpx rgba(0, 0, 0, 0.05);
+  padding: 30rpx;
 }
 
 .form-group {
+  margin-bottom: 30rpx;
   position: relative;
-  padding: 30rpx;
-  border-bottom: 1rpx solid var(--border-color);
-}
-
-.form-group:last-child {
-  border-bottom: none;
 }
 
 .form-label {
-  font-size: 28rpx;
-  color: var(--text-secondary);
-  margin-bottom: 10rpx;
+  font-size: 30rpx;
+  color: var(--text-color);
+  margin-bottom: 15rpx;
+  font-weight: 500;
 }
 
 .form-input {
-  font-size: 32rpx;
+  padding: 25rpx;
+  background-color: #f7f9fc;
+  border-radius: 10rpx;
+  font-size: 28rpx;
   color: var(--text-color);
-  width: 100%;
-  padding: 10rpx 0;
 }
 
 .form-textarea {
-  font-size: 32rpx;
-  color: var(--text-color);
   width: 100%;
-  min-height: 180rpx;
-  padding: 10rpx 0;
+  height: 200rpx;
+  box-sizing: border-box;
+  padding: 25rpx;
+  background-color: #f7f9fc;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  color: var(--text-color);
 }
 
 .icon-arrow {
   position: absolute;
-  right: 30rpx;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 25rpx;
+  bottom: 25rpx;
+  color: #999;
 }
 
 .icon-right {
@@ -78,68 +75,81 @@ page {
 }
 
 .file-upload-box {
-  margin-top: 10rpx;
-  border: 2rpx dashed #ccc;
-  border-radius: 12rpx;
-  padding: 30rpx;
+  background-color: #f7f9fc;
+  border-radius: 10rpx;
+  padding: 40rpx 30rpx;
   text-align: center;
 }
 
 .upload-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  color: #999;
 }
 
 .upload-icon {
-  font-size: 48rpx;
-  color: #ccc;
-  font-weight: bold;
+  font-size: 80rpx;
+  font-weight: 200;
+  margin-bottom: 10rpx;
 }
 
 .upload-text {
   font-size: 28rpx;
-  color: var(--text-secondary);
-  margin-top: 10rpx;
 }
 
 .uploaded-file {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.file-name {
+  font-size: 28rpx;
+  color: var(--primary-color);
+  word-break: break-all;
+}
+
+.file-status {
+  font-size: 26rpx;
+  color: #4caf50;
+}
+
+/* AI分析开关样式 */
+.switch-group {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.file-name {
-  font-size: 28rpx;
-  color: var(--text-color);
-  max-width: 450rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.switch-group .form-label {
+  margin-bottom: 0;
 }
 
-.file-status {
-  font-size: 24rpx;
-  color: var(--primary-color);
+.switch-box {
+  display: flex;
+  align-items: center;
+}
+
+.ai-tips {
+  background-color: #e0eaff;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  margin-bottom: 30rpx;
+}
+
+.ai-tips text {
+  font-size: 26rpx;
+  color: #506690;
+  line-height: 1.5;
 }
 
 .btn-submit-wrap {
-  padding: 30rpx;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #fff;
-  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  padding: 30rpx 30rpx 60rpx;
 }
 
 .btn-submit {
   background-color: var(--primary-color);
   color: #fff;
+  padding: 25rpx 0;
   font-size: 32rpx;
-  border-radius: 12rpx;
-  width: 100%;
-  padding: 20rpx 0;
-  text-align: center;
+  border-radius: 50rpx;
+  box-shadow: 0 5rpx 20rpx rgba(56, 148, 255, 0.3);
 } 

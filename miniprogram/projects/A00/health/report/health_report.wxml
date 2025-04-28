@@ -1,8 +1,5 @@
 <!--projects/A00/health/report/health_report.wxml-->
 <view class="main">
-  <view class="top-bar bar">
-    <view class="title">体检报告</view>
-  </view>
 
   <view class="reports">
     <view wx:if="{{isLoad && reportList.length == 0}}" class="no-data">
@@ -13,12 +10,12 @@
     </view>
 
     <view wx:if="{{isLoad && reportList.length > 0}}" class="report-list">
-      <view class="report-card" wx:for="{{reportList}}" wx:key="_id" bindtap="bindViewTap" data-id="{{item._id}}">
-        <view class="report-header">
+      <view class="report-card" wx:for="{{reportList}}" wx:key="_id">
+        <view class="report-header" bindtap="bindViewTap" data-id="{{item._id}}">
           <view class="report-type">{{item.reportType}}</view>
           <view class="report-date">{{item.reportDate}}</view>
         </view>
-        <view class="report-content">
+        <view class="report-content" bindtap="bindViewTap" data-id="{{item._id}}">
           <view class="report-hospital">
             <text class="label">医院：</text>
             <text class="value">{{item.hospital}}</text>
@@ -28,14 +25,33 @@
             <text class="value">{{item.summary || '暂无摘要'}}</text>
           </view>
           <view class="report-ai-analysis" wx:if="{{item.aiAnalysis}}">
-            <text class="label">AI分析：</text>
+            <view class="ai-risk-tag risk-{{item.aiAnalysis.riskLevel || 'low'}}">
+              {{item.aiAnalysis.riskLevel === 'high' ? '高风险' : (item.aiAnalysis.riskLevel === 'medium' ? '中风险' : '低风险')}}
+            </view>
+            <text class="label">AI建议：</text>
             <text class="value">{{item.aiAnalysis.suggestion || '暂无AI分析'}}</text>
           </view>
         </view>
         <view class="report-footer">
-          <text class="report-more">点击查看详情 ></text>
+          <view class="footer-left" bindtap="bindViewTap" data-id="{{item._id}}">
+            <text class="report-more">查看详情</text>
+          </view>
+          <view class="footer-right">
+            <view class="ai-btn {{item.aiAnalysis ? 'ai-analyzed' : ''}}" bindtap="bindAnalysisTap" data-id="{{item._id}}">
+              <text class="ai-icon">AI</text>
+              <text class="ai-text">{{item.aiAnalysis ? '重新分析' : 'AI分析'}}</text>
+            </view>
+          </view>
         </view>
       </view>
+    </view>
+    
+    <!-- 加载更多 -->
+    <view class="loading-more" wx:if="{{loading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+    <view class="no-more" wx:if="{{noMore && reportList.length > 0}}">
+      <text class="no-more-text">没有更多数据了</text>
     </view>
   </view>
 

@@ -26,6 +26,33 @@ exports.main = async (event, context) => {
 			};
 		}
 	}
+	
+	// 添加体检报告路由
+	if (event.route == 'medicalReport') {
+		try {
+			const { action, params } = event;
+			const wxContext = cloud.getWXContext();
+			
+			// 调用medicalReport云函数
+			return await cloud.callFunction({
+				name: 'medicalReport',
+				data: {
+					action,
+					params: {
+						...params,
+						userId: event.token || wxContext.OPENID || ''
+					}
+				}
+			}).then(res => res.result);
+		} catch (err) {
+			console.error('体检报告路由处理错误:', err);
+			return {
+				code: 500,
+				msg: '服务器繁忙，请稍后再试',
+				err: err.message
+			};
+		}
+	}
 
 	// 处理其他所有原有路由
 	return await application.app(event, context);

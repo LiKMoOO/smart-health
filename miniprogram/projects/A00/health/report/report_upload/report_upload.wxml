@@ -47,6 +47,17 @@
         </view>
       </view>
     </view>
+    
+    <view class="form-group switch-group">
+      <view class="form-label">AI自动分析</view>
+      <view class="switch-box">
+        <switch checked="{{enableAIAnalysis}}" bindchange="bindAIAnalysisChange" color="#3894FF"/>
+      </view>
+    </view>
+    
+    <view class="ai-tips" wx:if="{{enableAIAnalysis}}">
+      <text>开启后，系统将使用DeepSeek AI对您的体检报告进行智能分析，生成健康建议和风险评估。</text>
+    </view>
   </view>
 
   <view class="btn-submit-wrap">
