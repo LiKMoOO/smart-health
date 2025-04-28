@@ -133,7 +133,7 @@
  			name: 'cloud',
  			data: data,
  			success: function (res) {
- 				if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA) {
+ 				if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA&& res.result.code !== 0) {
  					console.log(res)
  					// 逻辑错误&数据校验错误 
  					if (hint) {

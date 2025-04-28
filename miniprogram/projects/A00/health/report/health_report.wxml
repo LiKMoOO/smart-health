@@ -10,14 +10,14 @@
 
   <!-- 报告列表 -->
   <view class="report-list">
-    <block wx:if="{{!list || list.length == 0}}">
+    <block wx:if="{{!reportList || reportList.length == 0}}">
       <view class="no-data">
         <image class="icon-empty" src="/images/icon/empty.png"></image>
         <text class="hint" style="position: relative; left: -100rpx; top: -120rpx">暂无体检报告</text>
       </view>
     </block>
     <block wx:else>
-      <view class="report-item" wx:for="{{list}}" wx:key="_id" bindtap="bindReportTap" data-id="{{item._id}}">
+      <view class="report-item" wx:for="{{reportList}}" wx:key="_id" bindtap="bindReportTap" data-id="{{item._id}}">
         <view class="report-header">
           <view class="hospital">{{item.hospital}}</view>
           <view class="date">{{item.reportDate}}</view>
