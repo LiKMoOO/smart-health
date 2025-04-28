@@ -1,6 +1,6 @@
-const cloudHelper = require('../../../../../helper/cloud_helper.js');
-const pageHelper = require('../../../../../helper/page_helper.js');
-const timeHelper = require('../../../../../helper/time_helper.js');
+const cloudHelper = require('../../../../helper/cloud_helper.js');
+const pageHelper = require('../../../../helper/page_helper.js');
+const timeHelper = require('../../../../helper/time_helper.js');
 
 Page({
   data: {
@@ -11,7 +11,6 @@ Page({
     reportFileId: '',
     reportFileName: '',
     reportItems: [],
-    enableAIAnalysis: true, // 是否开启AI自动分析
 
     // 报告类型选项
     reportTypeOptions: ['常规体检', '年度体检', '健康证体检', '婚前体检', '其他']
@@ -60,15 +59,6 @@ Page({
   bindSummaryInput: function(e) {
     this.setData({
       summary: e.detail.value
-    });
-  },
-
-  /**
-   * 切换AI自动分析
-   */
-  bindAIAnalysisChange: function(e) {
-    this.setData({
-      enableAIAnalysis: e.detail.value
     });
   },
 
@@ -137,8 +127,7 @@ Page({
         reportType: this.data.reportType,
         reportItems: this.data.reportItems,
         reportFileId: this.data.reportFileId,
-        summary: this.data.summary,
-        enableAIAnalysis: this.data.enableAIAnalysis
+        summary: this.data.summary
       };
       
       let options = {

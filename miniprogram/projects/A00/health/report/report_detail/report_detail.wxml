@@ -40,23 +40,21 @@
       </view>
     </view>
 
-    <view class="report-section ai-section" wx:if="{{report.aiAnalysis}}">
-      <view class="section-title">AI智能分析 <text class="deepseek-tag">DeepSeek</text></view>
+    <view class="report-section" wx:if="{{report.aiAnalysis}}">
+      <view class="section-title">AI分析</view>
       <view class="section-content ai-analysis" bindtap="bindViewAiResult">
-        <view class="ai-risk-badge risk-{{report.aiAnalysis.riskLevel || 'low'}}">
-          {{report.aiAnalysis.riskLevelZh || '低'}}风险
-        </view>
         <view class="ai-suggestion">{{report.aiAnalysis.suggestion}}</view>
-        <view class="ai-more">点击查看详细分析 <text class="arrow">></text></view>
+        <view class="ai-risk">
+          <text class="label">健康风险：</text>
+          <text class="value {{report.aiAnalysis.riskLevel === '高' ? 'high' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'low')}}">{{report.aiAnalysis.riskLevel}}</text>
+        </view>
+        <view class="ai-more">点击查看详细分析</view>
       </view>
     </view>
 
     <view class="btn-group">
       <button class="btn-primary" bindtap="bindViewFileTap">查看原始报告</button>
-      <button class="btn-default {{isAnalyzing ? 'btn-disabled' : ''}}" bindtap="bindAnalyzeByAI" wx:if="{{!report.aiAnalysis}}">
-        <text class="btn-icon ai-icon">AI</text> 
-        <text>{{isAnalyzing ? '分析中...' : 'DeepSeek AI分析'}}</text>
-      </button>
+      <button class="btn-default" bindtap="bindAnalyzeByAI" wx:if="{{!report.aiAnalysis}}">AI 智能分析</button>
       <button class="btn-default" bindtap="bindViewAiResult" wx:else>查看 AI 分析结果</button>
     </view>
   </block>
@@ -73,22 +71,20 @@
     <view class="modal-mask" bindtap="bindCloseAiResult"></view>
     <view class="modal-content">
       <view class="modal-header">
-        <view class="modal-title">DeepSeek AI 健康分析</view>
+        <view class="modal-title">AI 健康分析报告</view>
         <view class="modal-close" bindtap="bindCloseAiResult">×</view>
       </view>
       <view class="modal-body">
         <view class="ai-result-section">
-          <view class="ai-result-title">
-            健康风险等级
-            <view class="ai-risk-tag risk-{{report.aiAnalysis.riskLevel}}">{{report.aiAnalysis.riskLevelZh}}风险</view>
-          </view>
-        </view>
-
-        <view class="ai-result-section">
           <view class="ai-result-title">健康建议</view>
           <view class="ai-result-content">{{report.aiAnalysis.suggestion}}</view>
         </view>
-        
+        <view class="ai-result-section">
+          <view class="ai-result-title">健康风险</view>
+          <view class="ai-result-content">
+            <text class="ai-risk-level {{report.aiAnalysis.riskLevel === '高' ? 'high' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'low')}}">{{report.aiAnalysis.riskLevel}}</text>
+          </view>
+        </view>
         <view class="ai-result-section">
           <view class="ai-result-title">详细分析</view>
           <view class="ai-result-content ai-details">{{report.aiAnalysis.details}}</view>

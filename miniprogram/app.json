@@ -24,8 +24,6 @@
 		"projects/A00/health/profile/health_profile",
 		"projects/A00/health/metrics/health_metrics",
 		"projects/A00/health/report/health_report",
-		"projects/A00/health/report/report_upload/report_upload",
-		"projects/A00/health/report/report_detail/report_detail",
 		"projects/A00/health/medication/health_medication",
 		"projects/A00/health/journal/health_journal",
 		"projects/A00/health/analysis/health_analysis",
