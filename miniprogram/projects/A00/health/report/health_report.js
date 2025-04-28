@@ -34,20 +34,38 @@ Page({
 	 */
 	_loadReportList: async function () {
 		try {
+			if (this.data.reportList.length == 0) {
+				pageHelper.showLoading('加载中');
+			}
+
 			const params = {};
 			let options = {
 				title: '加载中'
 			}
-			const result = await cloudHelper.callCloudData('medicalReport', { action: 'getReportList', params }, options);
-			this.setData({
-				reportList: result.data,
-				isLoad: true
+
+			// 修改云函数调用参数格式
+			const result = await cloudHelper.callCloudData('cloud', {
+				route: 'medicalReport',
+				action: 'getReportList',
+				params
 			});
+
+			if (result && result.data) {
+				this.setData({
+					reportList: result.data,
+					isLoad: true
+				});
+			}
+
+			if (this.data.reportList.length == 0) {
+				pageHelper.showNoneToast('暂无体检报告');
+			}
 		} catch (err) {
-			console.error(err);
+			console.error('加载体检报告列表失败：', err);
 			this.setData({
 				isLoad: true
 			});
+			pageHelper.showModal('加载失败，请重试');
 		}
 	},
 
