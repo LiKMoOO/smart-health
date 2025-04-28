@@ -1,13 +1,13 @@
 <view class="main">
-  <view class="top-bar bar">
-    <view class="title">上传体检报告</view>
+  <view class="top-bar bar" style="width: 750rpx; height: 118rpx; display: flex; box-sizing: border-box; left: 0rpx; top: 0rpx; position: relative">
+    <view class="title" style="position: relative; left: 243rpx; top: -1rpx">上传体检报告</view>
   </view>
 
-  <view class="form-box">
-    <view class="form-group">
+  <view class="form-box" style="width: 750rpx; height: 1370rpx; display: block; box-sizing: border-box; left: 0rpx; top: -64rpx; position: relative">
+    <view class="form-group" style="position: relative; left: 0rpx; top: -4rpx">
       <view class="form-label">体检日期</view>
       <picker mode="date" value="{{reportDate}}" bindchange="bindDateChange">
-        <view class="form-input">{{reportDate || '请选择体检日期'}}</view>
+        <view class="form-input" style="position: relative; left: -33rpx; top: 0rpx">{{reportDate || '请选择体检日期'}}</view>
       </picker>
       <view class="icon-arrow">
         <text class="icon-right">></text>
@@ -16,13 +16,13 @@
 
     <view class="form-group">
       <view class="form-label">医院名称</view>
-      <input class="form-input" placeholder="请输入医院名称" value="{{hospital}}" bindinput="bindHospitalInput"></input>
+      <input class="form-input" placeholder="请输入医院名称" value="{{hospital}}" bindinput="bindHospitalInput" style="width: 429rpx; height: 47rpx; display: block; box-sizing: border-box"></input>
     </view>
 
     <view class="form-group">
       <view class="form-label">报告类型</view>
       <picker mode="selector" range="{{reportTypeOptions}}" bindchange="bindReportTypeChange">
-        <view class="form-input">{{reportType || '请选择报告类型'}}</view>
+        <view class="form-input" style="position: relative; left: -25rpx; top: 0rpx">{{reportType || '请选择报告类型'}}</view>
       </picker>
       <view class="icon-arrow">
         <text class="icon-right">></text>
@@ -31,7 +31,7 @@
 
     <view class="form-group">
       <view class="form-label">报告摘要</view>
-      <textarea class="form-textarea" placeholder="请输入报告概述或主要结论" value="{{summary}}" bindinput="bindSummaryInput" maxlength="200"></textarea>
+      <textarea class="form-textarea" placeholder="请输入报告概述或主要结论" value="{{summary}}" bindinput="bindSummaryInput" maxlength="200" style="width: 518rpx; height: 127rpx; display: block; box-sizing: border-box; left: 0rpx; top: 0rpx"></textarea>
     </view>
 
     <view class="form-group">
@@ -60,7 +60,7 @@
     </view>
   </view>
 
-  <view class="btn-submit-wrap">
+  <view class="btn-submit-wrap" style="width: 262rpx; height: 218rpx; display: block; box-sizing: border-box">
     <button class="btn-submit" bindtap="bindFormSubmit">提交</button>
   </view>
 </view> 

@@ -7,6 +7,13 @@
 			"list": [
 				{
 					"name": "",
+					"pathName": "projects/A00/health/report/report_detail/report_detail",
+					"query": "",
+					"launchMode": "default",
+					"scene": null
+				},
+				{
+					"name": "",
 					"pathName": "projects/A00/health/index/health_index",
 					"query": "",
 					"launchMode": "default",
