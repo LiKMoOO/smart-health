@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="header">
+    <view class="title">健康云函数测试</view>
+  </view>
+  
+  <view class="test-buttons">
+    <!-- 测试按钮组 -->
+    <view class="button-section">
+      <view class="section-title">健康首页测试</view>
+      <view class="btn-group">
+        <button class="btn" bindtap="testHealthIndexHelper" disabled="{{isLoading}}">通过cloudHelper调用</button>
+        <button class="btn" bindtap="testHealthIndexDirect" disabled="{{isLoading}}">直接调用</button>
+        <button class="btn btn-warn" bindtap="testHealthIndexNoRoute" disabled="{{isLoading}}">错误调用（不传route）</button>
+      </view>
+    </view>
+    
+    <view class="button-section">
+      <view class="section-title">其他功能测试</view>
+      <view class="btn-group">
+        <button class="btn" bindtap="testHealthMetrics" disabled="{{isLoading}}">获取健康指标</button>
+        <button class="btn" bindtap="testUpdateHealthData" disabled="{{isLoading}}">更新健康档案</button>
+        <button class="btn" bindtap="testAddHealthMetric" disabled="{{isLoading}}">添加血压记录</button>
+      </view>
+    </view>
+    
+    <view class="clear-btn">
+      <button class="btn btn-clear" bindtap="clearResults" disabled="{{isLoading}}">清空测试结果</button>
+    </view>
+  </view>
+  
+  <!-- 加载中提示 -->
+  <view class="loading" wx:if="{{isLoading}}">
+    <view class="loading-text">请求中...</view>
+  </view>
+  
+  <!-- 测试结果 -->
+  <view class="test-results">
+    <view class="results-title" wx:if="{{testResults.length > 0}}">测试结果</view>
+    <view class="results-empty" wx:if="{{!isLoading && testResults.length === 0}}">暂无测试结果</view>
+    
+    <view class="result-item" wx:for="{{testResults}}" wx:key="index">
+      <view class="result-title">{{item.title}}</view>
+      <view class="result-data">{{item.data}}</view>
+    </view>
+  </view>
+</view> 

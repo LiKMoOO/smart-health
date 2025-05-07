@@ -1,94 +1,130 @@
 <view class="main">
-  <!-- 顶部标题区域 - 添加视觉效果元素 -->
-  <view class="top-header" style="width: 671rpx; height: 238rpx; display: block; box-sizing: border-box; left: 0rpx; top: 0rpx">
-    <view class="header-content">
-      <view class="title">个人健康管理</view>
-      <view class="desc">记录健康数据，关注健康状态</view>
+  <!-- 加载骨架屏 -->
+  <view class="skeleton" wx:if="{{!isLoad}}">
+    <view class="skeleton-header"></view>
+    <view class="skeleton-modules">
+      <view class="skeleton-module" wx:for="{{6}}" wx:key="index"></view>
     </view>
-    <!-- 添加装饰元素 -->
-    <view class="header-decoration">
-      <view class="circle-1"></view>
-      <view class="circle-2"></view>
-    </view>
+    <view class="skeleton-overview"></view>
+    <view class="skeleton-section"></view>
   </view>
 
-  <!-- 健康模块导航 -->
-  <view class="module-list">
-    <view class="module-item" wx:for="{{moduleList}}" wx:key="index" bindtap="gotoModule" data-index="{{index}}">
-      <image class="module-icon" src="{{item.icon}}" mode="aspectFit"></image>
-      <view class="module-name">{{item.name}}</view>
-    </view>
-  </view>
-
-  <!-- 健康数据概览 -->
-  <view class="section health-overview" wx:if="{{healthInfo}}">
-    <view class="section-title">健康概览</view>
-    <view class="overview-content">
-      <view class="overview-item">
-        <view class="item-label">身高</view>
-        <view class="item-value">{{healthInfo.basicInfo.height || '--'}} <text class="unit">cm</text></view>
+  <!-- 主内容区域 -->
+  <block wx:if="{{isLoad}}">
+    <!-- 顶部标题区域 - 添加视觉效果元素 -->
+    <view class="top-header" style="width: 671rpx; height: 238rpx; display: block; box-sizing: border-box; left: 0rpx; top: 0rpx">
+      <view class="header-content">
+        <view class="title">个人健康管理</view>
+        <view class="desc">记录健康数据，关注健康状态</view>
       </view>
-      <view class="overview-item">
-        <view class="item-label">体重</view>
-        <view class="item-value">{{healthInfo.basicInfo.weight || '--'}} <text class="unit">kg</text></view>
-      </view>
-      <view class="overview-item">
-        <view class="item-label">BMI</view>
-        <view class="item-value">{{healthInfo.basicInfo.bmi || '--'}}</view>
+      <!-- 添加装饰元素 -->
+      <view class="header-decoration">
+        <view class="circle-1"></view>
+        <view class="circle-2"></view>
       </view>
     </view>
-  </view>
 
-  <!-- 最近健康记录 -->
-  <view class="section recent-metrics" wx:if="{{recentMetrics.length > 0}}">
-    <view class="section-title">最近记录</view>
-    <view class="metrics-list">
-      <view class="metric-item" wx:for="{{recentMetrics}}" wx:key="index">
-        <view class="metric-type">
-          <text wx:if="{{item.type === 'blood_pressure'}}">血压</text>
-          <text wx:elif="{{item.type === 'blood_sugar'}}">血糖</text>
-          <text wx:elif="{{item.type === 'heart_rate'}}">心率</text>
-          <text wx:elif="{{item.type === 'weight'}}">体重</text>
-          <text wx:else>{{item.type}}</text>
+    <!-- 健康警告提示条 -->
+    <view class="warning-banner" wx:if="{{healthWarnings.length > 0}}">
+      <view class="warning-icon">!</view>
+      <view class="warning-content">
+        <swiper class="warning-swiper" autoplay="{{true}}" vertical="{{true}}" circular="{{true}}" interval="3000">
+          <swiper-item wx:for="{{healthWarnings}}" wx:key="index">
+            <view class="warning-text">{{item}}</view>
+          </swiper-item>
+        </swiper>
+      </view>
+      <view class="warning-arrow" bindtap="_showHealthWarnings" data-warnings="{{healthWarnings}}">查看 ></view>
+    </view>
+
+    <!-- 健康模块导航 -->
+    <view class="module-list">
+      <view class="module-item" wx:for="{{moduleList}}" wx:key="index" bindtap="gotoModule" data-index="{{index}}">
+        <image class="module-icon" src="{{item.icon}}" mode="aspectFit"></image>
+        <view class="module-name">{{item.name}}</view>
+      </view>
+    </view>
+
+    <!-- 健康数据概览 -->
+    <view class="section health-overview" wx:if="{{healthInfo}}">
+      <view class="section-title">健康概览</view>
+      <view class="overview-content">
+        <view class="overview-item">
+          <view class="item-label">身高</view>
+          <view class="item-value">{{healthInfo.basicInfo.height || '--'}} <text class="unit">cm</text></view>
         </view>
-        <view class="metric-value">
-          <block wx:if="{{item.type === 'blood_pressure'}}">
-            {{item.value.systolic}}/{{item.value.diastolic}} {{item.unit}}
-          </block>
-          <block wx:else>
-            {{item.value}} {{item.unit}}
-          </block>
+        <view class="overview-item">
+          <view class="item-label">体重</view>
+          <view class="item-value">{{healthInfo.basicInfo.weight || '--'}} <text class="unit">kg</text></view>
         </view>
-        <view class="metric-time">{{timeAgo(item.recordTime)}}</view>
+        <view class="overview-item">
+          <view class="item-label">BMI</view>
+          <view class="item-value {{healthInfo.basicInfo.bmi > 28 || healthInfo.basicInfo.bmi < 18.5 ? 'warning' : ''}}">{{healthInfo.basicInfo.bmi || '--'}}</view>
+        </view>
       </view>
     </view>
-  </view>
 
-  <!-- 用药提醒 -->
-  <view class="section medication-reminders" wx:if="{{recentReminders.length > 0}}">
-    <view class="section-title">用药提醒</view>
-    <view class="reminder-list">
-      <view class="reminder-item" wx:for="{{recentReminders}}" wx:key="index">
-        <view class="reminder-info">
-          <view class="reminder-name">{{item.medicationName}}</view>
-          <view class="reminder-desc">{{item.dosage}} · {{item.frequency}}</view>
+    <!-- 最近健康记录 -->
+    <view class="section recent-metrics" wx:if="{{recentMetrics.length > 0}}">
+      <view class="section-header">
+        <view class="section-title">最近记录</view>
+        <view class="section-more" bindtap="gotoModule" data-index="1">更多 ></view>
+      </view>
+      <view class="metrics-list">
+        <view class="metric-item" wx:for="{{recentMetrics}}" wx:key="index">
+          <view class="metric-type">
+            <text wx:if="{{item.type === 'blood_pressure'}}">血压</text>
+            <text wx:elif="{{item.type === 'blood_sugar'}}">血糖</text>
+            <text wx:elif="{{item.type === 'heart_rate'}}">心率</text>
+            <text wx:elif="{{item.type === 'weight'}}">体重</text>
+            <text wx:else>{{item.type}}</text>
+          </view>
+          <view class="metric-value {{item.isAbnormal ? 'warning' : ''}}">
+            <block wx:if="{{item.type === 'blood_pressure'}}">
+              {{item.value.systolic}}/{{item.value.diastolic}} {{item.unit}}
+            </block>
+            <block wx:else>
+              {{item.value}} {{item.unit}}
+            </block>
+          </view>
+          <view class="metric-time">{{timeAgo(item.recordTime)}}</view>
         </view>
-        <view class="reminder-time">{{formatTime(item.nextReminder)}}</view>
+      </view>
+      <!-- 加载更多按钮 -->
+      <view class="load-more" wx:if="{{hasMoreMetrics}}" bindtap="_loadMoreMetrics">
+        <text>加载更多</text>
       </view>
     </view>
-  </view>
 
-  <!-- 空态提示 -->
-  <view class="empty-tip" wx:if="{{isLoad && !healthInfo && recentMetrics.length === 0 && recentReminders.length === 0}}">
-    <image class="empty-icon" src="/projects/A00/skin/images/health/empty.png" mode="aspectFit"></image>
-    <view class="empty-text">暂无健康数据记录</view>
-    <view class="empty-desc">点击上方功能开始记录您的健康数据</view>
-  </view>
+    <!-- 用药提醒 -->
+    <view class="section medication-reminders" wx:if="{{recentReminders.length > 0}}">
+      <view class="section-header">
+        <view class="section-title">用药提醒</view>
+        <view class="section-more" bindtap="gotoModule" data-index="3">更多 ></view>
+      </view>
+      <view class="reminder-list">
+        <view class="reminder-item" wx:for="{{recentReminders}}" wx:key="index">
+          <view class="reminder-info">
+            <view class="reminder-name">{{item.medicationName}}</view>
+            <view class="reminder-desc">{{item.dosage}} · {{item.frequency}}</view>
+          </view>
+          <view class="reminder-time {{isReminderUrgent(item.nextReminder) ? 'urgent' : ''}}">{{formatTime(item.nextReminder)}}</view>
+        </view>
+      </view>
+    </view>
 
-  <!-- 加载状态 -->
-  <view class="loading" wx:if="{{!isLoad}}">
-    <view class="loading-icon"></view>
-    <view class="loading-text">加载中...</view>
+    <!-- 空态提示 -->
+    <view class="empty-tip" wx:if="{{isLoad && !healthInfo && recentMetrics.length === 0 && recentReminders.length === 0}}">
+      <image class="empty-icon" src="/projects/A00/skin/images/health/empty.png" mode="aspectFit"></image>
+      <view class="empty-text">暂无健康数据记录</view>
+      <view class="empty-desc">点击上方功能开始记录您的健康数据</view>
+      <view class="empty-btn" bindtap="gotoModule" data-index="0">完善健康档案</view>
+    </view>
+  </block>
+
+  <!-- 刷新按钮 -->
+  <view class="refresh-btn" bindtap="refreshData">
+    <image class="icon-refresh" src="/projects/A00/skin/images/health/refresh.png" mode="aspectFit"></image>
   </view>
 </view>
 
@@ -129,4 +165,18 @@ function formatTime(timestamp) {
 }
 
 module.exports = formatTime;
+</wxs>
+
+<wxs module="isReminderUrgent">
+function isReminderUrgent(timestamp) {
+  if (!timestamp) return false;
+  
+  var now = getDate().getTime();
+  var diff = timestamp - now;
+  
+  // 如果距离下次提醒小于1小时，标记为紧急
+  return diff > 0 && diff < 3600 * 1000;
+}
+
+module.exports = isReminderUrgent;
 </wxs> 

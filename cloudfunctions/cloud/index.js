@@ -104,6 +104,47 @@ exports.main = async (event, context) => {
 		}
 	}
 
+	/**
+	 * 健康管理模块路由处理
+	 * 说明：该模块用于处理用户健康档案、健康指标和用药提醒相关功能
+	 * 路由前缀: health/
+	 * 支持的路由:
+	 * 1. health/gethealthindex: 获取健康首页数据
+	 * 2. health/gethealthmetrics: 获取健康指标数据
+	 * 3. health/updatehealthdata: 更新健康数据
+	 */
+	if (event.route.startsWith('health/')) {
+		try {
+			const wxContext = cloud.getWXContext();
+			// 始终使用微信OPENID作为用户标识，确保与ax_user中的USER_MINI_OPENID一致
+			const openId = wxContext.OPENID;
+			
+			console.log('health路由处理, OPENID:', openId);
+			
+			// 确保params对象存在
+			event.params = event.params || {};
+			
+			// 不再使用token，始终使用OPENID
+			event.params.userId = openId;
+			
+			// 调用health云函数
+			return await cloud.callFunction({
+				name: 'health',
+				data: {
+					route: event.route,
+					params: event.params
+				}
+			}).then(res => res.result);
+		} catch (err) {
+			console.error('健康管理路由处理错误:', err);
+			return {
+				code: 500,
+				msg: '服务器繁忙，请稍后重试',
+				err: err.message
+			};
+		}
+	}
+
 	// 处理其他所有原有路由
 	return await application.app(event, context);
 }

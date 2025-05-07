@@ -15,6 +15,10 @@ module.exports = {
 	'news/home_list': 'news_controller@getHomeNewsList',
 	'news/view': 'news_controller@viewNews', 
 
+	// 健康管理相关路由
+	'health/gethealthindex': 'health_controller@getHealthIndex',
+	'health/gethealthmetrics': 'health_controller@getHealthMetrics',
+	'health/updatehealthdata': 'health_controller@updateHealthData',
 
 	'meet/list': 'meet_controller@getMeetList',
 	'meet/list_by_day': 'meet_controller@getMeetListByDay',
