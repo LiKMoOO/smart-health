@@ -3,13 +3,11 @@
  */
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
-
-// 初始化数据库
 const db = cloud.database();
 const _ = db.command;
 const $ = db.command.aggregate;
 
-// 集合名称
+// 数据库集合名称常量
 const HEALTH_PROFILE_COLLECTION = 'health_profiles';
 const HEALTH_METRICS_COLLECTION = 'health_metrics';
 const HEALTH_REMINDERS_COLLECTION = 'health_reminders';
@@ -20,99 +18,69 @@ const HEALTH_REMINDERS_COLLECTION = 'health_reminders';
  */
 async function getHealthIndex(params) {
   const { userId, page = 1, size = 10 } = params;
-
-  // 确保userId有值
-  if (!userId) {
-    console.error('userId为空，无法查询健康数据');
-    return {
-      code: 400,
-      msg: '无效的用户ID'
-    };
-  }
-
+  console.log('开始获取健康首页数据，userId:', userId);
+  
   try {
-    console.log('开始获取健康首页数据，userId:', userId);
-
-    // 1. 获取用户健康档案
-    const profileRes = await db.collection(HEALTH_PROFILE_COLLECTION)
-      .where({
-        userId: userId
-      })
-      .limit(1)
+    // 查询健康档案
+    const profilePromise = db.collection(HEALTH_PROFILE_COLLECTION)
+      .where({ userId })
       .get();
-
-    console.log('健康档案查询结果:', profileRes);
-
-    let profile = null;
-    if (profileRes.data && profileRes.data.length > 0) {
-      profile = profileRes.data[0];
-    }
-
-    // 2. 获取最近健康指标记录
-    const metricsRes = await db.collection(HEALTH_METRICS_COLLECTION)
-      .where({
-        userId: userId
-      })
+    
+    // 查询最近的健康指标记录，每种类型取最新的一条
+    const metricsPromise = db.collection(HEALTH_METRICS_COLLECTION)
+      .where({ userId })
       .orderBy('recordTime', 'desc')
-      .limit(size)
-      .skip((page - 1) * size)
       .get();
-
-    console.log('健康指标查询结果:', metricsRes);
-
-    // 3. 获取用药提醒
-    const currentTime = new Date().getTime();
-    const remindersRes = await db.collection(HEALTH_REMINDERS_COLLECTION)
-      .where({
-        userId: userId,
-        nextReminder: _.gte(currentTime)
+    
+    // 查询用药提醒
+    const remindersPromise = db.collection(HEALTH_REMINDERS_COLLECTION)
+      .where({ 
+        userId,
+        nextReminder: _.gt(Date.now()) // 只获取未来的提醒
       })
       .orderBy('nextReminder', 'asc')
       .limit(5)
       .get();
-
-    console.log('用药提醒查询结果:', remindersRes);
-
-    // 处理健康指标，标记异常项
-    const metrics = metricsRes.data.map(metric => {
-      let isAbnormal = false;
-      
-      switch (metric.type) {
-        case 'blood_pressure':
-          if (metric.value && (metric.value.systolic > 140 || metric.value.diastolic > 90)) {
-            isAbnormal = true;
-          }
-          break;
-        case 'blood_sugar':
-          if (metric.value > 7.8) {
-            isAbnormal = true;
-          }
-          break;
-        case 'heart_rate':
-          if (metric.value > 100 || metric.value < 60) {
-            isAbnormal = true;
-          }
-          break;
+    
+    // 并行查询以提高效率
+    const [profileResult, metricsResult, remindersResult] = await Promise.all([
+      profilePromise, metricsPromise, remindersPromise
+    ]);
+    
+    console.log('健康档案查询结果:', profileResult);
+    console.log('健康指标查询结果:', metricsResult);
+    console.log('用药提醒查询结果:', remindersResult);
+    
+    // 处理健康档案数据
+    const profile = profileResult.data.length > 0 ? profileResult.data[0] : null;
+    
+    // 处理健康指标数据 (按类型分组只取最新)
+    const metricsMap = {};
+    metricsResult.data.forEach(item => {
+      if (!metricsMap[item.type] || metricsMap[item.type].recordTime < item.recordTime) {
+        metricsMap[item.type] = item;
       }
-      
-      return {
-        ...metric,
-        isAbnormal
-      };
     });
-
+    
+    const metrics = Object.values(metricsMap).sort((a, b) => b.recordTime - a.recordTime);
+    
+    // 整合数据
     return {
       code: 0,
       data: {
         profile,
         metrics,
-        reminders: remindersRes.data
+        reminders: remindersResult.data
       },
       msg: '获取成功'
     };
   } catch (err) {
-    console.error('获取健康首页数据失败：', err);
-    throw new Error('获取健康首页数据失败');
+    console.error('获取健康首页数据失败:', err);
+    return {
+      code: 500,
+      msg: '获取健康首页数据失败',
+      error: err.message
+    };
   }
 }
 
@@ -121,78 +89,48 @@ async function getHealthIndex(params) {
  */
 async function getHealthMetrics(params) {
   const { userId, page = 1, size = 10, type = null } = params;
-
-  // 确保userId有值
-  if (!userId) {
-    console.error('userId为空，无法查询健康指标数据');
-    return {
-      code: 400,
-      msg: '无效的用户ID'
-    };
-  }
-
+  console.log('开始获取健康指标数据，userId:', userId, '类型:', type);
+  
   try {
-    // 查询条件
-    const query = { userId };
+    // 构建查询条件
+    const condition = { userId };
     if (type) {
-      query.type = type;
+      condition.type = type;
     }
-
-    // 获取总数
+    
+    // 计算总数
     const countResult = await db.collection(HEALTH_METRICS_COLLECTION)
-      .where(query)
+      .where(condition)
       .count();
-
-    // 获取指标数据
-    let metricsQuery = db.collection(HEALTH_METRICS_COLLECTION)
-      .where(query)
+    
+    // 查询指定页的数据
+    const offset = (page - 1) * size;
+    const dataResult = await db.collection(HEALTH_METRICS_COLLECTION)
+      .where(condition)
       .orderBy('recordTime', 'desc')
-      .skip((page - 1) * size)
-      .limit(size);
-
-    const metricsRes = await metricsQuery.get();
-
-    // 处理健康指标，标记异常项
-    const metrics = metricsRes.data.map(metric => {
-      let isAbnormal = false;
-      
-      switch (metric.type) {
-        case 'blood_pressure':
-          if (metric.value && (metric.value.systolic > 140 || metric.value.diastolic > 90)) {
-            isAbnormal = true;
-          }
-          break;
-        case 'blood_sugar':
-          if (metric.value > 7.8) {
-            isAbnormal = true;
-          }
-          break;
-        case 'heart_rate':
-          if (metric.value > 100 || metric.value < 60) {
-            isAbnormal = true;
-          }
-          break;
-      }
-      
-      return {
-        ...metric,
-        isAbnormal
-      };
-    });
-
+      .skip(offset)
+      .limit(size)
+      .get();
+    
+    console.log('健康指标查询结果:', dataResult);
+    
     return {
       code: 0,
       data: {
-        list: metrics,
+        list: dataResult.data,
         total: countResult.total,
-        page: page,
-        size: size
+        page: parseInt(page),
+        size: parseInt(size)
       },
       msg: '获取成功'
     };
   } catch (err) {
-    console.error('获取健康指标数据失败：', err);
-    throw new Error('获取健康指标数据失败');
+    console.error('获取健康指标数据失败:', err);
+    return {
+      code: 500,
+      msg: '获取健康指标数据失败',
+      error: err.message
+    };
   }
 }
 
@@ -201,167 +139,161 @@ async function getHealthMetrics(params) {
  */
 async function updateHealthData(params) {
   const { userId, dataType, data } = params;
-
-  // 确保userId有值
-  if (!userId) {
-    console.error('userId为空，无法更新健康数据');
-    return {
-      code: 400,
-      msg: '无效的用户ID'
-    };
-  }
-
-  if (!dataType || !data) {
-    return {
-      code: 400,
-      msg: '参数错误'
-    };
-  }
-
+  console.log('更新健康数据，userId:', userId, '数据类型:', dataType);
+  
   try {
-    let result = null;
-
     switch (dataType) {
       case 'profile':
-        // 更新健康档案
-        result = await updateHealthProfile(userId, data);
-        break;
+        return await updateHealthProfile(userId, data);
       case 'metrics':
-        // 添加健康指标记录
-        result = await addHealthMetric(userId, data);
-        break;
+        return await addHealthMetric(userId, data);
       case 'reminder':
-        // 添加或更新用药提醒
-        result = await updateMedicationReminder(userId, data);
-        break;
+        return await updateHealthReminder(userId, data);
       default:
         return {
           code: 400,
-          msg: '不支持的数据类型'
+          msg: '无效的数据类型'
         };
     }
-
-    return {
-      code: 0,
-      data: result,
-      msg: '更新成功'
-    };
   } catch (err) {
-    console.error('更新健康数据失败：', err);
-    throw new Error('更新健康数据失败');
+    console.error('更新健康数据失败:', err);
+    return {
+      code: 500,
+      msg: '更新健康数据失败',
+      error: err.message
+    };
   }
 }
 
 /**
  * 更新健康档案
  */
-async function updateHealthProfile(userId, profileData) {
-  // 检查是否已存在档案
-  const profileRes = await db.collection(HEALTH_PROFILE_COLLECTION)
-    .where({
-      userId: userId
-    })
+async function updateHealthProfile(userId, data) {
+  // 查询是否已有健康档案
+  const profileResult = await db.collection(HEALTH_PROFILE_COLLECTION)
+    .where({ userId })
     .get();
-
-  // 处理基本信息
-  let basicInfoData = profileData.basicInfo || {};
-  if (typeof basicInfoData === 'string') {
-    try {
-      basicInfoData = JSON.parse(basicInfoData);
-    } catch (e) {
-      console.error('解析基本信息失败:', e);
-      basicInfoData = {};
-    }
-  }
-
-  const updateData = {
-    ...profileData,
-    HEALTH_PROFILE_BASIC: basicInfoData,
-    updateTime: new Date().getTime()
-  };
-
-  if (profileRes.data && profileRes.data.length > 0) {
-    // 更新现有档案
+  
+  if (profileResult.data.length > 0) {
+    // 已有档案，更新
     await db.collection(HEALTH_PROFILE_COLLECTION)
-      .doc(profileRes.data[0]._id)
+      .where({ userId })
       .update({
-        data: updateData
+        data: {
+          ...data,
+          updateTime: Date.now()
+        }
       });
-    
-    return { ...profileRes.data[0], ...updateData };
   } else {
-    // 创建新档案
-    const newProfileData = {
-      userId,
-      ...updateData,
-      createTime: new Date().getTime()
-    };
-    
-    const addRes = await db.collection(HEALTH_PROFILE_COLLECTION)
+    // 新增档案
+    await db.collection(HEALTH_PROFILE_COLLECTION)
       .add({
-        data: newProfileData
+        data: {
+          userId,
+          ...data,
+          createTime: Date.now(),
+          updateTime: Date.now()
+        }
       });
-    
-    return { _id: addRes._id, ...newProfileData };
   }
+  
+  return {
+    code: 0,
+    msg: '更新健康档案成功'
+  };
 }
 
 /**
  * 添加健康指标记录
  */
-async function addHealthMetric(userId, metricData) {
-  // 添加记录时间
-  const recordTime = metricData.recordTime || new Date().getTime();
+async function addHealthMetric(userId, data) {
+  // 处理异常标记
+  let isAbnormal = false;
+  let abnormalReason = '';
   
-  const newMetricData = {
-    userId,
-    ...metricData,
-    recordTime,
-    createTime: new Date().getTime()
-  };
+  // 根据不同类型检查是否异常
+  if (data.type === 'blood_pressure') {
+    // 血压异常判断
+    const { systolic, diastolic } = data.value;
+    if (systolic > 130 || diastolic > 85) {
+      isAbnormal = true;
+      abnormalReason = systolic > 130 ? '收缩压偏高' : '舒张压偏高';
+    }
+  } else if (data.type === 'blood_sugar') {
+    // 血糖异常判断 (空腹)
+    if (data.value > 6.1) {
+      isAbnormal = true;
+      abnormalReason = '血糖偏高';
+    }
+  } else if (data.type === 'heart_rate') {
+    // 心率异常判断
+    if (data.value > 90 || data.value < 60) {
+      isAbnormal = true;
+      abnormalReason = data.value > 90 ? '心率偏快' : '心率偏慢';
+    }
+  }
   
-  const addRes = await db.collection(HEALTH_METRICS_COLLECTION)
+  // 添加记录
+  await db.collection(HEALTH_METRICS_COLLECTION)
     .add({
-      data: newMetricData
+      data: {
+        userId,
+        ...data,
+        isAbnormal,
+        abnormalReason: isAbnormal ? abnormalReason : '',
+        createTime: Date.now()
+      }
     });
   
-  return { _id: addRes._id, ...newMetricData };
+  return {
+    code: 0,
+    msg: '添加健康指标成功',
+    data: {
+      isAbnormal,
+      abnormalReason
+    }
+  };
 }
 
 /**
- * 添加或更新用药提醒
+ * 更新用药提醒
  */
-async function updateMedicationReminder(userId, reminderData) {
-  const { _id } = reminderData;
-  
-  if (_id) {
-    // 更新现有提醒
+async function updateHealthReminder(userId, data) {
+  if (data._id) {
+    // 更新已有提醒
     await db.collection(HEALTH_REMINDERS_COLLECTION)
-      .doc(_id)
+      .doc(data._id)
       .update({
         data: {
-          ...reminderData,
-          updateTime: new Date().getTime()
+          medicationName: data.medicationName,
+          dosage: data.dosage,
+          frequency: data.frequency,
+          nextReminder: data.nextReminder,
+          updateTime: Date.now()
         }
       });
-    
-    return { ...reminderData };
   } else {
-    // 创建新提醒
-    const newReminderData = {
-      userId,
-      ...reminderData,
-      createTime: new Date().getTime(),
-      updateTime: new Date().getTime()
-    };
-    
-    const addRes = await db.collection(HEALTH_REMINDERS_COLLECTION)
+    // 添加新提醒
+    await db.collection(HEALTH_REMINDERS_COLLECTION)
       .add({
-        data: newReminderData
+        data: {
+          userId,
+          medicationName: data.medicationName,
+          dosage: data.dosage,
+          frequency: data.frequency,
+          startDate: data.startDate || Date.now(),
+          endDate: data.endDate || null,
+          nextReminder: data.nextReminder,
+          createTime: Date.now(),
+          updateTime: Date.now()
+        }
       });
-    
-    return { _id: addRes._id, ...newReminderData };
   }
+  
+  return {
+    code: 0,
+    msg: '更新用药提醒成功'
+  };
 }
 
 // 导出模块

@@ -9,9 +9,9 @@ const healthController = require('./controller/health');
 
 // 云函数入口函数
 exports.main = async (event, context) => {
-  const wxContext = cloud.getWXContext();
-  // 获取OPENID，如果为空则尝试使用前端传递的userId
-  let openId = wxContext.OPENID;
+  // 获取微信上下文，优先使用测试脚本传入的模拟上下文
+  const wxContext = context.wxContext || cloud.getWXContext();
+  const openId = wxContext.OPENID; // 使用微信OPENID
   
   // 获取路由和参数
   const { route, params = {} } = event;
@@ -25,12 +25,11 @@ exports.main = async (event, context) => {
   
   // 如果openId为空，尝试使用前端传入的userId
   if (!openId && params.userId) {
-    openId = params.userId;
-    console.log('【Health Cloud Function】使用前端传入的userId:', openId);
+    console.log('【Health Cloud Function】使用前端传入的userId:', params.userId);
+  } else {
+    // 使用openId作为userId，确保数据一致性
+    params.userId = openId;
   }
-  
-  // 使用openId作为userId，确保数据一致性
-  params.userId = openId;
   
   console.log('【Health Cloud Function】处理请求，userId:', params.userId);
   
