@@ -859,11 +859,19 @@
  }
 
  function cacheListSet(key, time = setting.CACHE_LIST_TIME) {
- 	key = key.toUpperCase();
- 	if (setting.CACHE_IS_LIST)
- 		cacheHelper.set(key + '_LIST', 'TRUE', time);
+ 	cacheHelper.set(key, time, time);
  }
 
+ function showLoading(title = '加载中...') {
+ 	wx.showLoading({
+ 		title: title,
+ 		mask: true
+ 	});
+ }
+
+ function hideLoading() {
+ 	wx.hideLoading();
+ }
 
  module.exports = {
  	setSkin,
@@ -940,4 +948,6 @@
  	cacheListRemove,
  	cacheListSet,
 
+ 	showLoading,
+ 	hideLoading
  }

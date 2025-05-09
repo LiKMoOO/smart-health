@@ -183,13 +183,19 @@ async function updateHealthProfile(userId, data) {
     .where({ userId })
     .get();
   
+  // 在更新或新增前，确保从 data 对象中移除 _id 和其他不应由前端直接修改的字段
+  const dataToUpdate = { ...data };
+  delete dataToUpdate._id; // 删除 _id 字段
+  // delete dataToUpdate.userId; // userId 应该由后端逻辑控制，而不是前端传入的data中的userId
+  // delete dataToUpdate.createTime; // createTime 不应该被更新
+
   if (profileResult.data.length > 0) {
     // 已有档案，更新
     await db.collection(HEALTH_PROFILE_COLLECTION)
       .where({ userId })
       .update({
         data: {
-          ...data,
+          ...dataToUpdate, // 使用处理过的 dataToUpdate
           updateTime: Date.now()
         }
       });
@@ -198,8 +204,8 @@ async function updateHealthProfile(userId, data) {
     await db.collection(HEALTH_PROFILE_COLLECTION)
       .add({
         data: {
-          userId,
-          ...data,
+          userId, // 确保使用函数参数传入的userId
+          ...dataToUpdate, // 使用处理过的 dataToUpdate
           createTime: Date.now(),
           updateTime: Date.now()
         }

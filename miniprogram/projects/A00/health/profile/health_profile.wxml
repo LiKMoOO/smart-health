@@ -48,7 +48,7 @@
         </view>
         <view class="info-item">
           <text class="label">血型</text>
-          <text class="value">{{profile.basicInfo.bloodType || '--'}}</text>
+          <text class="value">{{profile.basicInfo.bloodTypeDisplay || '--'}}</text>
         </view>
       </view>
       <view class="card-edit" wx:if="{{editBasicInfo}}">

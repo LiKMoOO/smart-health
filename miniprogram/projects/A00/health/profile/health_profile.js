@@ -46,102 +46,15 @@ Page({
 	 */
 	async _loadData() {
 		try {
-			this.setData({ isLoading: true });
-			
+			this.setData({ isLoad: false });
+
 			// 获取健康档案数据
-			// const result = await cloudHelper.callCloudData('health/gethealthindex', {});
-			// let profile = result.profile;
+			const result = await cloudHelper.callCloudData('health/gethealthindex', {});
+			let profile = result ? result.profile : null;
 			
 			// 如果没有档案数据，创建一个空结构
 			if (!profile) {
 				profile = {
-				basicInfo: {
-						height: '',
-						weight: '',
-						birthDate: '',
-					gender: 'male',
-						bloodType: 'unknown'
-				},
-					medicalHistory: [],
-					allergies: [],
-					emergencyContact: {
-						name: '',
-						relation: '',
-						phone: ''
-					}
-				};
-			} else {
-				// 确保基本信息转换为正确的格式
-				if (profile.HEALTH_PROFILE_BASIC && typeof profile.HEALTH_PROFILE_BASIC === 'object') {
-					profile.basicInfo = profile.HEALTH_PROFILE_BASIC;
-				} else if (profile.HEALTH_PROFILE_BASIC && typeof profile.HEALTH_PROFILE_BASIC === 'string') {
-					try {
-						profile.basicInfo = JSON.parse(profile.HEALTH_PROFILE_BASIC);
-					} catch (e) {
-						profile.basicInfo = {};
-					}
-				} else {
-					profile.basicInfo = {};
-				}
-				
-				// 处理医疗病史
-				if (profile.HEALTH_PROFILE_MEDICAL && Array.isArray(profile.HEALTH_PROFILE_MEDICAL)) {
-					profile.medicalHistory = profile.HEALTH_PROFILE_MEDICAL;
-				} else {
-					profile.medicalHistory = [];
-				}
-				
-				// 处理过敏信息
-				if (profile.HEALTH_PROFILE_ALLERGIES && Array.isArray(profile.HEALTH_PROFILE_ALLERGIES)) {
-					profile.allergies = profile.HEALTH_PROFILE_ALLERGIES;
-				} else {
-					profile.allergies = [];
-				}
-				
-				// 处理紧急联系人
-				if (profile.HEALTH_PROFILE_EMERGENCY && typeof profile.HEALTH_PROFILE_EMERGENCY === 'object') {
-					profile.emergencyContact = profile.HEALTH_PROFILE_EMERGENCY;
-				} else if (profile.HEALTH_PROFILE_EMERGENCY && typeof profile.HEALTH_PROFILE_EMERGENCY === 'string') {
-					try {
-						profile.emergencyContact = JSON.parse(profile.HEALTH_PROFILE_EMERGENCY);
-					} catch (e) {
-						profile.emergencyContact = {};
-					}
-				} else {
-					profile.emergencyContact = {
-					name: '',
-					relation: '',
-					phone: ''
-				};
-				}
-			}
-			
-			// 设置性别索引
-			let genderIndex = 0;
-			if (profile.basicInfo.gender === 'female') {
-				genderIndex = 1;
-			}
-			
-			// 设置血型索引
-			let bloodTypeIndex = 5; // 默认未知
-			const bloodTypeMap = { 'A': 0, 'B': 1, 'AB': 2, 'O': 3 };
-			if (bloodTypeMap[profile.basicInfo.bloodType] !== undefined) {
-				bloodTypeIndex = bloodTypeMap[profile.basicInfo.bloodType];
-			} else if (profile.basicInfo.bloodType) {
-				bloodTypeIndex = 4; // 其他
-			}
-			
-			this.setData({
-				isLoad: true,
-				profile,
-				genderIndex,
-				bloodTypeIndex
-			});
-		} catch (err) {
-			console.error('加载健康档案数据失败', err);
-			this.setData({ 
-				isLoad: true,
-				profile: {
 					basicInfo: {
 						height: '',
 						weight: '',
@@ -156,9 +69,66 @@ Page({
 						relation: '',
 						phone: ''
 					}
+				};
+			} else {
+				// 确保各个子对象存在，如果不存在则初始化为空结构，防止后续操作出错
+				if (!profile.basicInfo) {
+					profile.basicInfo = { height: '', weight: '', birthDate: '', gender: 'male', bloodType: 'unknown' };
+				}
+				if (!profile.medicalHistory) {
+					profile.medicalHistory = [];
+				}
+				if (!profile.allergies) {
+					profile.allergies = [];
+				}
+				if (!profile.emergencyContact) {
+					profile.emergencyContact = { name: '', relation: '', phone: '' };
+				}
+			}
+			
+			// 设置性别索引
+			let genderIndex = 0;
+			if (profile.basicInfo.gender === 'female') {
+				genderIndex = 1;
+			}
+			
+			// 设置血型索引
+			let bloodTypeIndex = 5;
+			const bloodTypeMap = { 'A型': 0, 'B型': 1, 'AB型': 2, 'O型': 3, '其他': 4, '未知': 5 };
+			const bloodTypeReverseMap = { 'A': 'A型', 'B': 'B型', 'AB': 'AB型', 'O': 'O型' };
+			
+			let dbBloodType = profile.basicInfo.bloodType;
+			if(dbBloodType && bloodTypeReverseMap[dbBloodType]) {
+				profile.basicInfo.bloodTypeDisplay = bloodTypeReverseMap[dbBloodType];
+			} else if (dbBloodType && !Object.values(bloodTypeMap).includes(this.data.bloodTypeOptions.indexOf(dbBloodType))) {
+				profile.basicInfo.bloodTypeDisplay = '其他';
+			} else {
+				profile.basicInfo.bloodTypeDisplay = dbBloodType || '未知';
+			}
+
+			bloodTypeIndex = this.data.bloodTypeOptions.indexOf(profile.basicInfo.bloodTypeDisplay);
+			if (bloodTypeIndex === -1) bloodTypeIndex = 5;
+
+			this.setData({
+				isLoad: true,
+				profile,
+				genderIndex,
+				bloodTypeIndex,
+				formBasicInfo: { ...(profile.basicInfo || {}) },
+				formEmergencyContact: { ...(profile.emergencyContact || {}) },
+			});
+		} catch (err) {
+			console.error('加载健康档案数据失败', err);
+			this.setData({ 
+				isLoad: true,
+				profile: {
+					basicInfo: { height: '', weight: '', birthDate: '', gender: 'male', bloodType: 'unknown'},
+					medicalHistory: [],
+					allergies: [],
+					emergencyContact: { name: '', relation: '', phone: '' }
 				}
 			});
-			pageHelper.showNoneToast('加载健康档案数据失败，创建新档案');
+			pageHelper.showNoneToast('加载失败，请稍后重试');
 		}
 	},
 
@@ -166,10 +136,17 @@ Page({
 	 * 编辑基本信息
 	 */
 	onEditBasicInfo() {
-		const formBasicInfo = { ...this.data.profile.basicInfo };
+		const currentProfile = this.data.profile || {};
+		const formBasicInfo = { ...(currentProfile.basicInfo || { height: '', weight: '', birthDate: '', gender: 'male', bloodType: 'unknown'}) };
+		const genderIndex = this.data.genderOptions.indexOf(formBasicInfo.gender === 'male' ? '男' : '女');
+		const bloodTypeDisplay = formBasicInfo.bloodTypeDisplay || formBasicInfo.bloodType || '未知';
+		const bloodTypeIndex = this.data.bloodTypeOptions.indexOf(bloodTypeDisplay);
+
 		this.setData({
 			editBasicInfo: true,
-			formBasicInfo
+			formBasicInfo,
+			genderIndex: genderIndex !== -1 ? genderIndex : 0,
+			bloodTypeIndex: bloodTypeIndex !== -1 ? bloodTypeIndex : 5,
 		});
 	},
 
@@ -186,40 +163,52 @@ Page({
 	 * 保存基本信息
 	 */
 	async onSaveBasicInfo() {
-		const formBasicInfo = this.data.formBasicInfo;
+		const formBasicInfoToSave = { ...this.data.formBasicInfo };
 		
 		// 表单验证
-		if (!formBasicInfo.height) {
+		if (!formBasicInfoToSave.height) {
 			return pageHelper.showModal('请输入身高');
 		}
-		if (!formBasicInfo.weight) {
+		if (!formBasicInfoToSave.weight) {
 			return pageHelper.showModal('请输入体重');
 		}
-		if (!formBasicInfo.birthDate) {
+		if (!formBasicInfoToSave.birthDate) {
 			return pageHelper.showModal('请选择出生日期');
 		}
-		
+
+		// 将显示的血型转换为数据库存储的格式
+		const selectedBloodTypeDisplay = this.data.bloodTypeOptions[this.data.bloodTypeIndex];
+		if (selectedBloodTypeDisplay === 'A型') formBasicInfoToSave.bloodType = 'A';
+		else if (selectedBloodTypeDisplay === 'B型') formBasicInfoToSave.bloodType = 'B';
+		else if (selectedBloodTypeDisplay === 'AB型') formBasicInfoToSave.bloodType = 'AB';
+		else if (selectedBloodTypeDisplay === 'O型') formBasicInfoToSave.bloodType = 'O';
+		else if (selectedBloodTypeDisplay === '其他') formBasicInfoToSave.bloodType = '其他';
+		else formBasicInfoToSave.bloodType = 'unknown';
+		delete formBasicInfoToSave.bloodTypeDisplay;
+
 		try {
-			// 通过云函数保存数据
-			await cloudHelper.callCloudData('health/savehealthprofile', {
-				basicInfo: formBasicInfo
+			pageHelper.showLoading('保存中...');
+			let updatedProfile = { ...this.data.profile };
+			updatedProfile.basicInfo = formBasicInfoToSave;
+
+			await cloudHelper.callCloudData('health/updatehealthdata', {
+				dataType: 'profile',
+				data: updatedProfile 
 			});
 			
 			// 更新本地数据
-			let profile = { ...this.data.profile };
-			profile.basicInfo = formBasicInfo;
-			// 更新后端字段结构
-			profile.HEALTH_PROFILE_BASIC = formBasicInfo;
-			
 			this.setData({
-				profile,
+				profile: updatedProfile,
 				editBasicInfo: false
 			});
-			
 			pageHelper.showSuccToast('保存成功');
+			getApp().globalData.refreshHealthIndex = true;
+
 		} catch (err) {
 			console.error('保存基本信息失败', err);
 			pageHelper.showModal('保存失败，请重试');
+		} finally {
+			pageHelper.hideLoading();
 		}
 	},
 
@@ -251,12 +240,8 @@ Page({
 	 */
 	onBloodTypeChange(e) {
 		const bloodTypeIndex = e.detail.value;
-		let { formBasicInfo } = this.data;
-		const bloodTypes = ['A', 'B', 'AB', 'O', 'other', 'unknown'];
-		formBasicInfo.bloodType = bloodTypes[bloodTypeIndex];
 		this.setData({
 			bloodTypeIndex,
-			formBasicInfo
 		});
 	},
 
@@ -336,42 +321,49 @@ Page({
 	/**
 	 * 保存疾病史
 	 */
-	onSaveMedicalHistory() {
-		const formMedicalHistory = this.data.formMedicalHistory;
-		
+	async onSaveMedicalHistory() {
+		const { formMedicalHistory, editMedicalHistoryIndex, profile } = this.data;
+
 		// 表单验证
 		if (!formMedicalHistory.condition) {
 			return pageHelper.showModal('请输入疾病名称');
 		}
-		
-		let profile = { ...this.data.profile };
-		const editIndex = this.data.editMedicalHistoryIndex;
-		
-		if (editIndex !== null) {
-			// 更新现有病史
-			profile.medicalHistory[editIndex] = formMedicalHistory;
-		} else {
-			// 添加新病史
-			if (!profile.medicalHistory) profile.medicalHistory = [];
-			profile.medicalHistory.push(formMedicalHistory);
-		}
-		
-		// 保存到云端
-		cloudHelper.callCloudData('health/savehealthprofile', {
-			medicalHistory: profile.medicalHistory
-		}).then(() => {
-			// 更新本地数据结构
-			profile.HEALTH_PROFILE_MEDICAL = profile.medicalHistory;
-			
-		this.setData({
-			profile,
-			showMedicalHistoryModal: false
-		});
-		pageHelper.showSuccToast('保存成功');
-		}).catch(err => {
-			console.error('保存病史失败', err);
+
+		try {
+			pageHelper.showLoading('保存中...');
+			let updatedProfile = JSON.parse(JSON.stringify(profile));
+			if (!updatedProfile.medicalHistory) {
+				updatedProfile.medicalHistory = [];
+			}
+
+			if (editMedicalHistoryIndex !== null) {
+				// 编辑
+				updatedProfile.medicalHistory[editMedicalHistoryIndex] = formMedicalHistory;
+			} else {
+				// 新增
+				updatedProfile.medicalHistory.push(formMedicalHistory);
+			}
+
+			await cloudHelper.callCloudData('health/updatehealthdata', {
+				dataType: 'profile',
+				data: updatedProfile
+			});
+
+			this.setData({
+				profile: updatedProfile,
+				showMedicalHistoryModal: false,
+				editMedicalHistoryIndex: null,
+				formMedicalHistory: {} 
+			});
+			pageHelper.showSuccToast('保存成功');
+			getApp().globalData.refreshHealthIndex = true;
+
+		} catch (err) {
+			console.error('保存既往病史失败', err);
 			pageHelper.showModal('保存失败，请重试');
-		});
+		} finally {
+			pageHelper.hideLoading();
+		}
 	},
 
 	/**
@@ -438,40 +430,40 @@ Page({
 	/**
 	 * 保存过敏原
 	 */
-	onSaveAllergy() {
-		const allergy = this.data.formAllergy.trim();
-		
-		// 表单验证
-		if (!allergy) {
-			return pageHelper.showModal('请输入过敏原');
+	async onSaveAllergy() {
+		const { formAllergy, profile } = this.data;
+
+		if (!formAllergy.trim()) {
+			return pageHelper.showModal('请输入过敏物名称');
 		}
-		
-		let profile = { ...this.data.profile };
-		if (!profile.allergies) profile.allergies = [];
-		
-		// 检查是否已存在
-		if (profile.allergies.includes(allergy)) {
-			return pageHelper.showModal('该过敏原已存在');
+
+		try {
+			pageHelper.showLoading('保存中...');
+			let updatedProfile = JSON.parse(JSON.stringify(profile));
+			if (!updatedProfile.allergies) {
+				updatedProfile.allergies = [];
+			}
+			updatedProfile.allergies.push(formAllergy.trim());
+
+			await cloudHelper.callCloudData('health/updatehealthdata', {
+				dataType: 'profile',
+				data: updatedProfile
+			});
+
+			this.setData({
+				profile: updatedProfile,
+				showAllergyModal: false,
+				formAllergy: ''
+			});
+			pageHelper.showSuccToast('保存成功');
+			getApp().globalData.refreshHealthIndex = true;
+
+		} catch (err) {
+			console.error('保存过敏史失败', err);
+			pageHelper.showModal('保存失败，请重试');
+		} finally {
+			pageHelper.hideLoading();
 		}
-		
-		profile.allergies.push(allergy);
-		
-		// 保存到云端
-		cloudHelper.callCloudData('health/savehealthprofile', {
-			allergies: profile.allergies
-		}).then(() => {
-			// 更新后端字段结构
-			profile.HEALTH_PROFILE_ALLERGIES = profile.allergies;
-			
-		this.setData({
-			profile,
-			showAllergyModal: false
-		});
-			pageHelper.showSuccToast('添加成功');
-		}).catch(err => {
-			console.error('添加过敏原失败', err);
-			pageHelper.showModal('添加失败，请重试');
-		});
 	},
 
 	/**
@@ -508,8 +500,8 @@ Page({
 	 * 保存紧急联系人
 	 */
 	async onSaveEmergencyContact() {
-		const formEmergencyContact = this.data.formEmergencyContact;
-		
+		const { formEmergencyContact, profile } = this.data;
+
 		// 表单验证
 		if (!formEmergencyContact.name) {
 			return pageHelper.showModal('请输入联系人姓名');
@@ -517,28 +509,32 @@ Page({
 		if (!formEmergencyContact.phone) {
 			return pageHelper.showModal('请输入联系人电话');
 		}
-		
+		if (!/^1[3-9]\d{9}$/.test(formEmergencyContact.phone)) {
+			return pageHelper.showModal('请输入正确的手机号码');
+		}
+
 		try {
-			// 保存到云端
-			await cloudHelper.callCloudData('health/savehealthprofile', {
-				emergencyContact: formEmergencyContact
+			pageHelper.showLoading('保存中...');
+			let updatedProfile = { ...this.data.profile };
+			updatedProfile.emergencyContact = { ...formEmergencyContact };
+
+			await cloudHelper.callCloudData('health/updatehealthdata', {
+				dataType: 'profile',
+				data: updatedProfile
 			});
-			
-			// 更新本地数据
-			let profile = { ...this.data.profile };
-			profile.emergencyContact = formEmergencyContact;
-			// 更新后端字段结构
-			profile.HEALTH_PROFILE_EMERGENCY = formEmergencyContact;
-			
+
 			this.setData({
-				profile,
+				profile: updatedProfile,
 				editEmergencyContact: false
 			});
-			
 			pageHelper.showSuccToast('保存成功');
+			getApp().globalData.refreshHealthIndex = true;
+
 		} catch (err) {
 			console.error('保存紧急联系人失败', err);
 			pageHelper.showModal('保存失败，请重试');
+		} finally {
+			pageHelper.hideLoading();
 		}
 	},
 
