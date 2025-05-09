@@ -12,6 +12,7 @@ const uploadReport = require('./controller/uploadReport')
 const getReportList = require('./controller/getReportList')
 const getReportDetail = require('./controller/getReportDetail')
 const analyzeReportByAI = require('./controller/analyzeReportByAI')
+const ocrReport = require('./controller/ocrReport')
 
 // 云函数入口函数
 exports.main = async (event, context) => {
@@ -32,6 +33,8 @@ exports.main = async (event, context) => {
       return await getReportDetail.main(params, wxContext)
     case 'analyzeReportByAI':
       return await analyzeReportByAI.main(params, wxContext)
+    case 'ocrReport':
+      return await ocrReport.main(params, wxContext)
     default:
       return { code: 404, msg: '未知操作' }
   }

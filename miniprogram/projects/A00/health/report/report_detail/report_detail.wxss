@@ -7,30 +7,27 @@ page {
   --text-color: #333;
   --text-secondary: #666;
   --border-color: #eee;
-  --abnormal-color: #ff4d4f;
-  --low-risk-color: #52c41a;
-  --medium-risk-color: #faad14;
-  --high-risk-color: #ff4d4f;
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --error-color: #f5222d;
 }
 
 .main {
   background-color: var(--bg-color);
   min-height: 100vh;
-  padding-bottom: 100rpx;
+  padding-bottom: 180rpx;
 }
 
 .top-bar {
-  background-color: #fff;
-  padding: 20rpx 30rpx;
-  display: flex;
-  align-items: center;
-  border-bottom: 1rpx solid var(--border-color);
+  background-color: var(--primary-color);
+  padding: 30rpx;
+  color: #fff;
+  text-align: center;
 }
 
 .top-bar .title {
   font-size: 36rpx;
   font-weight: bold;
-  color: var(--text-color);
 }
 
 .loading {
@@ -38,14 +35,14 @@ page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60rpx 0;
+  padding-top: 200rpx;
 }
 
 .loading-icon {
   width: 80rpx;
   height: 80rpx;
-  border: 6rpx solid #f3f3f3;
-  border-top: 6rpx solid var(--primary-color);
+  border: 6rpx solid var(--border-color);
+  border-top-color: var(--primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -57,7 +54,6 @@ page {
 
 .loading-text {
   margin-top: 20rpx;
-  font-size: 28rpx;
   color: var(--text-secondary);
 }
 
@@ -66,18 +62,18 @@ page {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100rpx 0;
+  padding-top: 200rpx;
 }
 
-.icon-no-data image {
+.icon-empty {
   width: 200rpx;
   height: 200rpx;
+  margin-bottom: 30rpx;
 }
 
-.text-no-data {
-  margin-top: 30rpx;
-  font-size: 30rpx;
+.hint {
   color: var(--text-secondary);
+  font-size: 30rpx;
 }
 
 /* 报告头部 */
@@ -85,23 +81,17 @@ page {
   background-color: #fff;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
-.report-type {
-  font-size: 40rpx;
+.hospital {
+  font-size: 36rpx;
   font-weight: bold;
   color: var(--text-color);
   margin-bottom: 10rpx;
 }
 
-.report-date {
-  font-size: 28rpx;
-  color: var(--text-secondary);
-  margin-bottom: 10rpx;
-}
-
-.report-hospital {
+.date {
   font-size: 28rpx;
   color: var(--text-secondary);
 }
@@ -160,7 +150,7 @@ page {
 
 .test-item.abnormal {
   background-color: rgba(255, 77, 79, 0.05);
-  border-left: 4rpx solid var(--abnormal-color);
+  border-left: 4rpx solid var(--error-color);
   margin-left: -24rpx;
   padding-left: 20rpx;
 }
@@ -174,8 +164,13 @@ page {
 
 .item-value {
   font-size: 32rpx;
+  font-weight: bold;
   color: var(--text-color);
   margin-bottom: 10rpx;
+}
+
+.item-value.abnormal {
+  color: var(--error-color);
 }
 
 .item-unit {
@@ -193,7 +188,7 @@ page {
   position: absolute;
   top: 20rpx;
   right: 20rpx;
-  background-color: var(--abnormal-color);
+  background-color: var(--error-color);
   color: #fff;
   font-size: 22rpx;
   padding: 4rpx 12rpx;

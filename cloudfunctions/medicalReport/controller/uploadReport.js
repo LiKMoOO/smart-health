@@ -16,7 +16,9 @@ const reportCollection = 'medical_report'
  * @param {String} params.hospital - 医院名称
  * @param {String} params.reportType - 报告类型
  * @param {String} params.summary - 报告摘要
- * @param {String} params.reportFileId - 报告文件云存储ID
+ * @param {String} params.reportFileId - 报告文件云存储ID（可能是单个ID或以逗号分隔的多个ID）
+ * @param {Boolean} params.isMultipleFiles - 是否为多文件上传
+ * @param {String} params.reportFileName - 报告文件名称（可选，多文件时以分号分隔）
  * @param {Array} params.reportItems - 报告项目数组（可选）
  * @param {Object} wxContext - 微信上下文
  * @returns {Object} - 返回结果
@@ -48,8 +50,26 @@ exports.main = async (params, wxContext) => {
       reportType: params.reportType,
       summary: params.summary || '',
       reportFileId: params.reportFileId,
+      reportFileName: params.reportFileName || '',
+      isMultipleFiles: params.isMultipleFiles || false,
       reportItems: params.reportItems || [],
-      createTime: db.serverDate()
+      createTime: db.serverDate(),
+      status: 0 // 0: 正常, 1: 异常/需关注
+    }
+
+    // 如果是多文件，检查文件ID格式
+    if (params.isMultipleFiles) {
+      const fileIds = params.reportFileId.split(',')
+      if (fileIds.length === 0) {
+        return { code: 1006, msg: '文件ID格式错误' }
+      }
+      
+      // 验证每个文件ID
+      for (const fileId of fileIds) {
+        if (!fileId || fileId.trim() === '') {
+          return { code: 1007, msg: '文件ID不能为空' }
+        }
+      }
     }
 
     // 写入数据库

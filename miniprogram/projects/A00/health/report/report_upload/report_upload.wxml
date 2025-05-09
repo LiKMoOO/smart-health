@@ -34,7 +34,23 @@
       <textarea class="form-textarea" placeholder="请输入报告概述或主要结论" value="{{summary}}" bindinput="bindSummaryInput" maxlength="200" style="width: 518rpx; height: 127rpx; display: block; box-sizing: border-box; left: 0rpx; top: 0rpx"></textarea>
     </view>
 
+    <!-- 上传设置 -->
     <view class="form-group">
+      <view class="form-label">上传设置</view>
+      <view class="upload-options">
+        <view class="option-item {{isMultipleFiles ? 'active' : ''}}" bindtap="toggleMultipleFiles">
+          <image class="option-icon" src="/images/icon/{{isMultipleFiles ? 'check' : 'uncheck'}}.png"></image>
+          <text>多文件上传</text>
+        </view>
+        <view class="option-item {{enableOcr ? 'active' : ''}}" bindtap="toggleOcr">
+          <image class="option-icon" src="/images/icon/{{enableOcr ? 'check' : 'uncheck'}}.png"></image>
+          <text>OCR智能识别</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 单文件上传 -->
+    <view class="form-group" wx:if="{{!isMultipleFiles}}">
       <view class="form-label">上传报告文件</view>
       <view class="file-upload-box" bindtap="bindChooseFile">
         <view wx:if="{{!reportFileId}}" class="upload-placeholder">
@@ -43,13 +59,53 @@
         </view>
         <view wx:else class="uploaded-file">
           <view class="file-name">{{reportFileName}}</view>
-          <view class="file-status">已上传</view>
+          <view class="file-actions">
+            <view class="file-status">已上传</view>
+            <view class="file-delete" catchtap="deleteFile">删除</view>
+          </view>
         </view>
       </view>
+    </view>
+
+    <!-- 多文件上传 -->
+    <view class="form-group" wx:if="{{isMultipleFiles}}">
+      <view class="form-label">上传多个报告文件</view>
+      <view class="multi-upload-box">
+        <view class="file-list" wx:if="{{reportFiles.length > 0}}">
+          <view class="file-item" wx:for="{{reportFiles}}" wx:key="index">
+            <view class="file-name">{{item.name}}</view>
+            <view class="file-delete" catchtap="deleteMultipleFile" data-index="{{index}}">×</view>
+          </view>
+        </view>
+        <view class="add-file-btn" bindtap="bindChooseFile">
+          <view class="upload-icon">+</view>
+          <view class="upload-text">选择文件</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- OCR结果展示 -->
+    <view class="form-group" wx:if="{{enableOcr && ocrResult}}">
+      <view class="form-label">OCR识别结果</view>
+      <view class="ocr-result">{{ocrResult}}</view>
     </view>
   </view>
 
   <view class="btn-submit-wrap" style="width: 262rpx; height: 218rpx; display: block; box-sizing: border-box">
     <button class="btn-submit" bindtap="bindFormSubmit">提交</button>
+  </view>
+</view>
+
+<!-- 文件预览弹窗 -->
+<view class="preview-modal" wx:if="{{previewMode}}">
+  <view class="preview-header">
+    <text>文件预览</text>
+    <view class="close-btn" bindtap="closePreview">×</view>
+  </view>
+  <view class="preview-content">
+    <image wx:if="{{currentPreviewUrl}}" src="{{currentPreviewUrl}}" mode="aspectFit" class="preview-image"></image>
+  </view>
+  <view class="preview-footer">
+    <view class="btn-continue" bindtap="closePreview">继续上传</view>
   </view>
 </view> 

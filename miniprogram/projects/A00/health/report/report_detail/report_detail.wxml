@@ -13,13 +13,83 @@
       <view class="hospital">{{report.hospital}}</view>
       <view class="date">{{report.reportDate}}</view>
     </view>
+    
     <view class="report-content">
-      <view class="type">{{report.reportType}}</view>
-      <view class="summary">{{report.summary}}</view>
+      <view class="section">
+        <view class="section-title">基本信息</view>
+        <view class="info-row">
+          <text class="label">报告类型</text>
+          <text class="value">{{report.reportType}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">体检日期</text>
+          <text class="value">{{report.reportDate}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">医院</text>
+          <text class="value">{{report.hospital}}</text>
+        </view>
+      </view>
+      
+      <view class="section">
+        <view class="section-title">报告摘要</view>
+        <view class="summary">{{report.summary || '无摘要信息'}}</view>
+      </view>
+      
+      <!-- AI分析结果 -->
+      <view class="section ai-section" wx:if="{{report.aiAnalysis}}">
+        <view class="section-title" bindtap="toggleAiResult">
+          AI智能分析
+          <text class="toggle-icon">{{showAiResult ? '▼' : '▶'}}</text>
+        </view>
+        <view class="ai-content" wx:if="{{showAiResult}}">
+          <view class="ai-risk">
+            <text class="risk-label">健康风险</text>
+            <text class="risk-value {{report.aiAnalysis.riskLevel === '低' ? 'low' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'high')}}">
+              {{report.aiAnalysis.riskLevel || '未知'}}
+            </text>
+          </view>
+          <view class="ai-suggestion">
+            <view class="suggestion-title">健康建议</view>
+            <view class="suggestion-content">{{report.aiAnalysis.suggestion || '暂无健康建议'}}</view>
+          </view>
+          <view class="ai-details">
+            <view class="details-title">详细分析</view>
+            <view class="details-content">{{report.aiAnalysis.details || '暂无详细分析'}}</view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 报告项目 -->
+      <view class="section" wx:if="{{report.reportItems && report.reportItems.length > 0}}">
+        <view class="section-title">检查项目</view>
+        <view class="report-items">
+          <block wx:for="{{report.reportItems}}" wx:key="name" wx:for-item="group">
+            <view class="item-group">
+              <view class="group-name">{{group.name}}</view>
+              <view class="item-list">
+                <view class="item" wx:for="{{group.items}}" wx:key="name">
+                  <view class="item-name">{{item.name}}</view>
+                  <view class="item-value {{item.abnormal ? 'abnormal' : ''}}">
+                    {{item.value}} {{item.unit}}
+                    <text wx:if="{{item.abnormal}}" class="abnormal-mark">*</text>
+                  </view>
+                  <view class="item-range">
+                    <text class="range-text">参考范围: {{item.referenceRange}}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
     </view>
+    
     <view class="report-footer">
       <button class="btn-primary" bindtap="bindViewFileTap">查看原始报告</button>
-      <button class="btn-default" bindtap="bindAnalyzeByAI">AI 智能分析</button>
+      <button class="btn-default" bindtap="bindAnalyzeByAI" disabled="{{isAnalyzing}}">
+        {{isAnalyzing ? '分析中...' : (report.aiAnalysis ? '重新分析' : 'AI 智能分析')}}
+      </button>
     </view>
   </block>
 

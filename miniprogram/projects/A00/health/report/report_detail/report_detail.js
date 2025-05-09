@@ -6,7 +6,8 @@ Page({
     isLoad: false,
     reportId: '',
     report: null,
-    showAiResult: false
+    showAiResult: false,
+    isAnalyzing: false
   },
 
   /**
@@ -24,7 +25,13 @@ Page({
     this.setData({
       reportId: options.id
     });
-    this._loadReportDetail();
+    
+    this._loadReportDetail().then(() => {
+      // 如果有analyze=true参数，自动触发AI分析
+      if (options.analyze === 'true' && this.data.report) {
+        this.bindAnalyzeByAI();
+      }
+    });
   },
 
   /**
@@ -54,8 +61,11 @@ Page({
 
       this.setData({
         report: result.data,
-        isLoad: true
+        isLoad: true,
+        showAiResult: result.data && result.data.aiAnalysis
       });
+      
+      return result;
     } catch (err) {
       console.error(err);
       this.setData({
@@ -73,14 +83,47 @@ Page({
       return;
     }
 
+    // 处理多文件情况
+    const fileIds = this.data.report.reportFileId.split(',');
+    if (fileIds.length > 1) {
+      // 如果是多个文件，弹出选择框
+      const fileNames = this.data.report.reportFileName ? this.data.report.reportFileName.split('; ') : [];
+      const items = fileIds.map((id, index) => {
+        return {
+          name: fileNames[index] || `文件${index + 1}`,
+          id: id
+        };
+      });
+
+      wx.showActionSheet({
+        itemList: items.map(item => item.name),
+        success: res => {
+          const selectedFile = items[res.tapIndex];
+          this._viewSingleFile(selectedFile.id);
+        }
+      });
+    } else {
+      // 单文件直接打开
+      this._viewSingleFile(this.data.report.reportFileId);
+    }
+  },
+
+  /**
+   * 查看单个文件
+   */
+  _viewSingleFile: function(fileId) {
+    wx.showLoading({ title: '加载文件中...' });
+    
     // 根据文件ID获取临时链接并打开
     wx.cloud.getTempFileURL({
-      fileList: [this.data.report.reportFileId],
+      fileList: [fileId],
       success: res => {
+        wx.hideLoading();
         const tempFileURL = res.fileList[0].tempFileURL;
         this._openFile(tempFileURL);
       },
       fail: err => {
+        wx.hideLoading();
         console.error(err);
         pageHelper.showModal('获取文件失败，请重试');
       }
@@ -88,102 +131,117 @@ Page({
   },
 
   /**
-   * 打开文件预览
+   * 打开文件
    */
-  _openFile: function (fileUrl) {
-    // 判断文件类型
-    const fileType = fileUrl.substring(fileUrl.lastIndexOf('.') + 1).toLowerCase();
-    if (['jpg', 'jpeg', 'png'].includes(fileType)) {
-      // 图片预览
-      wx.previewImage({
-        urls: [fileUrl]
-      });
-    } else if (fileType === 'pdf') {
-      // PDF预览
+  _openFile: function(url) {
+    if (url.toLowerCase().endsWith('.pdf')) {
+      // PDF文件
       wx.downloadFile({
-        url: fileUrl,
-        success: function (res) {
+        url: url,
+        success: function(res) {
           const filePath = res.tempFilePath;
           wx.openDocument({
             filePath: filePath,
-            showMenu: true
+            success: function(res) {
+              console.log('打开文档成功');
+            },
+            fail: function(error) {
+              console.error('打开文档失败', error);
+              pageHelper.showModal('打开文档失败，请重试');
+            }
           });
         },
-        fail: function (err) {
-          console.error(err);
-          pageHelper.showModal('文件打开失败，请重试');
+        fail: function(error) {
+          console.error('下载文件失败', error);
+          pageHelper.showModal('下载文件失败，请重试');
         }
       });
     } else {
-      pageHelper.showModal('不支持的文件类型');
+      // 图片文件
+      wx.previewImage({
+        urls: [url],
+        current: url
+      });
     }
   },
 
   /**
-   * 开始AI分析
+   * AI分析报告
    */
-  bindAnalyzeByAI: async function () {
+  bindAnalyzeByAI: async function() {
+    if (!this.data.report) {
+      pageHelper.showModal('报告不存在，无法分析');
+      return;
+    }
+
+    if (this.data.isAnalyzing) {
+      return;
+    }
+
     try {
-      pageHelper.showLoading('AI分析中');
-
-      // 准备要分析的内容
+      this.setData({ isAnalyzing: true });
+      
+      wx.showLoading({ title: 'AI分析中...', mask: true });
+      
+      // 准备AI分析所需内容
       let reportContent = '';
+      
+      // 如果有summary，放在最前面
       if (this.data.report.summary) {
-        reportContent += '摘要：' + this.data.report.summary + '\n';
+        reportContent += this.data.report.summary + '\n\n';
       }
-
-      // 添加体检项目内容
+      
+      // 添加报告明细项目
       if (this.data.report.reportItems && this.data.report.reportItems.length > 0) {
-        this.data.report.reportItems.forEach(section => {
-          reportContent += section.name + '：\n';
-          section.items.forEach(item => {
-            reportContent += `${item.name}：${item.value}${item.unit || ''} (参考范围：${item.referenceRange || '无'}) ${item.abnormal ? '异常' : '正常'}\n`;
-          });
+        this.data.report.reportItems.forEach(group => {
+          reportContent += group.name + ':\n';
+          
+          if (group.items && group.items.length > 0) {
+            group.items.forEach(item => {
+              const abnormalMark = item.abnormal ? '[异常]' : '';
+              reportContent += `  ${item.name}: ${item.value}${item.unit} ${abnormalMark} (参考范围: ${item.referenceRange})\n`;
+            });
+          }
+          
+          reportContent += '\n';
         });
       }
-
+      
+      // 调用AI分析云函数
       const params = {
         reportId: this.data.reportId,
         reportContent: reportContent
       };
-
+      
       const result = await cloudHelper.callCloudData('medicalReport', {
         action: 'analyzeReportByAI',
         params
       });
-
-      pageHelper.hideLoading();
-
-      // 重新加载报告数据以获取AI分析结果
-      await this._loadReportDetail();
-
-      // 显示AI分析结果
-      this.setData({
-        showAiResult: true
-      });
-
+      
+      wx.hideLoading();
+      
+      if (result && result.code === 0) {
+        await this._loadReportDetail(); // 重新加载报告以获取AI分析结果
+        this.setData({ showAiResult: true });
+        pageHelper.showSuccToast('分析完成');
+      } else {
+        pageHelper.showModal(result.msg || 'AI分析失败，请重试');
+      }
     } catch (err) {
-      pageHelper.hideLoading();
-      console.error(err);
+      wx.hideLoading();
+      console.error('AI分析失败', err);
       pageHelper.showModal('AI分析失败，请重试');
+    } finally {
+      this.setData({ isAnalyzing: false });
     }
   },
-
+  
   /**
-   * 显示AI分析结果
+   * 切换显示/隐藏AI分析结果
    */
-  bindViewAiResult: function () {
+  toggleAiResult: function() {
     this.setData({
-      showAiResult: true
-    });
-  },
-
-  /**
-   * 关闭AI分析结果
-   */
-  bindCloseAiResult: function () {
-    this.setData({
-      showAiResult: false
+      showAiResult: !this.data.showAiResult
     });
   }
-}) 
+}); 

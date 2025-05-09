@@ -16,4 +16,11 @@ Page({
 			title: '上传报告'
 		});
 	},
+
+  /**
+   * 表单提交按钮点击事件
+   */
+  bindFormSubmit: function() {
+    this.onSubmit();
+  }
 }) 
