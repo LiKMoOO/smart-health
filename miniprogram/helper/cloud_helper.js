@@ -56,6 +56,11 @@
  		
  		if (!result) return null;
 
+ 		// 处理健康相关接口的特殊情况
+ 		if (route === 'health/gethealthindex' && result.code === 0) {
+ 			return result.data; // 直接返回data字段
+ 		}
+
  		// 直接提取数据
  		if (helper.isDefined(result.data)) {
  			let data = result.data;
@@ -140,7 +145,7 @@
  			name: 'cloud',
  			data: data,
  			success: function (res) {
- 				if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA&& res.result.code !== 0) {
+ 				if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA && res.result.code !== 0) {
  					console.log(res)
  					// 逻辑错误&数据校验错误 
  					if (hint) {
@@ -160,11 +165,11 @@
  					});
  					//reject(res.result);
  					return;
- 				} else if (res.result.code != CODE.SUCC) {
+ 				} else if (res.result.code != CODE.SUCC && res.result.code !== 0) {
  					if (hint) {
  						wx.showModal({
  							title: '温馨提示',
- 							content: '系统开小差了，请稍后重试',
+ 							content: res.result.msg || '系统开小差了，请稍后重试',
  							showCancel: false
  						});
  					}

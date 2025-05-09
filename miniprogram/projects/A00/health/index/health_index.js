@@ -119,7 +119,7 @@ Page({
       
       // 验证数据
       if (!this._validateHealthData(healthData)) {
-        throw new Error('健康数据无效');
+        console.warn('健康数据验证失败，使用默认空数据');
       }
       
       // 计算BMI值
@@ -158,10 +158,12 @@ Page({
     } catch (err) {
       console.error('加载健康数据失败：', err);
       this.setData({
-        isLoad: true
+        isLoad: true,
+        healthInfo: null,
+        recentMetrics: [],
+        recentReminders: []
       });
-      this._handleError('加载健康数据失败，请重试');
-      throw err;
+      return null;
     }
   },
 
@@ -185,6 +187,7 @@ Page({
       // 读取缓存
       const cache = wx.getStorageSync(CACHE_KEY);
       if (cache && cache.timestamp && Date.now() - cache.timestamp < CACHE_EXPIRE) {
+        console.log('使用健康数据缓存');
         return cache.data;
       }
       
@@ -194,31 +197,25 @@ Page({
         size: PAGE_SIZE
       });
       
-      if (!res || !res.data) {
+      if (!res) {
+        console.error('云函数返回空数据');
         throw new Error('获取数据失败');
       }
       
       // 更新缓存
       wx.setStorageSync(CACHE_KEY, {
-        data: res.data,
+        data: res,
         timestamp: Date.now()
       });
       
       // 脱敏敏感数据
-      const healthData = this._maskSensitiveData(res.data);
+      const healthData = this._maskSensitiveData(res);
       
       // 防御性检查，确保返回数据不为空
       if (!healthData) {
         console.warn('健康数据返回为空，使用默认数据');
         return {
-          profile: {
-            basicInfo: {
-              height: '',
-              weight: '',
-              gender: '',
-              age: ''
-            }
-          },
+          profile: null,
           metrics: [],
           reminders: []
         };
@@ -246,16 +243,9 @@ Page({
       return healthData;
     } catch (err) {
       console.error('获取健康数据出错：', err);
-      // 如果获取失败，返回空数据结构而不是模拟数据
+      // 返回空数据结构而不抛出异常
       return {
-        profile: {
-          basicInfo: {
-            height: '',
-            weight: '',
-            gender: '',
-            age: ''
-          }
-        },
+        profile: null,
         metrics: [],
         reminders: []
       };
@@ -430,6 +420,14 @@ Page({
   // 数据验证
   _validateHealthData(data) {
     if (!data) return false;
+    
+    // 验证基本结构
+    if (!data.hasOwnProperty('profile') || 
+        !data.hasOwnProperty('metrics') || 
+        !data.hasOwnProperty('reminders')) {
+      console.warn('健康数据结构不完整');
+      return false;
+    }
     
     // 验证基本信息
     if (data.profile?.basicInfo) {

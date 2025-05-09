@@ -26,6 +26,7 @@ exports.main = async (event, context) => {
   // 如果openId为空，尝试使用前端传入的userId
   if (!openId && params.userId) {
     console.log('【Health Cloud Function】使用前端传入的userId:', params.userId);
+    params.userId = params.userId;
   } else {
     // 使用openId作为userId，确保数据一致性
     params.userId = openId;

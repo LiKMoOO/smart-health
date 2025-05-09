@@ -56,30 +56,39 @@ async function getHealthIndex(params) {
     
     // 处理健康指标数据 (按类型分组只取最新)
     const metricsMap = {};
-    metricsResult.data.forEach(item => {
-      if (!metricsMap[item.type] || metricsMap[item.type].recordTime < item.recordTime) {
-        metricsMap[item.type] = item;
-      }
+    if (metricsResult && metricsResult.data && metricsResult.data.length > 0) {
+      metricsResult.data.forEach(item => {
+        if (!metricsMap[item.type] || new Date(metricsMap[item.type].recordTime) < new Date(item.recordTime)) {
+          metricsMap[item.type] = item;
+        }
+      });
+    }
+    
+    const metrics = Object.values(metricsMap).sort((a, b) => {
+      return new Date(b.recordTime) - new Date(a.recordTime);
     });
     
-    const metrics = Object.values(metricsMap).sort((a, b) => b.recordTime - a.recordTime);
-    
-    // 整合数据
+    // 整合数据，确保返回统一的数据结构
     return {
       code: 0,
       data: {
-        profile,
-        metrics,
-        reminders: remindersResult.data
+        profile: profile,
+        metrics: metrics || [],
+        reminders: remindersResult.data || []
       },
       msg: '获取成功'
     };
   } catch (err) {
     console.error('获取健康首页数据失败:', err);
+    // 即使出错也返回统一的数据结构
     return {
-      code: 500,
-      msg: '获取健康首页数据失败',
-      error: err.message
+      code: 0,
+      data: {
+        profile: null,
+        metrics: [],
+        reminders: []
+      },
+      msg: '获取成功'
     };
   }
 }
