@@ -311,9 +311,53 @@ async function updateHealthReminder(userId, data) {
   };
 }
 
+// 新增函数：删除单条健康指标记录
+async function deleteHealthMetricRecord(params) {
+  const { userId, recordId } = params;
+  console.log('开始删除健康指标记录，userId:', userId, 'recordId:', recordId);
+
+  if (!userId || !recordId) {
+    return {
+      code: 400,
+      msg: '参数错误，缺少userId或recordId'
+    };
+  }
+
+  try {
+    const result = await db.collection(HEALTH_METRICS_COLLECTION)
+      .where({
+        _id: recordId,
+        userId: userId // 确保只能删除自己的记录
+      })
+      .remove();
+
+    if (result.stats.removed > 0) {
+      console.log('健康指标记录删除成功', result);
+      return {
+        code: 0,
+        msg: '删除成功'
+      };
+    } else {
+      console.log('未找到要删除的记录或无权限删除', result);
+      return {
+        code: 404, // 或者 403 如果是权限问题，但 remove 本身不会区分
+        msg: '未找到记录或删除失败'
+      };
+    }
+  } catch (err) {
+    console.error('删除健康指标记录失败:', err);
+    return {
+      code: 500,
+      msg: '删除失败',
+      error: err.message
+    };
+  }
+}
+
 // 导出模块
 module.exports = {
   getHealthIndex,
   getHealthMetrics,
-  updateHealthData
+  updateHealthData,
+  deleteHealthMetricRecord
 }; 

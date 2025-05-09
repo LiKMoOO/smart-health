@@ -1,5 +1,5 @@
 <!--projects/A00/health/metrics/health_metrics.wxml-->
-<view class="container">
+<view class="container" bindtap="testTap">
   <!-- 顶部标题 -->
   <view class="header">
     <view class="title">健康指标管理</view>
@@ -8,7 +8,7 @@
 
   <!-- 指标类型选择 -->
   <view class="type-selector">
-    <scroll-view scroll-x enable-flex class="type-scroll">
+    <scroll-view scroll-x enable-flex class="type-scroll" style="width: 712rpx; display: flex; box-sizing: border-box; height: 95rpx">
       <view wx:for="{{metricTypes}}" wx:key="id" 
         class="type-item {{activeTypeIndex === index ? 'active' : ''}}"
         bindtap="onChangeType" data-index="{{index}}">
@@ -17,20 +17,13 @@
     </scroll-view>
   </view>
 
-  <!-- 操作按钮 -->
-  <view class="action-bar">
-    <view class="action-btn add-btn" bindtap="showAddMetricModal">
-      <text class="icon-add">+</text>
-      <text>添加记录</text>
-    </view>
-    <view class="action-btn filter-btn" bindtap="showFilterModalTap">
-      <text class="icon-filter">■</text>
-      <text>筛选</text>
-    </view>
-    <view class="action-btn chart-btn" bindtap="toggleChart">
-      <text class="icon-chart">▣</text>
-      <text>{{showChart ? '列表' : '图表'}}</text>
-    </view>
+  <!-- 操作按钮 - 重新设计为更简单直接的按钮 -->
+  <view class="simple-buttons">
+    <button class="simple-btn add-btn" catchtap="addRecord">添加记录</button>
+    <button class="simple-btn filter-btn" catchtap="filterRecord">筛选</button>
+    <button class="simple-btn chart-btn" catchtap="chartToggle">
+      {{showChart ? '列表' : '图表'}}
+    </button>
   </view>
 
   <!-- 图表展示 -->
@@ -66,9 +59,9 @@
 
     <!-- 空态 -->
     <view wx:if="{{isLoad && indicatorList.length === 0}}" class="empty-state">
-      <image class="empty-image" src="/projects/A00/skin/images/health/empty.png" mode="aspectFit"></image>
+      <image class="empty-image" src="/projects/A00/skin/images/health/metrics.png" mode="aspectFit"></image>
       <view class="empty-text">暂无{{metricTypes[activeTypeIndex].name}}记录</view>
-      <view class="empty-desc">点击上方按钮添加记录</view>
+      <view class="empty-desc">点击上方添加记录按钮开始记录</view>
     </view>
 
     <!-- 加载中 -->
@@ -83,7 +76,7 @@
     <view class="modal-bg" bindtap="hideAddMetricModal"></view>
     <view class="modal-content">
       <view class="modal-header">
-        <text>添加{{metricTypes[activeTypeIndex].name}}记录</text>
+        <text>{{isEdit ? '编辑' : '添加'}}{{metricTypes[activeTypeIndex].name}}记录</text>
         <view class="close-btn" bindtap="hideAddMetricModal">×</view>
       </view>
       <view class="modal-body">
@@ -185,6 +178,7 @@
       </view>
       <view class="modal-footer">
         <button class="btn-delete" bindtap="deleteRecord" data-id="{{currentDetail._id}}">删除</button>
+        <button class="btn-edit" bindtap="editRecord" data-id="{{currentDetail._id}}">编辑</button>
         <button class="btn-close" bindtap="hideDetailModal">关闭</button>
       </view>
     </view>

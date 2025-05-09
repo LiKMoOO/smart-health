@@ -2,6 +2,7 @@
 const pageHelper = require('../../../../helper/page_helper.js');
 const cloudHelper = require('../../../../helper/cloud_helper.js');
 const timeHelper = require('../../../../helper/time_helper.js');
+const MAX_RECORDS_PER_PAGE = 15; // 每页记录数
 
 Page({
 
@@ -14,11 +15,11 @@ Page({
 		
 		// 指标类型
 		metricTypes: [
-			{ id: 'blood_pressure', name: '血压', unit: 'mmHg', hasMultipleValues: true },
-			{ id: 'blood_sugar', name: '血糖', unit: 'mmol/L', hasMultipleValues: false },
-			{ id: 'weight', name: '体重', unit: 'kg', hasMultipleValues: false },
-			{ id: 'heart_rate', name: '心率', unit: 'bpm', hasMultipleValues: false },
-			{ id: 'temperature', name: '体温', unit: '°C', hasMultipleValues: false }
+			{ id: 'blood_pressure', name: '血压', unit: 'mmHg', hasMultipleValues: true, fields: [{ name: 'systolic', label: '收缩压', placeholder: '请输入收缩压' }, { name: 'diastolic', label: '舒张压', placeholder: '请输入舒张压' }] },
+			{ id: 'blood_sugar', name: '血糖', unit: 'mmol/L', hasMultipleValues: false, placeholder: '请输入血糖值' },
+			{ id: 'weight', name: '体重', unit: 'kg', hasMultipleValues: false, placeholder: '请输入体重值' },
+			{ id: 'heart_rate', name: '心率', unit: 'bpm', hasMultipleValues: false, placeholder: '请输入心率值' },
+			// { id: 'temperature', name: '体温', unit: '°C', hasMultipleValues: false, placeholder: '请输入体温值' }
 		],
 		
 		// 当前选中的指标类型
@@ -27,12 +28,16 @@ Page({
 		// 新记录表单
 		showAddModal: false,
 		formMetric: {
-			type: 'blood_pressure',
+			type: '',
 			value: {},
-			unit: 'mmHg',
-			recordTime: null,
+			unit: '',
+			recordTime: '',
 			notes: ''
 		},
+		
+		// 是否为编辑模式
+		isEdit: false,
+		editRecordId: null,
 		
 		// 详情弹窗
 		showDetailModal: false,
@@ -43,31 +48,27 @@ Page({
 		filter: {
 			startDate: '',
 			endDate: '',
-			type: ''
 		},
 		
 		// 图表相关
 		showChart: false,
-		chartData: []
+		// chartData: [] // 暂时不用
+		
+		// 分页相关
+		_page: 1,
+		_total: 0,
+		_canLoadMore: true,
 	},
 
 	/**
 	 * 生命周期函数--监听页面加载
 	 */
 	onLoad(options) {
-		// 获取当前日期
-		const today = new Date();
-		const formattedDate = this._formatDate(today);
-		
-		// 初始化记录时间为当前时间
-		let formMetric = this.data.formMetric;
-		formMetric.recordTime = formattedDate;
-		
+		this._resetFormMetric(); // 初始化表单涉及的指标类型
 		this.setData({
-			formMetric
+			'formMetric.recordTime': this._formatDate(new Date()) // 默认记录时间为今天
 		});
-		
-		this._loadData();
+		this._loadData(true); // 首次加载
 	},
 
 	/**
@@ -102,15 +103,16 @@ Page({
 	 * 页面相关事件处理函数--监听用户下拉动作
 	 */
 	onPullDownRefresh() {
-		this._loadData();
-		wx.stopPullDownRefresh();
+		this._loadData(true);
 	},
 
 	/**
 	 * 页面上拉触底事件的处理函数
 	 */
 	onReachBottom() {
-		// 暂无分页加载
+		if (this.data._canLoadMore) {
+			this._loadData();
+		}
 	},
 
 	/**
@@ -126,60 +128,81 @@ Page({
 	/**
 	 * 加载健康指标数据
 	 */
-	async _loadData() {
+	async _loadData(isRefresh = false) {
+		console.log('[health_metrics.js] _loadData called. isRefresh:', isRefresh, 'Current page:', this.data._page, 'Can load more:', this.data._canLoadMore);
+
+		if (!this.data._canLoadMore && !isRefresh) {
+			console.log('[health_metrics.js] Cannot load more and not a refresh. Returning.');
+			wx.stopPullDownRefresh(); // 确保停止下拉刷新动画
+			return;
+		}
+
 		try {
-			// 设置加载状态
-			this.setData({
-				isLoad: false
-			});
-			
-			// 获取当前选中的指标类型
-			const currentTypeId = this.data.metricTypes[this.data.activeTypeIndex].id;
-			
-			// 构建查询条件
+			const page = isRefresh ? 1 : this.data._page;
+			console.log('[health_metrics.js] Effective page to load:', page);
+
+			if (isRefresh) {
+				console.log('[health_metrics.js] Refreshing data, resetting indicatorList and _total.');
+				this.setData({ indicatorList: [], _total: 0 });
+			}
+			// 初始设置 isLoad 为 false 以显示加载动画，_canLoadMore 设为 true 允许加载
+			this.setData({ isLoad: false, _canLoadMore: true }); 
+			console.log('[health_metrics.js] Set isLoad to false to show loading.');
+
+			const currentType = this.data.metricTypes[this.data.activeTypeIndex];
 			let params = {
-				type: currentTypeId
+				type: currentType.id,
+				page: page,
+				size: MAX_RECORDS_PER_PAGE,
 			};
-			
-			// 添加筛选条件
-			if (this.data.filter.startDate) {
-				params.startTime = new Date(this.data.filter.startDate).getTime();
-			}
-			
-			if (this.data.filter.endDate) {
-				// 设置为当天的23:59:59
-				const endDate = new Date(this.data.filter.endDate);
-				endDate.setHours(23, 59, 59, 999);
-				params.endTime = endDate.getTime();
-			}
-			
-			// 调用云函数获取数据
+
+			if (this.data.filter.startDate) params.startTime = new Date(this.data.filter.startDate + " 00:00:00").getTime();
+			if (this.data.filter.endDate) params.endTime = new Date(this.data.filter.endDate + " 23:59:59").getTime();
+			console.log('[health_metrics.js] Request params:', params);
+
 			const result = await cloudHelper.callCloudData('health/gethealthmetrics', params);
-			
-			// 格式化数据
-			let list = result.list.map(item => {
-				// 处理日期显示
-				const recordDate = new Date(item.recordTime);
-				return {
+			console.log('[health_metrics.js] Cloud function result:', result);
+
+			if (result && Array.isArray(result.list)) {
+				const formattedList = result.list.map(item => ({
 					...item,
-					formattedDate: this._formatDate(recordDate),
-					formattedTime: this._formatTime(recordDate)
-				};
-			});
-			
-			// 更新状态
-			this.setData({
-				indicatorList: list,
-				isLoad: true
-			});
-			
+					formattedDate: item.recordTime ? this._formatDate(new Date(item.recordTime)) : 'N/A',
+					formattedTime: item.recordTime ? this._formatTime(new Date(item.recordTime)) : 'N/A',
+				}));
+				console.log('[health_metrics.js] Formatted list count:', formattedList.length, 'Total from cloud:', result.total);
+				
+				const newList = isRefresh ? formattedList : [...this.data.indicatorList, ...formattedList];
+				const newTotal = result.total || 0;
+				const newPage = page + 1;
+				// _canLoadMore: 新列表长度等于每页数量 并且 (当前加载的页数 * 每页数量 < 总数)
+				const canLoadMore = formattedList.length === MAX_RECORDS_PER_PAGE && (page * MAX_RECORDS_PER_PAGE < newTotal);
+
+				console.log('[health_metrics.js] New list length:', newList.length, 'New total:', newTotal, 'Next page:', newPage, 'Can load more (next):', canLoadMore);
+
+				this.setData({
+					indicatorList: newList,
+					_total: newTotal,
+					_page: newPage,
+					_canLoadMore: canLoadMore,
+					// isLoad: true, // 将 isLoad 的设置移到 finally 块
+				});
+			} else {
+				console.warn('[health_metrics.js] Cloud function result.list is not an array or result is null.');
+				// 如果云函数返回的不是预期格式，也应该能处理，比如认为没有更多数据了
+				this.setData({
+					_canLoadMore: false,
+					// isLoad: true,
+				});
+			}
 		} catch (error) {
-			console.error('获取健康指标数据失败', error);
-			this.setData({
-				isLoad: true
-			});
-			
+			console.error('[health_metrics.js] 获取健康指标数据失败', error);
+			this.setData({ _canLoadMore: false /*, isLoad: true*/ }); // 出错也认为加载结束
 			pageHelper.showNoneToast('获取数据失败，请重试');
+		} finally {
+			console.log('[health_metrics.js] Finally block. Setting isLoad to true.');
+			this.setData({ isLoad: true }); // 确保 isLoad 在加载流程结束后（无论成功失败）都设为 true
+			wx.stopPullDownRefresh();
+			console.log('[health_metrics.js] Current indicatorList length after load:', this.data.indicatorList.length, 'isLoad state:', this.data.isLoad);
 		}
 	},
 	
@@ -187,64 +210,40 @@ Page({
 	 * 切换指标类型
 	 */
 	onChangeType(e) {
-		// 获取点击的索引
-		const index = e.currentTarget.dataset.index;
-		
-		// 更新当前选中的类型
+		const index = parseInt(e.currentTarget.dataset.index, 10);
 		this.setData({
-			activeTypeIndex: index
+			activeTypeIndex: index,
+			_page: 1, // 重置分页
+			_canLoadMore: true,
 		});
-		
-		// 重新格式化表单数据
-		let formMetric = this.data.formMetric;
-		formMetric.type = this.data.metricTypes[index].id;
-		formMetric.unit = this.data.metricTypes[index].unit;
-		
-		// 根据类型不同，初始化不同的值结构
-		if (this.data.metricTypes[index].hasMultipleValues) {
-			formMetric.value = {
-				systolic: '',
-				diastolic: ''
-			};
-		} else {
-			formMetric.value = '';
-		}
-		
-		this.setData({
-			formMetric
-		});
-		
-		// 重新加载数据
-		this._loadData();
+		this._resetFormMetric(); // 根据新类型重置表单中 type, unit, value结构
+		this._loadData(true); // 重新加载数据
 	},
 	
 	/**
 	 * 显示添加记录弹窗
 	 */
 	showAddMetricModal() {
-		// 重置表单数据
-		const type = this.data.metricTypes[this.data.activeTypeIndex];
-		let formMetric = {
-			type: type.id,
-			unit: type.unit,
-			recordTime: this._formatDate(new Date()),
-			notes: ''
-		};
-		
-		// 根据类型不同，初始化不同的值结构
-		if (type.hasMultipleValues) {
-			formMetric.value = {
-				systolic: '',
-				diastolic: ''
-			};
-		} else {
-			formMetric.value = '';
+		console.log('[DEBUG] showAddMetricModal called!');
+		try {
+			// 重置表单数据
+			this._resetFormMetric(); // 确保表单基于当前激活的类型
+			
+			// 设置默认日期为今天
+			const today = this._formatDate(new Date());
+			console.log('[DEBUG] 默认日期:', today);
+			
+			// 更新页面状态，显示模态框
+			this.setData({
+				'formMetric.recordTime': today,
+				'formMetric.notes': '', // 清空备注
+				showAddModal: true
+			});
+			
+			console.log('[DEBUG] showAddModal设置完成, 当前值:', this.data.showAddModal);
+		} catch (e) {
+			console.error('[DEBUG] Error in showAddMetricModal:', e);
 		}
-		
-		this.setData({
-			formMetric,
-			showAddModal: true
-		});
 	},
 	
 	/**
@@ -252,7 +251,9 @@ Page({
 	 */
 	hideAddMetricModal() {
 		this.setData({
-			showAddModal: false
+			showAddModal: false,
+			isEdit: false,
+			editRecordId: null
 		});
 	},
 	
@@ -262,99 +263,26 @@ Page({
 	onMetricInput(e) {
 		const field = e.currentTarget.dataset.field;
 		const value = e.detail.value;
-		
-		let formMetric = this.data.formMetric;
-		
-		// 根据字段类型不同进行处理
-		if (field === 'systolic' || field === 'diastolic') {
-			// 血压等多值情况
-			formMetric.value[field] = value;
-		} else if (field === 'value') {
-			// 单值情况
-			formMetric.value = value;
+		const currentType = this.data.metricTypes[this.data.activeTypeIndex];
+
+		if (field === 'notes') {
+			this.setData({ 'formMetric.notes': value });
+		} else if (currentType.hasMultipleValues) {
+			// field 会是 'systolic' 或 'diastolic'
+			this.setData({ [`formMetric.value.${field}`]: value });
 		} else {
-			// 其他字段
-			formMetric[field] = value;
+			// field 是 'value'
+			this.setData({ 'formMetric.value': value });
 		}
-		
-		this.setData({
-			formMetric
-		});
 	},
 	
 	/**
 	 * 处理日期选择
 	 */
 	onDateChange(e) {
-		const date = e.detail.value;
-		
-		let formMetric = this.data.formMetric;
-		formMetric.recordTime = date;
-		
 		this.setData({
-			formMetric
+			'formMetric.recordTime': e.detail.value
 		});
-	},
-	
-	/**
-	 * 提交指标记录
-	 */
-	async submitMetric() {
-		// 获取表单数据
-		const formMetric = this.data.formMetric;
-		const type = this.data.metricTypes[this.data.activeTypeIndex];
-		
-		// 验证数据
-		if (type.hasMultipleValues) {
-			// 多值验证
-			if (!formMetric.value.systolic) {
-				return pageHelper.showModal('请输入收缩压值');
-			}
-			if (!formMetric.value.diastolic) {
-				return pageHelper.showModal('请输入舒张压值');
-			}
-		} else {
-			// 单值验证
-			if (!formMetric.value) {
-				return pageHelper.showModal(`请输入${type.name}值`);
-			}
-		}
-		
-		// 验证日期
-		if (!formMetric.recordTime) {
-			return pageHelper.showModal('请选择测量日期');
-		}
-		
-		try {
-			pageHelper.showLoading('提交中...');
-			
-			// 准备提交的数据
-			const params = {
-				type: formMetric.type,
-				value: formMetric.value,
-				unit: formMetric.unit,
-				notes: formMetric.notes,
-				recordTimestamp: new Date(formMetric.recordTime).getTime()
-			};
-			
-			// 调用云函数
-			await cloudHelper.callCloudData('health/addhealthmetrics', params);
-			
-			// 隐藏弹窗
-			this.setData({
-				showAddModal: false
-			});
-			
-			// 重新加载数据
-			this._loadData();
-			
-			pageHelper.showSuccToast('添加成功');
-		} catch (error) {
-			console.error('添加健康指标记录失败', error);
-			pageHelper.showModal('添加失败，请重试');
-		} finally {
-			pageHelper.hideLoading();
-		}
 	},
 	
 	/**
@@ -362,12 +290,14 @@ Page({
 	 */
 	viewDetail(e) {
 		const index = e.currentTarget.dataset.index;
-		const detail = this.data.indicatorList[index];
-		
-		this.setData({
-			currentDetail: detail,
-			showDetailModal: true
-		});
+		const record = this.data.indicatorList[index];
+		if (record) {
+			this.setData({
+				currentDetail: record,
+				showDetailModal: true
+			});
+			console.log('[DEBUG] 查看记录详情:', record);
+		}
 	},
 	
 	/**
@@ -375,50 +305,219 @@ Page({
 	 */
 	hideDetailModal() {
 		this.setData({
-			showDetailModal: false
+			showDetailModal: false,
+			currentDetail: null
 		});
 	},
 	
 	/**
-	 * 删除记录
+	 * 编辑记录
 	 */
-	async deleteRecord(e) {
-		const id = e.currentTarget.dataset.id;
+	editRecord(e) {
+		console.log('[DEBUG] 编辑记录按钮点击');
+		const recordId = e.currentTarget.dataset.id;
+		if (!recordId) return;
 		
-		// 确认删除
-		const confirm = await pageHelper.showConfirm('确定要删除此记录吗？');
-		if (!confirm) return;
+		const record = this.data.currentDetail;
+		if (!record) return;
 		
-		try {
-			pageHelper.showLoading('删除中...');
-			
-			// 调用云函数删除
-			await cloudHelper.callCloudData('health/deletehealthmetric', { id });
-			
-			// 隐藏弹窗
+		// 在指标类型中查找当前记录的类型
+		const typeIndex = this.data.metricTypes.findIndex(item => item.id === record.type);
+		if (typeIndex === -1) {
+			console.error('[DEBUG] 找不到对应的指标类型:', record.type);
+			pageHelper.showModal('无法编辑该记录，找不到对应的指标类型');
+			return;
+		}
+		
+		// 如果需要切换指标类型
+		if (typeIndex !== this.data.activeTypeIndex) {
 			this.setData({
-				showDetailModal: false
+				activeTypeIndex: typeIndex
+			});
+			this._resetFormMetric();
+		}
+		
+		// 设置表单数据
+		let formMetricValue = {};
+		if (this.data.metricTypes[typeIndex].hasMultipleValues) {
+			formMetricValue = {
+				systolic: record.value.systolic.toString(),
+				diastolic: record.value.diastolic.toString()
+			};
+		} else {
+			formMetricValue = record.value.toString();
+		}
+		
+		// 设置编辑模式
+		this.setData({
+			isEdit: true,
+			editRecordId: recordId,
+			'formMetric.value': formMetricValue,
+			'formMetric.recordTime': this._formatDate(new Date(record.recordTime)),
+			'formMetric.notes': record.notes || '',
+			showAddModal: true,
+			showDetailModal: false
+		});
+		
+		console.log('[DEBUG] 编辑模式表单数据:', this.data.formMetric);
+	},
+	
+	/**
+	 * 提交指标记录
+	 */
+	async submitMetric() {
+		console.log('[DEBUG] submitMetric called!');
+		try {
+			const { formMetric, metricTypes, activeTypeIndex, isEdit, editRecordId } = this.data;
+			const currentMetricType = metricTypes[activeTypeIndex];
+			console.log('[DEBUG] 当前指标类型:', currentMetricType.name);
+			console.log('[DEBUG] 表单数据:', formMetric);
+			console.log('[DEBUG] 是否编辑模式:', isEdit, '记录ID:', editRecordId);
+			
+			// 构建保存数据
+			let metricToSave = {
+				type: currentMetricType.id,
+				unit: currentMetricType.unit,
+				notes: formMetric.notes ? formMetric.notes.trim() : '',
+				recordTime: new Date(formMetric.recordTime + " 12:00:00").getTime(), // 默认当天中午12点
+				value: null
+			};
+			
+			// 如果是编辑模式，添加ID
+			if (isEdit && editRecordId) {
+				metricToSave._id = editRecordId;
+			}
+
+			// 数据校验和赋值
+			if (currentMetricType.hasMultipleValues) {
+				// 血压等多值指标
+				const systolic = parseFloat(formMetric.value.systolic);
+				const diastolic = parseFloat(formMetric.value.diastolic);
+				
+				if (isNaN(systolic) || systolic <= 0) {
+					pageHelper.showModal('请输入有效的收缩压');
+					return;
+				}
+				if (isNaN(diastolic) || diastolic <= 0) {
+					pageHelper.showModal('请输入有效的舒张压');
+					return;
+				}
+				if (systolic <= diastolic) {
+					pageHelper.showModal('收缩压应大于舒张压');
+					return;
+				}
+				
+				metricToSave.value = { systolic, diastolic };
+				console.log('[DEBUG] 多值指标数据:', metricToSave.value);
+			} else {
+				// 单值指标
+				const singleValue = parseFloat(formMetric.value);
+				if (isNaN(singleValue) || singleValue < 0) {
+					pageHelper.showModal('请输入有效的' + currentMetricType.name + '值');
+					return;
+				}
+				
+				// 针对不同类型指标的数值范围校验
+				if (currentMetricType.id === 'blood_sugar' && singleValue > 30) {
+					pageHelper.showModal('血糖值似乎过高，请确认后重新输入');
+					return;
+				} else if (currentMetricType.id === 'weight' && singleValue > 300) {
+					pageHelper.showModal('体重值似乎过高，请确认后重新输入');
+					return;
+				} else if (currentMetricType.id === 'heart_rate' && singleValue > 220) {
+					pageHelper.showModal('心率值似乎过高，请确认后重新输入');
+					return;
+				}
+				
+				metricToSave.value = singleValue;
+				console.log('[DEBUG] 单值指标数据:', metricToSave.value);
+			}
+
+			// 显示加载中
+			pageHelper.showLoading(isEdit ? '更新中...' : '保存中...');
+			
+			// 调用云函数保存数据
+			console.log('[DEBUG] 准备提交数据:', {dataType: 'metrics', data: metricToSave});
+			const result = await cloudHelper.callCloudData('health/updatehealthdata', {
+				dataType: 'metrics',
+				data: metricToSave
 			});
 			
-			// 重新加载数据
-			this._loadData();
+			console.log('[DEBUG] 提交结果:', result);
 			
-			pageHelper.showSuccToast('删除成功');
-		} catch (error) {
-			console.error('删除健康指标记录失败', error);
-			pageHelper.showModal('删除失败，请重试');
+			// 显示成功提示
+			pageHelper.showSuccToast(isEdit ? '记录更新成功' : '记录添加成功');
+			
+			// 关闭模态框并重置编辑状态
+			this.hideAddMetricModal();
+			
+			// 刷新列表数据
+			this._loadData(true);
+			
+			// 如果有异常值，显示健康提醒
+			if (result && result.data && result.data.isAbnormal && result.data.abnormalReason) {
+				setTimeout(() => {
+					pageHelper.showModal('健康提醒：' + result.data.abnormalReason, '记录提示');
+				}, 1500);
+			}
+
+		} catch (err) {
+			console.error('[DEBUG] 添加健康指标失败:', err);
+			pageHelper.showModal('操作失败，请重试: ' + (err.message || err));
 		} finally {
 			pageHelper.hideLoading();
 		}
 	},
 	
 	/**
+	 * 删除记录
+	 */
+	async deleteRecord(e) {
+		const recordId = e.currentTarget.dataset.id;
+		if (!recordId) return;
+
+		wx.showModal({
+			title: '确认删除',
+			content: '确定要删除这条记录吗？',
+			success: async (res) => {
+				if (res.confirm) {
+					try {
+						pageHelper.showLoading('删除中...');
+						// 调用实际的云函数接口
+						const result = await cloudHelper.callCloudData('health/deletehealthmetric', { recordId: recordId }); 
+						
+						if (result && result.code === 0) { // 假设云函数返回 code: 0 表示成功
+							pageHelper.showSuccToast('删除成功');
+							this.hideDetailModal(); // 关闭详情弹窗
+							this._loadData(true); // 刷新列表
+						} else {
+							pageHelper.showModal(result.msg || '删除失败，请稍后重试');
+						}
+
+					} catch (err) {
+						console.error('删除记录失败', err);
+						pageHelper.showModal('删除操作失败，请检查网络或稍后重试');
+					} finally {
+						pageHelper.hideLoading();
+					}
+				}
+			}
+		});
+	},
+	
+	/**
 	 * 显示筛选弹窗
 	 */
 	showFilterModalTap() {
-		this.setData({
-			showFilterModal: true
-		});
+		console.log('[DEBUG] showFilterModalTap called!');
+		try {
+			this.setData({
+				showFilterModal: true
+			});
+			console.log('[DEBUG] showFilterModal set to true:', this.data.showFilterModal);
+		} catch (e) {
+			console.error('[DEBUG] Error in showFilterModalTap:', e);
+		}
 	},
 	
 	/**
@@ -435,13 +534,8 @@ Page({
 	 */
 	onFilterInput(e) {
 		const field = e.currentTarget.dataset.field;
-		const value = e.detail.value;
-		
-		let filter = this.data.filter;
-		filter[field] = value;
-		
 		this.setData({
-			filter
+			[`filter.${field}`]: e.detail.value
 		});
 	},
 	
@@ -449,49 +543,100 @@ Page({
 	 * 应用筛选
 	 */
 	applyFilter() {
-		// 隐藏筛选弹窗
-		this.setData({
-			showFilterModal: false
-		});
-		
-		// 重新加载数据
-		this._loadData();
+		this.hideFilterModal();
+		this.setData({_page: 1}); // 重置分页
+		this._loadData(true);
 	},
 	
 	/**
 	 * 切换图表/列表视图
 	 */
 	toggleChart() {
-		const showChart = !this.data.showChart;
-		
-		this.setData({
-			showChart
-		});
-		
-		// 如果切换到图表视图，可以在这里准备图表数据
-		if (showChart) {
-			// TODO: 准备图表数据
+		console.log('[DEBUG] toggleChart called!');
+		try {
+			const newShowChart = !this.data.showChart;
+			this.setData({
+				showChart: newShowChart
+			});
+			console.log('[DEBUG] showChart set to:', newShowChart);
+		} catch (e) {
+			console.error('[DEBUG] Error in toggleChart:', e);
 		}
+	},
+	
+	/**
+	 * 重置表单相关的指标类型信息
+	 */
+	_resetFormMetric() {
+		const currentType = this.data.metricTypes[this.data.activeTypeIndex];
+		let formValue = {};
+		if (currentType.hasMultipleValues) {
+			currentType.fields.forEach(f => formValue[f.name] = '');
+		} else {
+			formValue = ''; // 单值直接为空字符串或 null
+		}
+		this.setData({
+			'formMetric.type': currentType.id,
+			'formMetric.unit': currentType.unit,
+			'formMetric.value': formValue,
+		});
 	},
 	
 	/**
 	 * 格式化日期 YYYY-MM-DD
 	 */
 	_formatDate(date) {
-		const year = date.getFullYear();
-		const month = String(date.getMonth() + 1).padStart(2, '0');
-		const day = String(date.getDate()).padStart(2, '0');
-		
-		return `${year}-${month}-${day}`;
+		return timeHelper.timestamp2Time(date.getTime(), 'Y-M-D');
 	},
 	
 	/**
 	 * 格式化时间 HH:MM
 	 */
 	_formatTime(date) {
-		const hours = String(date.getHours()).padStart(2, '0');
-		const minutes = String(date.getMinutes()).padStart(2, '0');
+		return timeHelper.timestamp2Time(date.getTime(), 'h:m');
+	},
+
+	// 全局测试点击
+	testTap: function() {
+		console.log('全局点击测试 - 成功触发!');
+		wx.showToast({
+			title: '点击成功!',
+			icon: 'none'
+		});
+	},
+
+	// 添加记录直接函数
+	addRecord: function() {
+		console.log('[DEBUG] addRecord 按钮被点击!');
+		wx.showToast({
+			title: '添加记录!',
+			icon: 'none',
+			duration: 1000
+		});
 		
-		return `${hours}:${minutes}`;
-	}
+		// 确保模态框显示
+		setTimeout(() => {
+			this.showAddMetricModal();
+		}, 500);
+	},
+
+	// 筛选直接函数
+	filterRecord: function() {
+		console.log('筛选按钮被点击!');
+		wx.showToast({
+			title: '筛选!',
+			icon: 'none'
+		});
+		this.showFilterModalTap();
+	},
+
+	// 图表直接函数
+	chartToggle: function() {
+		console.log('图表按钮被点击!');
+		wx.showToast({
+			title: '切换图表!',
+			icon: 'none'
+		});
+		this.toggleChart();
+	},
 })

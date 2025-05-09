@@ -4,6 +4,8 @@
   min-height: 100vh;
   background-color: #f5f6fa;
   padding-bottom: 30rpx;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* 顶部标题 */
@@ -12,6 +14,8 @@
   padding: 40rpx 30rpx 50rpx;
   color: #fff;
   border-radius: 0 0 30rpx 30rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .title {
@@ -67,50 +71,70 @@
   border-radius: 3rpx;
 }
 
-/* 操作按钮栏 */
-.action-bar {
-  margin: 20rpx;
+/* 新操作按钮栏 */
+.new-action-bar {
+  margin: 30rpx 20rpx;
   display: flex;
   justify-content: space-between;
 }
 
-.action-btn {
+.action-button {
   flex: 1;
-  padding: 15rpx 0;
-  background-color: #fff;
-  border-radius: 10rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 24rpx;
-  color: #666;
+  height: 140rpx;
   margin: 0 10rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  border-radius: 12rpx;
+  border: none;
+  background-color: #fff;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: visible;
+  padding: 0;
+  line-height: normal;
 }
 
-.action-btn:first-child {
+.action-button::after {
+  border: none;
+}
+
+.action-button:first-child {
   margin-left: 0;
 }
 
-.action-btn:last-child {
+.action-button:last-child {
   margin-right: 0;
 }
 
-.icon-add, .icon-filter, .icon-chart {
-  font-size: 32rpx;
-  margin-bottom: 5rpx;
+.add-button {
+  background: linear-gradient(135deg, #4168E0 0%, #2858DF 100%);
 }
 
-.icon-add {
-  color: #2858DF;
+.filter-button {
+  background: linear-gradient(135deg, #FF9966 0%, #FF7733 100%);
 }
 
-.icon-filter {
-  color: #ff8c00;
+.chart-button {
+  background: linear-gradient(135deg, #5B8FF9 0%, #3370FF 100%);
 }
 
-.icon-chart {
-  color: #3366cc;
+.button-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.action-button .icon {
+  font-size: 40rpx;
+  color: #fff;
+  margin-bottom: 10rpx;
+}
+
+.action-button .text {
+  font-size: 26rpx;
+  color: #fff;
+  font-weight: normal;
 }
 
 /* 列表展示 */
@@ -261,7 +285,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 999;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -285,7 +309,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  z-index: 1000;
+  z-index: 10000;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.2);
 }
 
 .modal-header {
@@ -363,11 +388,13 @@
   line-height: 1.5;
 }
 
-.btn-cancel, .btn-submit, .btn-delete, .btn-close {
+.btn-cancel, .btn-submit, .btn-delete, .btn-close, .btn-edit {
   padding: 15rpx 30rpx;
   font-size: 28rpx;
   border-radius: 8rpx;
   margin-left: 20rpx;
+  line-height: 1.5;
+  border: none;
 }
 
 .btn-cancel, .btn-close {
@@ -375,9 +402,16 @@
   color: #666;
 }
 
-.btn-submit {
-  background-color: #2858DF;
+.btn-edit {
+  background-color: #4CAF50;
   color: #fff;
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #4168E0 0%, #2858DF 100%);
+  color: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(40, 88, 223, 0.3);
+  font-weight: bold;
 }
 
 .btn-delete {
@@ -408,4 +442,40 @@
   flex: 1;
   font-size: 28rpx;
   color: #333;
+}
+
+/* 简单按钮组 */
+.simple-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 20rpx;
+  padding: 10rpx;
+}
+
+.simple-btn {
+  margin: 0 10rpx;
+  padding: 20rpx 0;
+  border-radius: 10rpx;
+  color: white;
+  font-size: 28rpx;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.simple-btn::after {
+  border: none;
+}
+
+.add-btn {
+  background-color: #2858DF;
+}
+
+.filter-btn {
+  background-color: #FF7733;
+}
+
+.chart-btn {
+  background-color: #3370FF;
 } 

@@ -58,6 +58,14 @@ exports.main = async (event, context) => {
       case 'health/updatehealthdata':
         console.log('【Health Cloud Function】调用updateHealthData');
         return await healthController.updateHealthData(params);
+
+      // 新增 case 用于删除健康指标记录
+      case 'health/deletehealthmetric':
+        console.log('【Health Cloud Function】调用deleteHealthMetricRecord');
+        // 确保将 userId (从 openId 或前端传入) 传递给控制器函数
+        // params 中应该已经包含了 recordId (由前端调用时传入)
+        params.userId = params.userId; // 确保 userId 被正确传递 (在入口处已处理 openId 到 params.userId 的赋值)
+        return await healthController.deleteHealthMetricRecord(params);
         
       default:
         console.log('【Health Cloud Function】未找到对应接口:', route);
