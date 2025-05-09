@@ -184,7 +184,7 @@ Page({
 			}
 
 			// 调用云函数获取数据
-			let res = await cloudHelper.callCloudData('medical_report/get_report_list', params);
+			let res = await cloudHelper.callCloudData('medical_report/getReportList', params);
 
 			// 处理返回的数据，格式化日期显示
 			for (let k in res.list) {

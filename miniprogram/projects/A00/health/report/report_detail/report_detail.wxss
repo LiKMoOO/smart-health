@@ -10,6 +10,10 @@ page {
   --success-color: #52c41a;
   --warning-color: #faad14;
   --error-color: #f5222d;
+  --low-risk-color: #52c41a; /* 低风险 - 绿色 */
+  --medium-risk-color: #faad14; /* 中风险 - 黄色 */
+  --high-risk-color: #f5222d; /* 高风险 - 红色 */
+  --ai-bg-color: #f0f7ff; /* AI分析背景色 - 浅蓝色 */
 }
 
 .main {
@@ -82,383 +86,8 @@ page {
   padding: 30rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
-}
-
-.hospital {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: var(--text-color);
-  margin-bottom: 10rpx;
-}
-
-.date {
-  font-size: 28rpx;
-  color: var(--text-secondary);
-}
-
-/* 报告章节 */
-.report-section {
-  background-color: #fff;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
-}
-
-.section-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: var(--text-color);
-  margin-bottom: 20rpx;
-  padding-bottom: 20rpx;
-  border-bottom: 1rpx solid var(--border-color);
-}
-
-.section-content {
-  font-size: 28rpx;
-  color: var(--text-color);
-  line-height: 1.6;
-}
-
-/* 检测项目 */
-.item-category {
-  margin-bottom: 30rpx;
-}
-
-.item-category:last-child {
-  margin-bottom: 0;
-}
-
-.category-name {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: var(--text-color);
-  margin-bottom: 20rpx;
-}
-
-.item-list {
-  border-left: 4rpx solid var(--border-color);
-  padding-left: 20rpx;
-}
-
-.test-item {
-  padding: 20rpx;
-  margin-bottom: 16rpx;
-  background-color: #f9f9f9;
-  border-radius: 8rpx;
-  position: relative;
-}
-
-.test-item.abnormal {
-  background-color: rgba(255, 77, 79, 0.05);
-  border-left: 4rpx solid var(--error-color);
-  margin-left: -24rpx;
-  padding-left: 20rpx;
-}
-
-.item-name {
-  font-size: 28rpx;
-  font-weight: bold;
-  color: var(--text-color);
-  margin-bottom: 10rpx;
-}
-
-.item-value {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: var(--text-color);
-  margin-bottom: 10rpx;
-}
-
-.item-value.abnormal {
-  color: var(--error-color);
-}
-
-.item-unit {
-  font-size: 24rpx;
-  color: var(--text-secondary);
-  margin-left: 4rpx;
-}
-
-.item-range {
-  font-size: 24rpx;
-  color: var(--text-secondary);
-}
-
-.item-status {
-  position: absolute;
-  top: 20rpx;
-  right: 20rpx;
-  background-color: var(--error-color);
-  color: #fff;
-  font-size: 22rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 30rpx;
-}
-
-/* AI分析 */
-.ai-analysis {
-  background-color: #f0f7ff;
-  border-radius: 8rpx;
-  padding: 20rpx;
-}
-
-.ai-suggestion {
-  font-size: 28rpx;
-  color: var(--text-color);
-  line-height: 1.6;
-  margin-bottom: 16rpx;
-}
-
-.ai-risk {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10rpx;
-}
-
-.ai-risk .label {
-  font-size: 26rpx;
-  color: var(--text-secondary);
-}
-
-.ai-risk .value {
-  font-size: 26rpx;
-  font-weight: bold;
-}
-
-.ai-risk .value.high {
-  color: var(--high-risk-color);
-}
-
-.ai-risk .value.medium {
-  color: var(--medium-risk-color);
-}
-
-.ai-risk .value.low {
-  color: var(--low-risk-color);
-}
-
-.ai-more {
-  font-size: 24rpx;
-  color: var(--primary-color);
-  text-align: right;
-}
-
-/* 按钮 */
-.btn-group {
-  padding: 30rpx;
-  display: flex;
-  justify-content: space-between;
-}
-
-.btn-primary {
-  flex: 1;
-  background-color: var(--primary-color);
-  color: #fff;
-  font-size: 28rpx;
-  padding: 20rpx 0;
-  border-radius: 8rpx;
-  margin-right: 20rpx;
-}
-
-.btn-default {
-  flex: 1;
-  background-color: #fff;
-  color: var(--primary-color);
-  font-size: 28rpx;
-  padding: 20rpx 0;
-  border-radius: 8rpx;
-  border: 1rpx solid var(--primary-color);
-}
-
-/* 弹窗 */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-mask {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-}
-
-.modal-content {
-  position: relative;
-  width: 90%;
-  max-height: 90vh;
-  background-color: #fff;
   border-radius: 12rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
-  z-index: 1001;
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 30rpx;
-  border-bottom: 1rpx solid var(--border-color);
-}
-
-.modal-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: var(--text-color);
-}
-
-.modal-close {
-  font-size: 40rpx;
-  color: var(--text-secondary);
-  width: 60rpx;
-  height: 60rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-body {
-  padding: 30rpx;
-  overflow-y: auto;
-  max-height: calc(90vh - 200rpx);
-}
-
-.ai-result-section {
-  margin-bottom: 30rpx;
-}
-
-.ai-result-title {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: var(--text-color);
-  margin-bottom: 10rpx;
-}
-
-.ai-result-content {
-  font-size: 28rpx;
-  color: var(--text-color);
-  line-height: 1.6;
-}
-
-.ai-risk-level {
-  font-size: 28rpx;
-  font-weight: bold;
-  padding: 6rpx 20rpx;
-  border-radius: 30rpx;
-  display: inline-block;
-}
-
-.ai-risk-level.high {
-  background-color: rgba(255, 77, 79, 0.1);
-  color: var(--high-risk-color);
-}
-
-.ai-risk-level.medium {
-  background-color: rgba(250, 173, 20, 0.1);
-  color: var(--medium-risk-color);
-}
-
-.ai-risk-level.low {
-  background-color: rgba(82, 196, 26, 0.1);
-  color: var(--low-risk-color);
-}
-
-.ai-details {
-  white-space: pre-wrap;
-}
-
-.modal-footer {
-  padding: 20rpx 30rpx 30rpx;
-  display: flex;
-  justify-content: center;
-}
-
-.btn-close {
-  background-color: var(--primary-color);
-  color: #fff;
-  font-size: 28rpx;
-  padding: 20rpx 0;
-  border-radius: 8rpx;
-  width: 100%;
-}
-
-/* 页面基本样式 */
-page {
-  --primary-color: #0080ff;
-  --bg-color: #f5f7fa;
-  --text-color: #333;
-  --text-secondary: #666;
-  --border-color: #eee;
-  --success-color: #52c41a;
-  --warning-color: #faad14;
-  --error-color: #f5222d;
-}
-
-.main {
-  min-height: 100vh;
-  background-color: var(--bg-color);
-  padding-bottom: 180rpx;
-}
-
-/* 顶部栏 */
-.top-bar {
-  background-color: var(--primary-color);
-  padding: 30rpx;
-  color: #fff;
-  text-align: center;
-}
-
-.top-bar .title {
-  font-size: 36rpx;
-  font-weight: bold;
-}
-
-/* 加载中 */
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding-top: 200rpx;
-}
-
-.loading-icon {
-  width: 80rpx;
-  height: 80rpx;
-  border: 6rpx solid var(--border-color);
-  border-top-color: var(--primary-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-text {
-  margin-top: 20rpx;
-  color: var(--text-secondary);
-}
-
-/* 报告头部 */
-.report-header {
-  background-color: #fff;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  margin: 20rpx;
 }
 
 .hospital {
@@ -475,16 +104,16 @@ page {
 
 /* 报告内容 */
 .report-content {
-  padding: 0 30rpx;
+  padding: 0 20rpx;
 }
 
+/* 报告章节 */
 .section {
   background-color: #fff;
-  border-radius: 12rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+  border-radius: 12rpx;
 }
 
 .section-title {
@@ -492,8 +121,8 @@ page {
   font-weight: bold;
   color: var(--text-color);
   margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
   border-bottom: 1rpx solid var(--border-color);
-  padding-bottom: 15rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -506,61 +135,64 @@ page {
 
 .title-icon {
   margin-right: 10rpx;
-  font-size: 32rpx;
-}
-
-/* 基本信息 */
-.info-row {
-  display: flex;
-  margin-bottom: 15rpx;
-}
-
-.label {
-  width: 200rpx;
-  color: var(--text-secondary);
-  font-size: 28rpx;
-}
-
-.value {
-  flex: 1;
-  color: var(--text-color);
-  font-size: 28rpx;
-}
-
-/* 摘要 */
-.summary {
-  font-size: 28rpx;
-  color: var(--text-color);
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
-
-/* AI分析结果 */
-.ai-section {
-  border-left: 4rpx solid var(--primary-color);
-  transition: all 0.3s ease;
-}
-
-.ai-section:active {
-  opacity: 0.8;
+  font-size: 36rpx;
 }
 
 .toggle-icon {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: var(--primary-color);
-  background-color: rgba(0, 128, 255, 0.1);
-  padding: 6rpx 12rpx;
-  border-radius: 6rpx;
+}
+
+.summary {
+  font-size: 30rpx;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+
+/* 信息行 */
+.info-row {
+  display: flex;
+  padding: 16rpx 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .label {
+  width: 180rpx;
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+.info-row .value {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-color);
+}
+
+/* AI分析部分 */
+.ai-section {
+  background-color: var(--ai-bg-color);
+  transition: all 0.3s ease;
+}
+
+.ai-section.expanded {
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
 }
 
 .ai-content {
-  padding-top: 20rpx;
-  animation: fadeIn 0.3s ease;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+  opacity: 0;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10rpx); }
-  to { opacity: 1; transform: translateY(0); }
+.ai-content.show {
+  max-height: 2000rpx; /* 足够大的值以容纳内容 */
+  opacity: 1;
+  transition: max-height 0.5s ease, opacity 0.3s ease 0.2s;
 }
 
 .ai-header {
@@ -575,87 +207,87 @@ page {
   align-items: center;
 }
 
+.risk-label {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+.risk-value {
+  font-size: 32rpx;
+  font-weight: bold;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  margin-left: 10rpx;
+}
+
+.risk-value.low {
+  color: var(--low-risk-color);
+  background-color: rgba(82, 196, 26, 0.1);
+}
+
+.risk-value.medium {
+  color: var(--medium-risk-color);
+  background-color: rgba(250, 173, 20, 0.1);
+}
+
+.risk-value.high {
+  color: var(--high-risk-color);
+  background-color: rgba(245, 34, 45, 0.1);
+}
+
 .ai-time {
   font-size: 24rpx;
   color: var(--text-secondary);
 }
 
-.risk-label {
-  font-size: 28rpx;
-  color: var(--text-secondary);
-  margin-right: 20rpx;
-}
-
-.risk-value {
-  font-size: 28rpx;
-  font-weight: bold;
-  padding: 8rpx 20rpx;
-  border-radius: 30rpx;
-}
-
-.risk-value.low {
-  background-color: rgba(82, 196, 26, 0.1);
-  color: var(--success-color);
-}
-
-.risk-value.medium {
-  background-color: rgba(250, 173, 20, 0.1);
-  color: var(--warning-color);
-}
-
-.risk-value.high {
-  background-color: rgba(245, 34, 45, 0.1);
-  color: var(--error-color);
-}
-
 .ai-suggestion, .ai-details {
-  margin-bottom: 30rpx;
+  margin-bottom: 20rpx;
+  background-color: rgba(255, 255, 255, 0.6);
   padding: 20rpx;
-  background-color: #f9f9f9;
-  border-radius: 12rpx;
+  border-radius: 8rpx;
 }
 
 .suggestion-title, .details-title {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: bold;
   color: var(--text-color);
-  margin-bottom: 15rpx;
-  display: flex;
-  align-items: center;
-}
-
-.suggestion-title::before, .details-title::before {
-  content: "";
-  display: inline-block;
-  width: 8rpx;
-  height: 28rpx;
-  background-color: var(--primary-color);
-  margin-right: 10rpx;
-  border-radius: 4rpx;
+  margin-bottom: 10rpx;
+  border-left: 6rpx solid var(--primary-color);
+  padding-left: 10rpx;
 }
 
 .suggestion-content, .details-content {
   font-size: 28rpx;
+  line-height: 1.6;
   color: var(--text-color);
-  line-height: 1.8;
   white-space: pre-wrap;
-  text-align: justify;
 }
 
-/* 检查项目 */
+/* 报告项目 */
 .item-group {
   margin-bottom: 30rpx;
+}
+
+.item-group:last-child {
+  margin-bottom: 0;
 }
 
 .group-name {
   font-size: 30rpx;
   font-weight: bold;
-  color: var(--primary-color);
-  margin-bottom: 15rpx;
+  color: var(--text-color);
+  margin-bottom: 20rpx;
+  background-color: rgba(0, 128, 255, 0.1);
+  padding: 10rpx 20rpx;
+  border-radius: 6rpx;
+}
+
+.item-list {
+  padding-left: 20rpx;
 }
 
 .item {
-  padding: 15rpx 0;
+  padding: 16rpx 0;
   border-bottom: 1rpx solid var(--border-color);
 }
 
@@ -665,7 +297,7 @@ page {
 
 .item-name {
   font-size: 28rpx;
-  color: var(--text-color);
+  color: var(--text-secondary);
   margin-bottom: 10rpx;
 }
 
@@ -673,7 +305,7 @@ page {
   font-size: 32rpx;
   font-weight: bold;
   color: var(--text-color);
-  margin-bottom: 5rpx;
+  margin-bottom: 6rpx;
 }
 
 .item-value.abnormal {
@@ -681,8 +313,9 @@ page {
 }
 
 .abnormal-mark {
+  font-size: 24rpx;
   color: var(--error-color);
-  margin-left: 10rpx;
+  margin-left: 8rpx;
 }
 
 .item-range {
@@ -690,34 +323,31 @@ page {
   color: var(--text-secondary);
 }
 
-/* 报告底部 */
+/* 按钮部分 */
 .report-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 30rpx;
-  background-color: #fff;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+  padding: 20rpx;
+  background-color: #fff;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
-  z-index: 100;
 }
 
 .btn-primary, .btn-default {
   width: 45%;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 40rpx;
   font-size: 30rpx;
-  border-radius: 10rpx;
-  transition: all 0.3s ease;
 }
 
 .btn-primary {
   background-color: var(--primary-color);
   color: #fff;
-}
-
-.btn-primary:active {
-  opacity: 0.8;
 }
 
 .btn-default {
@@ -726,12 +356,9 @@ page {
   border: 1rpx solid var(--primary-color);
 }
 
-.btn-default:active {
-  background-color: rgba(0, 128, 255, 0.05);
-}
-
 .btn-default.analyzing {
-  background-color: #f9f9f9;
+  color: var(--text-secondary);
+  border-color: var(--border-color);
 }
 
 .btn-content {
@@ -740,16 +367,35 @@ page {
   justify-content: center;
 }
 
-.analyzing-icon {
-  width: 30rpx;
-  height: 30rpx;
-  border: 3rpx solid rgba(0, 128, 255, 0.3);
-  border-top: 3rpx solid var(--primary-color);
-  border-radius: 50%;
+/* 分析中动画 */
+.analyzing-animation {
+  display: flex;
+  align-items: center;
   margin-right: 10rpx;
-  animation: spin 1s linear infinite;
 }
 
-button[disabled] {
-  opacity: 0.6;
-} 
+.dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background-color: var(--text-secondary);
+  margin: 0 4rpx;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}

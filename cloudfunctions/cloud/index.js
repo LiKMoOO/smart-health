@@ -53,49 +53,25 @@ exports.main = async (event, context) => {
 	 */
 	if (event.route == 'medicalReport') {
 		try {
-			// 从请求中提取操作类型和参数
-			const { action, params } = event;
-			const wxContext = cloud.getWXContext();
-			
-			// 注入用户ID，确保每个请求都有用户标识
-			// 优先使用params中的userId，如果没有则使用token或微信OPENID
-			if (params && !params.userId) {
-				params.userId = event.token || wxContext.OPENID || '';
-			}
-			
-			// 根据不同操作类型分发到对应的控制器处理
-			switch (action) {
-				case 'getReportList':
-					// 动态引入控制器，避免启动时加载错误
-					// 该控制器负责获取用户的体检报告列表，支持分页
-					const getReportList = require('./project/controller/medical_report/get_report_list');
-					return await getReportList.main(params || {});
-					
-				case 'uploadReport':
-					// 该控制器负责处理用户上传的体检报告
-					// 包括保存报告基本信息和文件ID
-					const uploadReport = require('./project/controller/medical_report/upload_report');
-					return await uploadReport.main(params || {});
-					
-				case 'getReportDetail':
-					// 该控制器负责获取单个体检报告的详细信息
-					// 包括基本信息、检查项目和AI分析结果(如果有)
-					const getReportDetail = require('./project/controller/medical_report/get_report_detail');
-					return await getReportDetail.main(params || {});
-					
-				case 'analyzeReportByAI':
-					// 该控制器负责对体检报告进行AI分析
-					// 生成健康评估和建议
-					const analyzeReportByAI = require('./project/controller/medical_report/analyze_report_by_ai');
-					return await analyzeReportByAI.main(params || {});
-					
-				default:
-					// 处理未知操作类型
-					return { code: 404, msg: '未知操作' };
-			}
+			console.log('[cloud/index.js] 转发 medicalReport 请求给 medicalReport 云函数, event:', JSON.stringify(event));
+			// 直接调用 'medicalReport' 云函数，并将原始的 event (已包含 action 和 params) 传递过去
+			return await cloud.callFunction({
+				name: 'medicalReport', // <--- 指定调用 medicalReport 云函数包
+				data: event // <--- 将包含 action 和 params 的整个 event 对象传递过去
+			}).then(res => {
+                console.log('[cloud/index.js] medicalReport 云函数返回结果:', JSON.stringify(res.result));
+                return res.result; //确保返回云函数实际执行的结果
+            }).catch(err => {
+                console.error('[cloud/index.js] 调用 medicalReport 云函数失败:', err);
+                return {
+                    code: 500,
+                    msg: '调用体检报告服务失败',
+                    error: err.message
+                };
+            });
 		} catch (err) {
-			// 统一错误处理，记录错误日志并返回用户友好的错误信息
-			console.error('体检报告路由处理错误:', err);
+			// 统一错误处理
+			console.error('体检报告路由转发处理错误:', err);
 			return {
 				code: 500,
 				msg: '服务器繁忙，请稍后重试',

@@ -244,10 +244,8 @@ module.exports = Behavior({
         };
         console.log('[onSubmit] 准备调用云函数 (callCloudSumbitAsync)，参数:', JSON.stringify(paramsToCloud));
         
-        // **** 修改调用函数 ****
-        // const result = await cloudHelper.callCloudData('medicalReport', paramsToCloud);
+        // 使用callCloudSumbitAsync而不是callCloudData
         const result = await cloudHelper.callCloudSumbitAsync('medicalReport', paramsToCloud);
-        // ********************
 
         console.log('[onSubmit] 云函数调用返回结果:', result);
         console.log('[onSubmit] 云函数返回结果类型 (typeof result):', typeof result);

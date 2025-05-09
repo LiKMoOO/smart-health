@@ -37,7 +37,7 @@
       </view>
       
       <!-- AI分析结果 -->
-      <view class="section ai-section" wx:if="{{report.aiAnalysis}}">
+      <view class="section ai-section {{showAiResult ? 'expanded' : ''}}" wx:if="{{report.aiAnalysis}}">
         <view class="section-title" bindtap="toggleAiResult">
           <view class="title-text">
             <text class="title-icon">🤖</text>
@@ -45,10 +45,10 @@
           </view>
           <text class="toggle-icon">{{showAiResult ? '收起' : '展开'}}</text>
         </view>
-        <view class="ai-content" wx:if="{{showAiResult}}">
+        <view class="ai-content {{showAiResult ? 'show' : ''}}">
           <view class="ai-header">
             <view class="ai-risk">
-              <text class="risk-label">健康风险</text>
+              <text class="risk-label">健康风险：</text>
               <text class="risk-value {{report.aiAnalysis.riskLevel === '低' ? 'low' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'high')}}">
                 {{report.aiAnalysis.riskLevel || '未知'}}
               </text>
@@ -99,7 +99,11 @@
       <button class="btn-primary" bindtap="bindViewFileTap">查看原始报告</button>
       <button class="btn-default {{isAnalyzing ? 'analyzing' : ''}}" bindtap="bindAnalyzeByAI" disabled="{{isAnalyzing}}">
         <view class="btn-content">
-          <view class="analyzing-icon" wx:if="{{isAnalyzing}}"></view>
+          <view class="analyzing-animation" wx:if="{{isAnalyzing}}">
+            <view class="dot"></view>
+            <view class="dot"></view>
+            <view class="dot"></view>
+          </view>
           <text>{{isAnalyzing ? '分析中...' : (report.aiAnalysis ? '重新分析' : 'AI 智能分析')}}</text>
         </view>
       </button>
