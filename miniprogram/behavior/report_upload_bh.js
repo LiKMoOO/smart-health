@@ -205,40 +205,62 @@ module.exports = Behavior({
     
     // 表单提交
     onSubmit: async function() {
+      console.log('[onSubmit] 开始执行表单提交');
       // 如果是多文件模式且还没上传，先上传文件
       if (this.data.isMultipleFiles && this.data.reportFiles.length > 0 && !this.data.reportFileId) {
+        console.log('[onSubmit] 多文件模式，开始上传文件');
         await this.uploadMultipleFiles();
+        console.log('[onSubmit] 多文件上传完成，FileId:', this.data.reportFileId);
       }
       
       const { reportDate, hospital, reportType, summary, reportFileId } = this.data;
       const userId = wx.getStorageSync('openid') || '';
       
+      console.log('[onSubmit] 当前表单数据:', { reportDate, hospital, reportType, summary, reportFileId, userId, reportFileName: this.data.reportFileName });
+
       if (!reportDate || !hospital || !reportType || !reportFileId) {
+        console.warn('[onSubmit] 表单信息不完整');
         pageHelper.showModal('请填写完整信息并上传报告文件');
         return;
       }
       
       try {
+        console.log('[onSubmit] 显示提交中Loading...');
         wx.showLoading({ title: '提交中...', mask: true });
+        
         // 准备参数
-        const params = {
+        const paramsToCloud = {
           action: 'uploadReport',
           params: { 
-            userId, 
-            reportDate, 
-            hospital, 
-            reportType, 
-            summary, 
+            userId,
+            reportDate,
+            hospital,
+            reportType,
+            summary,
             reportFileId,
+            reportFileName: this.data.reportFileName, // 确保传递reportFileName
             isMultipleFiles: this.data.isMultipleFiles
           }
         };
+        console.log('[onSubmit] 准备调用云函数 (callCloudSumbitAsync)，参数:', JSON.stringify(paramsToCloud));
         
-        // 调用云函数
-        const result = await cloudHelper.callCloudData('medicalReport', params);
+        // **** 修改调用函数 ****
+        // const result = await cloudHelper.callCloudData('medicalReport', paramsToCloud);
+        const result = await cloudHelper.callCloudSumbitAsync('medicalReport', paramsToCloud);
+        // ********************
+
+        console.log('[onSubmit] 云函数调用返回结果:', result);
+        console.log('[onSubmit] 云函数返回结果类型 (typeof result):', typeof result);
+        if (result) {
+          console.log('[onSubmit] 云函数返回结果.code:', result.code);
+          console.log('[onSubmit] 云函数返回结果.code 类型 (typeof result.code):', typeof result.code);
+        }
+
         wx.hideLoading();
+        console.log('[onSubmit] 关闭提交中Loading');
         
         if (result && result.code === 0) {
+          console.log('[onSubmit] 云函数返回成功，result.code === 0');
           pageHelper.showSuccToast('上传成功');
           
           // 成功后询问是否要进行AI分析
@@ -248,21 +270,30 @@ module.exports = Behavior({
             confirmText: '进行分析',
             cancelText: '暂不需要',
             success: res => {
+              console.log('[onSubmit] AI分析弹窗选择结果:', res);
               if (res.confirm) {
+                console.log('[onSubmit] 用户选择进行AI分析，跳转到详情页，reportId:', result.data.reportId);
                 wx.navigateTo({
                   url: `/projects/A00/health/report/report_detail/report_detail?id=${result.data.reportId}&analyze=true`
                 });
               } else {
+                console.log('[onSubmit] 用户选择暂不进行AI分析，返回上一页');
                 setTimeout(() => wx.navigateBack(), 1000);
               }
+            },
+            fail: (err) => {
+              console.error('[onSubmit] AI分析弹窗显示失败:', err);
+              setTimeout(() => wx.navigateBack(), 1000); // 即使弹窗失败也尝试返回
             }
           });
         } else {
-          pageHelper.showModal(result.msg || '上传失败');
+          console.error('[onSubmit] 云函数返回失败或result.code !== 0，显示上传失败提示。Result:', result);
+          pageHelper.showModal( (result && result.msg) || '上传失败，请检查网络或联系管理员');
         }
       } catch (err) {
         wx.hideLoading();
-        pageHelper.showModal('上传失败，请重试');
+        console.error('[onSubmit] 调用云函数或后续处理出现异常:', err);
+        pageHelper.showModal('上传请求失败，请稍后重试');
       }
     }
   }

@@ -392,4 +392,364 @@ page {
   padding: 20rpx 0;
   border-radius: 8rpx;
   width: 100%;
+}
+
+/* 页面基本样式 */
+page {
+  --primary-color: #0080ff;
+  --bg-color: #f5f7fa;
+  --text-color: #333;
+  --text-secondary: #666;
+  --border-color: #eee;
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --error-color: #f5222d;
+}
+
+.main {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding-bottom: 180rpx;
+}
+
+/* 顶部栏 */
+.top-bar {
+  background-color: var(--primary-color);
+  padding: 30rpx;
+  color: #fff;
+  text-align: center;
+}
+
+.top-bar .title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+/* 加载中 */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 200rpx;
+}
+
+.loading-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  color: var(--text-secondary);
+}
+
+/* 报告头部 */
+.report-header {
+  background-color: #fff;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.hospital {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 10rpx;
+}
+
+.date {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+/* 报告内容 */
+.report-content {
+  padding: 0 30rpx;
+}
+
+.section {
+  background-color: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 20rpx;
+  border-bottom: 1rpx solid var(--border-color);
+  padding-bottom: 15rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-text {
+  display: flex;
+  align-items: center;
+}
+
+.title-icon {
+  margin-right: 10rpx;
+  font-size: 32rpx;
+}
+
+/* 基本信息 */
+.info-row {
+  display: flex;
+  margin-bottom: 15rpx;
+}
+
+.label {
+  width: 200rpx;
+  color: var(--text-secondary);
+  font-size: 28rpx;
+}
+
+.value {
+  flex: 1;
+  color: var(--text-color);
+  font-size: 28rpx;
+}
+
+/* 摘要 */
+.summary {
+  font-size: 28rpx;
+  color: var(--text-color);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* AI分析结果 */
+.ai-section {
+  border-left: 4rpx solid var(--primary-color);
+  transition: all 0.3s ease;
+}
+
+.ai-section:active {
+  opacity: 0.8;
+}
+
+.toggle-icon {
+  font-size: 24rpx;
+  color: var(--primary-color);
+  background-color: rgba(0, 128, 255, 0.1);
+  padding: 6rpx 12rpx;
+  border-radius: 6rpx;
+}
+
+.ai-content {
+  padding-top: 20rpx;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.ai-risk {
+  display: flex;
+  align-items: center;
+}
+
+.ai-time {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.risk-label {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-right: 20rpx;
+}
+
+.risk-value {
+  font-size: 28rpx;
+  font-weight: bold;
+  padding: 8rpx 20rpx;
+  border-radius: 30rpx;
+}
+
+.risk-value.low {
+  background-color: rgba(82, 196, 26, 0.1);
+  color: var(--success-color);
+}
+
+.risk-value.medium {
+  background-color: rgba(250, 173, 20, 0.1);
+  color: var(--warning-color);
+}
+
+.risk-value.high {
+  background-color: rgba(245, 34, 45, 0.1);
+  color: var(--error-color);
+}
+
+.ai-suggestion, .ai-details {
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background-color: #f9f9f9;
+  border-radius: 12rpx;
+}
+
+.suggestion-title, .details-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 15rpx;
+  display: flex;
+  align-items: center;
+}
+
+.suggestion-title::before, .details-title::before {
+  content: "";
+  display: inline-block;
+  width: 8rpx;
+  height: 28rpx;
+  background-color: var(--primary-color);
+  margin-right: 10rpx;
+  border-radius: 4rpx;
+}
+
+.suggestion-content, .details-content {
+  font-size: 28rpx;
+  color: var(--text-color);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  text-align: justify;
+}
+
+/* 检查项目 */
+.item-group {
+  margin-bottom: 30rpx;
+}
+
+.group-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: var(--primary-color);
+  margin-bottom: 15rpx;
+}
+
+.item {
+  padding: 15rpx 0;
+  border-bottom: 1rpx solid var(--border-color);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-size: 28rpx;
+  color: var(--text-color);
+  margin-bottom: 10rpx;
+}
+
+.item-value {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: var(--text-color);
+  margin-bottom: 5rpx;
+}
+
+.item-value.abnormal {
+  color: var(--error-color);
+}
+
+.abnormal-mark {
+  color: var(--error-color);
+  margin-left: 10rpx;
+}
+
+.item-range {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+/* 报告底部 */
+.report-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 30rpx;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.btn-primary, .btn-default {
+  width: 45%;
+  font-size: 30rpx;
+  border-radius: 10rpx;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.btn-primary:active {
+  opacity: 0.8;
+}
+
+.btn-default {
+  background-color: #fff;
+  color: var(--primary-color);
+  border: 1rpx solid var(--primary-color);
+}
+
+.btn-default:active {
+  background-color: rgba(0, 128, 255, 0.05);
+}
+
+.btn-default.analyzing {
+  background-color: #f9f9f9;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.analyzing-icon {
+  width: 30rpx;
+  height: 30rpx;
+  border: 3rpx solid rgba(0, 128, 255, 0.3);
+  border-top: 3rpx solid var(--primary-color);
+  border-radius: 50%;
+  margin-right: 10rpx;
+  animation: spin 1s linear infinite;
+}
+
+button[disabled] {
+  opacity: 0.6;
 } 

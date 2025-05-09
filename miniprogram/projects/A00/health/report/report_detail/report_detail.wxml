@@ -39,20 +39,30 @@
       <!-- AI分析结果 -->
       <view class="section ai-section" wx:if="{{report.aiAnalysis}}">
         <view class="section-title" bindtap="toggleAiResult">
-          AI智能分析
-          <text class="toggle-icon">{{showAiResult ? '▼' : '▶'}}</text>
+          <view class="title-text">
+            <text class="title-icon">🤖</text>
+            <text>AI智能分析</text>
+          </view>
+          <text class="toggle-icon">{{showAiResult ? '收起' : '展开'}}</text>
         </view>
         <view class="ai-content" wx:if="{{showAiResult}}">
-          <view class="ai-risk">
-            <text class="risk-label">健康风险</text>
-            <text class="risk-value {{report.aiAnalysis.riskLevel === '低' ? 'low' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'high')}}">
-              {{report.aiAnalysis.riskLevel || '未知'}}
-            </text>
+          <view class="ai-header">
+            <view class="ai-risk">
+              <text class="risk-label">健康风险</text>
+              <text class="risk-value {{report.aiAnalysis.riskLevel === '低' ? 'low' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'high')}}">
+                {{report.aiAnalysis.riskLevel || '未知'}}
+              </text>
+            </view>
+            <view class="ai-time" wx:if="{{report.aiAnalysisTime}}">
+              分析时间：{{formatDate(report.aiAnalysisTime)}}
+            </view>
           </view>
+          
           <view class="ai-suggestion">
             <view class="suggestion-title">健康建议</view>
             <view class="suggestion-content">{{report.aiAnalysis.suggestion || '暂无健康建议'}}</view>
           </view>
+          
           <view class="ai-details">
             <view class="details-title">详细分析</view>
             <view class="details-content">{{report.aiAnalysis.details || '暂无详细分析'}}</view>
@@ -87,8 +97,11 @@
     
     <view class="report-footer">
       <button class="btn-primary" bindtap="bindViewFileTap">查看原始报告</button>
-      <button class="btn-default" bindtap="bindAnalyzeByAI" disabled="{{isAnalyzing}}">
-        {{isAnalyzing ? '分析中...' : (report.aiAnalysis ? '重新分析' : 'AI 智能分析')}}
+      <button class="btn-default {{isAnalyzing ? 'analyzing' : ''}}" bindtap="bindAnalyzeByAI" disabled="{{isAnalyzing}}">
+        <view class="btn-content">
+          <view class="analyzing-icon" wx:if="{{isAnalyzing}}"></view>
+          <text>{{isAnalyzing ? '分析中...' : (report.aiAnalysis ? '重新分析' : 'AI 智能分析')}}</text>
+        </view>
       </button>
     </view>
   </block>
