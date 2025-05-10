@@ -27,7 +27,8 @@
 		"projects/A00/health/medication/health_medication",
 		"projects/A00/health/journal/health_journal",
 		"projects/A00/health/analysis/health_analysis",
-    "projects/A00/health/report/report_upload/report_upload",
+		"projects/A00/health/report/report_upload/report_upload",
+		"projects/A00/health/report/report_detail/report_detail",
 
 		"cmpts/public/form/form_set/field/form_set_field",
 		"pages/admin/index/home/admin_home",
@@ -53,9 +54,7 @@
 		"pages/admin/setup/contact/admin_setup_contact",
 		"pages/admin/setup/qr/admin_setup_qr",
 		"pages/admin/user/list/admin_user_list",
-    "pages/admin/user/export/admin_user_export"
-    
-
+		"pages/admin/user/export/admin_user_export"
 	],
 	"window": {
 		"backgroundColor": "#f1f1f1",

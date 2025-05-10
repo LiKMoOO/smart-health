@@ -10,6 +10,20 @@
  const picHelper = require('./pic_helper.js');
  const CACHE_SKIN = 'SKIN_PID';
 
+ // 用户ID函数
+ function setCacheUserId(userId) {
+ 	if (!userId) return;
+ 	cacheHelper.set('USER_ID', userId, 86400 * 365);
+ }
+
+ function getCacheUserId() {
+ 	return cacheHelper.get('USER_ID');
+ }
+
+ function delCacheUserId() {
+ 	cacheHelper.remove('USER_ID');
+ }
+
  function getSkin() {
  	return  {
 		PID: 'A00', // 体检
@@ -873,6 +887,92 @@
  	wx.hideLoading();
  }
 
+ /**
+  * 检查页面是否已经注册
+  * @param {String} pageUrl - 页面路径，格式如'/pages/index/index'
+  * @returns {Boolean} 页面是否存在
+  */
+ function checkPageExist(pageUrl) {
+ 	if (!pageUrl) return false;
+ 	
+ 	try {
+ 		// 标准化路径
+ 		if (pageUrl.startsWith('/')) {
+ 			pageUrl = pageUrl.substring(1);
+ 		}
+ 		
+ 		const pages = getCurrentPages();
+ 		const registered = wx.getStorageSync('PAGE_REGISTER_LIST') || [];
+ 		
+ 		// 当前页面栈中存在该页面
+ 		const existInStack = pages.some(page => {
+ 			const route = page.route || page.__route__;
+ 			return route === pageUrl;
+ 		});
+ 		
+ 		if (existInStack) {
+ 			return true;
+ 		}
+ 		
+ 		// 曾经注册过的页面
+ 		if (registered.includes(pageUrl)) {
+ 			return true;
+ 		}
+ 		
+ 		// 如果是第一次检查，可以尝试直接用API判断
+ 		try {
+ 			const res = wx.getSystemInfoSync();
+ 			// 微信8.0以上版本支持isPageSupported API
+ 			if (res.SDKVersion && compareVersion(res.SDKVersion, '2.20.0') >= 0) {
+ 				const supported = wx.canIUse('isPageSupported');
+ 				if (supported) {
+ 					return wx.isPageSupported({url: '/' + pageUrl});
+ 				}
+ 			}
+ 		} catch (e) {
+ 			console.error('检查页面支持失败:', e);
+ 		}
+ 		
+ 		// 默认返回true，假设页面存在
+ 		return true;
+ 	} catch (err) {
+ 		console.error('检查页面是否存在发生错误:', err);
+ 		return true; // 出错时默认认为页面存在
+ 	}
+ }
+
+ /**
+  * 比较版本号
+  * @param {String} v1 - 版本号1
+  * @param {String} v2 - 版本号2
+  * @returns {Number} 1: v1>v2, -1: v1<v2, 0: v1=v2
+  */
+ function compareVersion(v1, v2) {
+ 	v1 = v1.split('.');
+ 	v2 = v2.split('.');
+ 	const len = Math.max(v1.length, v2.length);
+ 	
+ 	while (v1.length < len) {
+ 		v1.push('0');
+ 	}
+ 	while (v2.length < len) {
+ 		v2.push('0');
+ 	}
+ 	
+ 	for (let i = 0; i < len; i++) {
+ 		const num1 = parseInt(v1[i], 10);
+ 		const num2 = parseInt(v2[i], 10);
+ 		
+ 		if (num1 > num2) {
+ 			return 1;
+ 		} else if (num1 < num2) {
+ 			return -1;
+ 		}
+ 	}
+ 	
+ 	return 0;
+ }
+
  module.exports = {
  	setSkin,
  	getSkin,
@@ -949,5 +1049,14 @@
  	cacheListSet,
 
  	showLoading,
- 	hideLoading
+ 	hideLoading,
+
+ 	// 页面检查函数
+ 	checkPageExist,
+ 	compareVersion,
+
+ 	// 名片基类
+ 	setUserId: setCacheUserId,
+ 	getUserId: getCacheUserId,
+ 	delUserId: delCacheUserId
  }

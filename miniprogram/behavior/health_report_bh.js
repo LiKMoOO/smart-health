@@ -353,11 +353,95 @@ module.exports = Behavior({
 			let id = pageHelper.dataset(e, 'id');
 			console.log('点击报告，报告ID:', id);
 			
-			if (!id) return;
+			if (!id) {
+				console.error('报告ID为空，无法跳转');
+				pageHelper.showNoneToast('报告信息错误');
+				return;
+			}
 			
-			wx.navigateTo({
-				url: '/projects/A00/health/report/report_detail/report_detail?id=' + id
+			// 显示加载中
+			wx.showLoading({
+				title: '加载中...',
+				mask: true
 			});
+			
+			// 使用绝对路径，确保路径正确
+			const url = `/projects/A00/health/report/report_detail/report_detail?id=${id}`;
+			
+			// 直接跳转到详情页
+			wx.navigateTo({
+				url: url,
+				success: () => {
+					console.log('成功跳转到报告详情页');
+					wx.hideLoading();
+				},
+				fail: (err) => {
+					console.error('跳转到报告详情页失败:', err);
+					wx.hideLoading();
+					
+					pageHelper.showModal('无法打开报告详情，请确保已更新至最新版本');
+				}
+			});
+		},
+		
+		/**
+		 * 预加载报告详情数据并跳转
+		 * @param {String} id - 报告ID
+		 */
+		_preloadReportDetail: async function(id) {
+			try {
+				let opts = {
+					title: 'bar'
+				};
+				
+				// 获取用户ID
+				const userId = wx.getStorageSync('OPENID');
+				if (!userId) {
+					wx.hideLoading();
+					pageHelper.showModal('无法获取用户信息，请退出并重新进入小程序');
+					return;
+				}
+				
+				// 准备请求参数
+				let params = {
+					reportId: id,
+					userId: userId
+				};
+
+				// 调用云函数获取报告详情
+				let result = await cloudHelper.callCloudData('medicalReport', {
+					action: 'getReportDetail',
+					params: params
+				}, opts);
+
+				// 检查返回数据
+				if (!result || !result.data) {
+					wx.hideLoading();
+					pageHelper.showModal('报告信息不存在或已被删除');
+					return;
+				}
+
+				// 把报告详情数据存到本地缓存
+				wx.setStorageSync('TEMP_REPORT_DETAIL', result.data);
+				
+				// 跳转到详情页，传递报告ID
+				wx.navigateTo({
+					url: '/projects/A00/health/report/report_detail/report_detail?id=' + id,
+					success: () => {
+						console.log('预加载后成功跳转到报告详情页');
+						wx.hideLoading();
+					},
+					fail: (err) => {
+						console.error('预加载后跳转到报告详情页失败:', err);
+						wx.hideLoading();
+						pageHelper.showModal('页面跳转失败，请重试');
+					}
+				});
+			} catch (err) {
+				console.error('预加载报告详情失败:', err);
+				wx.hideLoading();
+				pageHelper.showModal('获取报告详情失败，请重试');
+			}
 		},
 
 		url: function (e) {

@@ -64,7 +64,11 @@
  		// 处理medicalReport云函数的返回结果
  		if (route === 'medicalReport' && result.code === 0) {
  			console.log('medicalReport返回结果:', result);
- 			return result; // medicalReport云函数已经处理过返回格式，直接返回
+ 			return {
+ 				data: result.data || result.result, // 优先获取data字段，兼容不同返回格式
+ 				code: result.code,
+ 				msg: result.msg
+ 			}; // 确保返回正确格式
  		}
 
  		// 直接提取数据

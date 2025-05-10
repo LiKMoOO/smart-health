@@ -53,9 +53,18 @@ Page({
   _loadReportDetail: async function () {
     try {
       console.log('开始加载报告详情, reportId:', this.data.reportId);
+      // 获取用户ID
+      const userId = wx.getStorageSync('OPENID');
+      if (!userId) {
+        pageHelper.showModal('无法获取用户信息，请退出并重新进入小程序');
+        return;
+      }
+
       const params = {
-        reportId: this.data.reportId
+        reportId: this.data.reportId,
+        userId: userId // 确保传递用户ID
       };
+      
       let options = {
         title: '加载中'
       };
@@ -67,7 +76,7 @@ Page({
 
       console.log('获取到报告详情:', result);
       
-      if (!result) {
+      if (!result || !result.data) {
         console.error('未获取到报告详情');
         this.setData({
           isLoad: true
@@ -77,19 +86,30 @@ Page({
       }
 
       // 处理日期格式等数据
-      if (result.aiAnalysisTime) {
+      let reportData = result.data;
+      
+      // 确保数据格式正确
+      if (typeof reportData === 'string') {
+        try {
+          reportData = JSON.parse(reportData);
+        } catch (e) {
+          console.error('报告数据格式错误:', e);
+        }
+      }
+      
+      if (reportData.aiAnalysisTime) {
         // 时间戳格式转换为可读格式
-        console.log('AI分析时间:', result.aiAnalysisTime);
+        console.log('AI分析时间:', reportData.aiAnalysisTime);
       }
 
       this.setData({
-        report: result,
+        report: reportData,
         isLoad: true,
-        showAiResult: result && result.aiAnalysis
+        showAiResult: reportData && reportData.aiAnalysis
       });
       
       console.log('报告数据已设置到页面');
-      return result;
+      return reportData;
     } catch (err) {
       console.error('加载报告详情失败:', err);
       this.setData({

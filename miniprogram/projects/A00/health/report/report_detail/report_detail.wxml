@@ -5,35 +5,45 @@
 
   <view wx:if="{{!isLoad}}" class="loading">
     <view class="loading-icon"></view>
-    <view class="loading-text">加载中...</view>
+    <view class="loading-text">正在加载报告数据...</view>
   </view>
 
   <block wx:elif="{{isLoad && report}}">
     <view class="report-header">
-      <view class="hospital">{{report.hospital}}</view>
-      <view class="date">{{report.reportDate}}</view>
+      <view class="hospital">{{report.hospital || '未知医院'}}</view>
+      <view class="date">体检日期：{{report.reportDate || '未知日期'}}</view>
     </view>
     
     <view class="report-content">
       <view class="section">
-        <view class="section-title">基本信息</view>
+        <view class="section-title">
+          <view class="title-text">
+            <text class="title-icon">📋</text>
+            <text>基本信息</text>
+          </view>
+        </view>
         <view class="info-row">
           <text class="label">报告类型</text>
-          <text class="value">{{report.reportType}}</text>
+          <text class="value">{{report.reportType || '常规体检'}}</text>
         </view>
         <view class="info-row">
           <text class="label">体检日期</text>
-          <text class="value">{{report.reportDate}}</text>
+          <text class="value">{{report.reportDate || '未知日期'}}</text>
         </view>
         <view class="info-row">
           <text class="label">医院</text>
-          <text class="value">{{report.hospital}}</text>
+          <text class="value">{{report.hospital || '未知医院'}}</text>
         </view>
       </view>
       
       <view class="section">
-        <view class="section-title">报告摘要</view>
-        <view class="summary">{{report.summary || '无摘要信息'}}</view>
+        <view class="section-title">
+          <view class="title-text">
+            <text class="title-icon">📝</text>
+            <text>报告摘要</text>
+          </view>
+        </view>
+        <view class="summary">{{report.summary || '此报告暂无摘要信息'}}</view>
       </view>
       
       <!-- AI分析结果 -->
@@ -72,7 +82,12 @@
       
       <!-- 报告项目 -->
       <view class="section" wx:if="{{report.reportItems && report.reportItems.length > 0}}">
-        <view class="section-title">检查项目</view>
+        <view class="section-title">
+          <view class="title-text">
+            <text class="title-icon">🔬</text>
+            <text>检查项目</text>
+          </view>
+        </view>
         <view class="report-items">
           <block wx:for="{{report.reportItems}}" wx:key="name" wx:for-item="group">
             <view class="item-group">
@@ -111,7 +126,7 @@
   </block>
 
   <view wx:elif="{{isLoad && !report}}" class="no-data">
-    <image class="icon-empty" src="/images/icon/empty.png"></image>
+    <image class="icon-empty" src="/projects/A00/skin/images/icon/empty.png"></image>
     <view class="hint">报告不存在或已被删除</view>
   </view>
 
