@@ -151,9 +151,13 @@
 
 /* 主容器 */
 .container {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  background-color: #f5f6fa;
-  padding-bottom: 30rpx;
+  background-color: #f6f7fb;
+  padding-bottom: 140rpx;
+  box-sizing: border-box;
+  position: relative;
 }
 
 /* 顶部标题 */
@@ -409,4 +413,523 @@
   padding: 15rpx;
   border-radius: 8rpx;
   line-height: 1.5;
+}
+
+/* 搜索栏样式 */
+.search-bar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 120rpx;
+  padding: 20rpx 30rpx;
+  background-color: #4582FE;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 80rpx;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 40rpx;
+  padding: 0 30rpx;
+}
+
+.search-box input {
+  flex: 1;
+  height: 80rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 报告列表样式 */
+.report-list {
+  flex: 1;
+  padding: 30rpx 24rpx;
+}
+
+/* 空数据提示 */
+.empty-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 200rpx;
+}
+
+.empty-icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.6;
+}
+
+.empty-text {
+  font-size: 34rpx;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 20rpx;
+}
+
+.empty-tip {
+  font-size: 26rpx;
+  color: #999;
+  text-align: center;
+}
+
+/* 报告卡片样式 */
+.report-item {
+  margin-bottom: 24rpx;
+}
+
+.report-card {
+  background-color: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  padding: 30rpx;
+  transition: transform 0.2s;
+}
+
+.report-card:active {
+  transform: scale(0.98);
+}
+
+/* 报告头部 */
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.hospital-info {
+  display: flex;
+  align-items: center;
+}
+
+.hospital-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 16rpx;
+}
+
+.hospital-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.report-date {
+  font-size: 26rpx;
+  color: #666;
+  padding: 8rpx 16rpx;
+  background-color: #f7f8fa;
+  border-radius: 8rpx;
+}
+
+/* 报告内容 */
+.report-content {
+  padding: 24rpx 0;
+}
+
+.report-type-box, .report-summary-box {
+  margin-bottom: 20rpx;
+}
+
+.report-type-label, .report-summary-label {
+  font-size: 24rpx;
+  color: #888;
+  margin-bottom: 8rpx;
+  display: block;
+}
+
+.report-type-value {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.report-summary-value {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* 报告底部 */
+.report-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.report-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+
+.normal .status-dot {
+  background-color: #52c41a;
+}
+
+.warning .status-dot {
+  background-color: #ff4d4f;
+}
+
+.status-text {
+  font-size: 26rpx;
+}
+
+.normal .status-text {
+  color: #52c41a;
+}
+
+.warning .status-text {
+  color: #ff4d4f;
+}
+
+.view-detail {
+  display: flex;
+  align-items: center;
+}
+
+.view-detail text {
+  font-size: 26rpx;
+  color: #4582FE;
+  margin-right: 8rpx;
+}
+
+.icon-arrow {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+/* 上传按钮区域 */
+.upload-btn-area {
+  position: fixed;
+  bottom: 40rpx;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 30rpx;
+  box-sizing: border-box;
+  z-index: 9;
+}
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  height: 90rpx;
+  background-color: #4582FE;
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 45rpx;
+  box-shadow: 0 8rpx 24rpx rgba(69, 130, 254, 0.3);
+  transition: transform 0.2s;
+}
+
+.upload-btn:active {
+  transform: scale(0.96);
+}
+
+.icon-plus {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 16rpx;
+}
+
+/* 模态框样式 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-container {
+  width: 90%;
+  max-width: 650rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-close {
+  font-size: 40rpx;
+  color: #999;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 30rpx;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* 表单项样式 */
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.form-input, .picker-box, .form-textarea {
+  width: 100%;
+  height: 80rpx;
+  background-color: #f7f8fa;
+  border-radius: 8rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #333;
+  box-sizing: border-box;
+  border: 1rpx solid #eee;
+}
+
+.picker-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.picker-value {
+  flex: 1;
+  color: #333;
+}
+
+.icon-calendar {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.form-textarea {
+  height: 200rpx;
+  padding: 20rpx 24rpx;
+  line-height: 1.5;
+}
+
+.file-selector {
+  width: 100%;
+  min-height: 120rpx;
+  background-color: #f7f8fa;
+  border: 1rpx dashed #ccc;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+}
+
+.file-name {
+  font-size: 28rpx;
+  color: #333;
+  word-break: break-all;
+}
+
+.file-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-upload {
+  width: 48rpx;
+  height: 48rpx;
+  margin-bottom: 16rpx;
+}
+
+.file-placeholder text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.modal-footer {
+  display: flex;
+  padding: 20rpx 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.btn-cancel, .btn-save, .btn-primary {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 8rpx;
+  font-size: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10rpx;
+}
+
+.btn-cancel {
+  background-color: #f7f8fa;
+  color: #666;
+  border: 1rpx solid #eee;
+}
+
+.btn-save, .btn-primary {
+  background-color: #4582FE;
+  color: #fff;
+}
+
+/* 异常项目分析样式 */
+.abnormal-list {
+  padding: 10rpx 0;
+}
+
+.abnormal-item {
+  background-color: #f9f9f9;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.abnormal-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.abnormal-category {
+  background-color: #4582FE;
+  color: #fff;
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  margin-right: 16rpx;
+}
+
+.abnormal-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.abnormal-values {
+  margin-bottom: 16rpx;
+}
+
+.value-item {
+  display: flex;
+  margin-bottom: 8rpx;
+}
+
+.value-label {
+  width: 160rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.value-data {
+  flex: 1;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.abnormal-analysis {
+  background-color: #fff;
+  border-left: 6rpx solid #4582FE;
+  padding: 16rpx;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+  border-radius: 0 8rpx 8rpx 0;
+}
+
+/* 字体图标 */
+@font-face {
+  font-family: 'iconfont';
+  src: url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAOEAA0AAAAAB4AAAAA0AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP0ZGVE0cGh4GYACCahEICopQggsLEAABNgIkAxgEIAWFCAdYG6oFyJ4ExzEwYXIV1YkwUvbTsJ9dCCHIzYR7VW/NxdRUE/KLPDzRHt/u3jSjIkQdOlEgJW5q/JdpMI0Fip00b2TFGBv7qDJn/+QDLIMcqhU3QTfdTPfxxfufJ3pNTiF9cCZiYB0RQ+EJ9A/f+P938zYS5AIEwB/QFgAAOICQgxoAkACCvQBAAwAAAAcgJwAAgHwAAHgD4iQgYA7oHgK+A+aHPAGQUAARBEI4JIKQiGYskAiiK6QmUzWNVX6xQiH0Eg1S5HmA8e9PuWiSJWVllaRYAJQoJMOKqlLRLPkpw8iIMt81tLc3N3G6Nh1pWwsA8EAwQHAGpAyuAJLfzBDsEARRmQxJ45mXocgUAMZgwPAfUzVX+FIZjMlkUQYGLW1t4RWFgTMEOQKvKdgYdMISXAFxM5rQAz1BFdOWKRyWLBQXZUxdqhC6YNrSpQp+FbxZ23c/Ppn2DAfRtWr8kTZCiUJTwSITUaZwPBPxxhHJqRyRdVPE2FGgdFmkUEVE6soxOeexAoWSZfOnMKLr6cQy+AyFYCRtOKRRGZQlioIRoZgZnEkTCwDWnOcH+c/TlWxOo6ySU4FT9gJXKAyKEhFxCTcDT4SfUcmbLLFJlJJXgZWgSfXpVW+kL5w+c8b0OfqPJfKXRafPn67Pb96oA9qfbk239LeuKupfTYpOGJ36KS0pKTRpf0r2xMycjLS4xOyMKZkpCUn77c9hXy/uNEbXV6Uk9Z/LY1P2tGFf4LZ9X9hXm/Xkj9qmv/+/uT19Ud0+Vf1VXmzvVU3XDR5bW1Vt0fy+OGFf6ppb3hxuflxmTnf30D73NP/+3Xjf18nRq7l3tOo6o3Fq6J3e0Tz2uyYyTOcr9rn3dcHTZ+5Z3dO8K+9zdH6sdzfe1zuVk9e4fGG6q3Nhee1U7/ZHurZR1kgQgFXPAgBgjfcXd5/aSACwXgcOAIC9jWsGgBuXnXjFAwT7SqIk4E+PGwAESoQmGAAuAQAAMBdLKlO3CxUqqAAAUEy7+kZprDIhoVFALZPJGE1AQKPBtHg8PqekVCaXMRXFlfWNXLmy7p4ODgxEomZnizAcv7y6PkRJsREa93c3igsUDCooZBARGCmG41dWNwbj++Nbnz9jT+2+3XMsKhZfHuQKtcqb7f3b/X9nKAHpI3SbVKRLZmRw1u1JQ9C6UtLnGFmsdkAp1NeS3E5H93g9OZVSlkAwXCotCyONMfMnbGQFisL/0Bi3Uf8WCNEoMiZ6eBL1+OKk9AxSdFiEHO4RJTJ9cxYnwjNaNKYUDgA=') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.svg-icon {
+  font-family: 'iconfont';
+  font-size: 28rpx;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 图标样式 */
+.icon-search, .hospital-icon, .icon-arrow, .icon-plus, .icon-calendar, .icon-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-search .svg-icon {
+  font-size: 36rpx;
+  color: #4582FE;
+}
+
+.hospital-icon .svg-icon {
+  font-size: 36rpx;
+  color: #4582FE;
+}
+
+.icon-arrow .svg-icon {
+  font-size: 24rpx;
+  color: #4582FE;
+}
+
+.icon-plus .svg-icon {
+  font-size: 40rpx;
+  color: #fff;
+}
+
+.icon-calendar .svg-icon {
+  font-size: 32rpx;
+  color: #999;
+}
+
+.icon-upload .svg-icon {
+  font-size: 48rpx;
+  color: #999;
 } 

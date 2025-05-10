@@ -21,6 +21,10 @@ module.exports = Behavior({
 	data: {
 		isLoad: false, // 是否已加载数据
 		reportList: [], // 报告列表数据
+		
+		// 搜索相关
+		search: '', // 搜索关键词
+		originalReportList: [], // 原始报告列表，用于搜索
 
 		// 当前选中的报告
 		currentReport: null,
@@ -132,10 +136,13 @@ module.exports = Behavior({
 					wx.hideLoading();
 					
 					// 处理后台返回的数据
-					if (!result || !result.data) {
+					console.log('报告列表返回结果:', result);
+					
+					// 检查返回的结果是否有效
+					if (!result) {
 						// 如果数据为空且还有重试机会，继续重试
 						if (retryCount < maxRetries) {
-							console.log(`加载报告列表第${retryCount+1}次失败，正在重试...`);
+							console.log(`加载报告列表第${retryCount+1}/${maxRetries+1}次失败，正在重试...`);
 							retryCount++;
 							await new Promise(resolve => setTimeout(resolve, 1000));
 							continue;
@@ -149,14 +156,21 @@ module.exports = Behavior({
 						return;
 					}
 
+					// 获取报告列表数据
+					let reportData = null;
+					if (result.data) {
+						reportData = result.data;
+					}
+
 					// 更新页面数据
 					this.setData({
 						isLoad: true,
-						reportList: result.data
+						reportList: reportData,
+						originalReportList: reportData // 保存原始数据用于搜索
 					});
 
 					// 处理空数据的情况
-					if (result.data.length === 0) {
+					if (!reportData || reportData.length === 0) {
 						pageHelper.showNoneToast('暂无体检报告');
 					}
 					
@@ -217,6 +231,46 @@ module.exports = Behavior({
 		 * 页面上拉触底事件的处理函数
 		 */
 		onReachBottom: function () { },
+
+		/**
+		 * 搜索框输入事件处理
+		 * @param {Object} e - 事件对象 
+		 */
+		bindSearchInput: function(e) {
+			// 获取搜索关键词
+			const keyword = e.detail.value.toLowerCase();
+			this.setData({
+				search: keyword
+			});
+			
+			// 如果关键词为空，恢复原始列表
+			if (!keyword) {
+				this.setData({
+					reportList: this.data.originalReportList
+				});
+				return;
+			}
+			
+			// 根据关键词过滤报告列表
+			const filtered = this.data.originalReportList.filter(item => {
+				// 匹配医院名称、体检类型、概述中是否包含关键词
+				return (
+					(item.hospital && item.hospital.toLowerCase().includes(keyword)) ||
+					(item.reportType && item.reportType.toLowerCase().includes(keyword)) ||
+					(item.summary && item.summary.toLowerCase().includes(keyword))
+				);
+			});
+			
+			// 更新显示的列表
+			this.setData({
+				reportList: filtered
+			});
+			
+			// 显示搜索结果提示
+			if (filtered.length === 0) {
+				pageHelper.showNoneToast('未找到相关报告');
+			}
+		},
 
 		/**
 		 * 用户点击右上角分享
@@ -289,6 +343,21 @@ module.exports = Behavior({
 				console.error('获取报告详情失败：', err);
 				pageHelper.showModal('获取报告详情失败，请重试');
 			}
+		},
+
+		/**
+		 * 点击报告项，跳转到详情页
+		 * @param {Object} e - 事件对象
+		 */
+		bindReportTap: function (e) {
+			let id = pageHelper.dataset(e, 'id');
+			console.log('点击报告，报告ID:', id);
+			
+			if (!id) return;
+			
+			wx.navigateTo({
+				url: '/projects/A00/health/report/report_detail/report_detail?id=' + id
+			});
 		},
 
 		url: function (e) {

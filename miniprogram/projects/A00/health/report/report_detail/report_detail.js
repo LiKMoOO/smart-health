@@ -254,7 +254,57 @@ Page({
       this.setData({ isAnalyzing: true });
       
       wx.showLoading({ title: 'AI分析中...', mask: true });
-      console.log('开始AI分析报告');
+      console.log('开始AI分析报告，reportId:', this.data.reportId);
+      
+      // 获取用户ID
+      const userId = wx.getStorageSync('OPENID');
+      console.log('当前用户ID:', userId);
+      
+      if (!userId) {
+        console.error('未获取到用户ID，尝试从云函数获取');
+        try {
+          // 尝试获取用户OpenID
+          await new Promise((resolve, reject) => {
+            wx.cloud.callFunction({
+              name: 'cloud',
+              data: {},
+              success: res => {
+                console.log('获取OpenID成功:', res);
+                if (res.result && res.result.openId) {
+                  wx.setStorageSync('OPENID', res.result.openId);
+                  console.log('用户OpenID已保存:', res.result.openId);
+                  resolve();
+                } else if (res.result && res.result.event && res.result.event.userInfo && res.result.event.userInfo.openId) {
+                  wx.setStorageSync('OPENID', res.result.event.userInfo.openId);
+                  console.log('用户OpenID已保存(从event):', res.result.event.userInfo.openId);
+                  resolve();
+                } else {
+                  reject(new Error('获取用户ID失败'));
+                }
+              },
+              fail: err => {
+                console.error('获取用户ID失败:', err);
+                reject(err);
+              }
+            });
+          });
+        } catch (err) {
+          wx.hideLoading();
+          this.setData({ isAnalyzing: false });
+          console.error('获取用户ID失败:', err);
+          pageHelper.showModal('无法获取用户信息，请退出并重新进入小程序');
+          return;
+        }
+      }
+      
+      // 再次获取用户ID（可能刚刚设置了）
+      const finalUserId = wx.getStorageSync('OPENID');
+      if (!finalUserId) {
+        wx.hideLoading();
+        this.setData({ isAnalyzing: false });
+        pageHelper.showModal('无法获取用户信息，请退出并重新进入小程序');
+        return;
+      }
       
       // 准备AI分析所需内容
       let reportContent = '';
@@ -290,18 +340,23 @@ Page({
       
       // 调用AI分析云函数
       const params = {
+        userId: finalUserId,
         reportId: this.data.reportId,
         reportContent: reportContent
       };
       
-      console.log('开始调用analyzeReportByAI云函数');
-      const result = await cloudHelper.callCloudSumbitAsync('medicalReport', {
+      console.log('开始调用analyzeReportByAI云函数，参数:', JSON.stringify(params));
+      
+      // 使用callCloudSumbit确保错误处理更加完善
+      const result = await cloudHelper.callCloudSumbit('medicalReport', {
         action: 'analyzeReportByAI',
         params
+      }, {
+        title: 'AI分析中...',
+        hint: true
       });
       
-      console.log('AI分析云函数返回结果:', result);
-      wx.hideLoading();
+      console.log('AI分析云函数返回结果:', JSON.stringify(result));
       
       if (result && result.code === 0) {
         await this._loadReportDetail(); // 重新加载报告以获取AI分析结果
@@ -316,8 +371,13 @@ Page({
     } catch (err) {
       wx.hideLoading();
       console.error('AI分析过程中发生异常:', err);
-      pageHelper.showModal('AI分析失败，请稍后重试');
+      if (err.errMsg && err.errMsg.includes('timeout')) {
+        pageHelper.showModal('AI分析超时，请稍后重试或联系客服');
+      } else {
+        pageHelper.showModal('AI分析失败，请稍后重试');
+      }
     } finally {
+      wx.hideLoading();
       this.setData({ isAnalyzing: false });
     }
   },

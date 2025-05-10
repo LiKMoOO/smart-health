@@ -60,6 +60,12 @@
  		if (route === 'health/gethealthindex' && result.code === 0) {
  			return result.data; // 直接返回data字段
  		}
+ 		
+ 		// 处理medicalReport云函数的返回结果
+ 		if (route === 'medicalReport' && result.code === 0) {
+ 			console.log('medicalReport返回结果:', result);
+ 			return result; // medicalReport云函数已经处理过返回格式，直接返回
+ 		}
 
  		// 直接提取数据
  		if (helper.isDefined(result.data)) {
