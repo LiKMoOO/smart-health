@@ -57,6 +57,59 @@ module.exports = Behavior({
 			let retryCount = 0;
 			const maxRetries = 2;
 			
+			// 尝试获取用户ID
+			const userId = wx.getStorageSync('OPENID');
+			
+			// 如果用户ID不存在，先获取用户ID
+			if (!userId) {
+				wx.showLoading({
+					title: '加载中...',
+					mask: true
+				});
+				
+				try {
+					// 尝试获取用户OpenID
+					await new Promise((resolve, reject) => {
+						wx.cloud.callFunction({
+							name: 'cloud',
+							data: {},
+							success: res => {
+								console.log('获取OpenID成功:', res);
+								if (res.result && res.result.openId) {
+									wx.setStorageSync('OPENID', res.result.openId);
+									console.log('用户OpenID已保存:', res.result.openId);
+									resolve();
+								} else if (res.result && res.result.event && res.result.event.userInfo && res.result.event.userInfo.openId) {
+									wx.setStorageSync('OPENID', res.result.event.userInfo.openId);
+									console.log('用户OpenID已保存(从event):', res.result.event.userInfo.openId);
+									resolve();
+								} else {
+									reject(new Error('获取用户ID失败'));
+								}
+							},
+							fail: err => {
+								console.error('获取用户ID失败:', err);
+								reject(err);
+							}
+						});
+					});
+					
+					wx.hideLoading();
+				} catch (err) {
+					wx.hideLoading();
+					console.error('获取用户ID失败:', err);
+					pageHelper.showModal('获取用户信息失败，请重启小程序');
+					return;
+				}
+			}
+			
+			// 重新获取用户ID（可能刚刚设置了）
+			const finalUserId = wx.getStorageSync('OPENID');
+			if (!finalUserId) {
+				pageHelper.showModal('无法获取用户信息，请退出并重新进入小程序');
+				return;
+			}
+			
 			while (retryCount <= maxRetries) {
 				try {
 					wx.showLoading({
@@ -65,17 +118,15 @@ module.exports = Behavior({
 					});
 
 					// 准备云函数调用参数
-					const params = {};
+					// 确保传递正确的用户ID
+					const params = {
+						userId: finalUserId
+					};
+
 					// 调用云函数
-					// 说明：
-					// 1. 'cloud'是云函数名称
-					// 2. route指定路由到medicalReport模块
-					// 3. action指定执行getReportList操作
-					const result = await cloudHelper.callCloudData('cloud', {
-						PID: 'A00', // 项目ID
-						route: 'medicalReport', // 路由到体检报告模块
-						action: 'getReportList', // 获取报告列表操作
-						params // 业务参数
+					const result = await cloudHelper.callCloudData('medicalReport', {
+						action: 'getReportList',
+						params: params
 					}, opts);
 
 					wx.hideLoading();
@@ -203,21 +254,24 @@ module.exports = Behavior({
 				let opts = {
 					title: 'bar'
 				};
+				
+				// 获取用户ID
+				const userId = wx.getStorageSync('OPENID');
+				if (!userId) {
+					pageHelper.showModal('无法获取用户信息，请退出并重新进入小程序');
+					return;
+				}
+				
 				// 准备请求参数
 				let params = {
-					reportId: id
+					reportId: id,
+					userId: userId // 确保传递用户ID
 				};
 
 				// 调用云函数获取报告详情
-				// 说明：
-				// 1. 'cloud'是云函数名称
-				// 2. route指定路由到medicalReport模块
-				// 3. action指定执行getReportDetail操作
-				let result = await cloudHelper.callCloudData('cloud', {
-					PID: 'A00',
-					route: 'medicalReport',
+				let result = await cloudHelper.callCloudData('medicalReport', {
 					action: 'getReportDetail',
-					params
+					params: params
 				}, opts);
 
 				// 检查返回数据

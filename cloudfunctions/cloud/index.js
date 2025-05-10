@@ -8,6 +8,22 @@ const TcbRouter = require('tcb-router');
 exports.main = async (event, context) => {
 	console.log(event);
 	
+	// 如果没有route，直接返回OpenID
+	if (!event.route) {
+		const wxContext = cloud.getWXContext();
+		console.log('返回用户OpenID:', wxContext.OPENID);
+		return {
+			code: 0,
+			openId: wxContext.OPENID,
+			event: {
+				userInfo: {
+					openId: wxContext.OPENID,
+					appId: wxContext.APPID
+				}
+			}
+		};
+	}
+	
 	// 处理cloud路由请求，从params中获取真正的路由
 	if (event.route === 'cloud' && event.params && event.params.route) {
 		// 修改event对象的route，使其指向真正的目标路由

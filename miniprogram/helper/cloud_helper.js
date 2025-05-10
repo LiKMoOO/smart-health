@@ -133,96 +133,166 @@
 
  		// 区分不同模块的参数处理方式
  		if (route === 'medicalReport') {
- 			// medicalReport模块使用action和params参数
- 			data.action = params.action;
- 			data.params = params.params || {};
+ 			// medicalReport模块直接调用同名云函数
+ 			// 确保传递正确的参数格式
+ 			data = {
+ 				action: params.action,
+ 				params: params.params || {}
+ 			};
+ 			
+ 			// 如果params.params中没有userId，尝试从本地存储获取
+ 			if (!data.params.userId) {
+ 				const openId = wx.getStorageSync('OPENID');
+ 				if (openId) {
+ 					data.params.userId = openId;
+ 					console.log('从本地存储添加userId:', openId);
+ 				}
+ 			}
+ 			
+ 			console.log('调用medicalReport云函数, data:', data);
+ 			
+ 			wx.cloud.callFunction({
+ 				name: 'medicalReport', // 直接调用medicalReport云函数
+ 				data: data,
+ 				success: function (res) {
+ 					if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA && res.result.code !== 0) {
+ 						console.log(res)
+ 						// 逻辑错误&数据校验错误 
+ 						if (hint) {
+ 							wx.showModal({
+ 								title: '温馨提示',
+ 								content: res.result.msg,
+ 								showCancel: false
+ 							});
+ 						}
+
+ 						reject(res.result);
+ 						return;
+ 					} else if (res.result.code == CODE.ADMIN_ERROR) {
+ 						// 后台登录错误
+ 						wx.reLaunch({
+ 							url: '/pages/admin/index/login/admin_login',
+ 						});
+ 						return;
+ 					} else if (res.result.code != CODE.SUCC && res.result.code !== 0) {
+ 						if (hint) {
+ 							wx.showModal({
+ 								title: '温馨提示',
+ 								content: res.result.msg || '系统开小差了，请稍后重试',
+ 								showCancel: false
+ 							});
+ 						}
+ 						reject(res.result);
+ 						return;
+ 					}
+
+ 					resolve(res.result);
+ 				},
+ 				fail: function (err) {
+ 					// 处理失败情况
+ 					_fail(err, hint, reject);
+ 				},
+ 				complete: function () {
+ 					if (hint) {
+ 						if (title == 'bar')
+ 							wx.hideNavigationBarLoading();
+ 						else
+ 							wx.hideLoading();
+ 					}
+ 				}
+ 			});
  		} else {
  			// 其他模块直接将params作为参数
  			data.params = params;
+ 			
+ 			wx.cloud.callFunction({
+ 				name: 'cloud',
+ 				data: data,
+ 				success: function (res) {
+ 					if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA && res.result.code !== 0) {
+ 						console.log(res)
+ 						// 逻辑错误&数据校验错误 
+ 						if (hint) {
+ 							wx.showModal({
+ 								title: '温馨提示',
+ 								content: res.result.msg,
+ 								showCancel: false
+ 							});
+ 						}
+
+ 						reject(res.result);
+ 						return;
+ 					} else if (res.result.code == CODE.ADMIN_ERROR) {
+ 						// 后台登录错误
+ 						wx.reLaunch({
+ 							url: '/pages/admin/index/login/admin_login',
+ 						});
+ 						//reject(res.result);
+ 						return;
+ 					} else if (res.result.code != CODE.SUCC && res.result.code !== 0) {
+ 						if (hint) {
+ 							wx.showModal({
+ 								title: '温馨提示',
+ 								content: res.result.msg || '系统开小差了，请稍后重试',
+ 								showCancel: false
+ 							});
+ 						}
+ 						reject(res.result);
+ 						return;
+ 					}
+
+ 					resolve(res.result);
+ 				},
+ 				fail: function (err) {
+ 					// 处理失败情况
+ 					_fail(err, hint, reject);
+ 				},
+ 				complete: function () {
+ 					if (hint) {
+ 						if (title == 'bar')
+ 							wx.hideNavigationBarLoading();
+ 						else
+ 							wx.hideLoading();
+ 					}
+ 				}
+ 			});
  		}
-
- 		wx.cloud.callFunction({
- 			name: 'cloud',
- 			data: data,
- 			success: function (res) {
- 				if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA && res.result.code !== 0) {
- 					console.log(res)
- 					// 逻辑错误&数据校验错误 
- 					if (hint) {
- 						wx.showModal({
- 							title: '温馨提示',
- 							content: res.result.msg,
- 							showCancel: false
- 						});
- 					}
-
- 					reject(res.result);
- 					return;
- 				} else if (res.result.code == CODE.ADMIN_ERROR) {
- 					// 后台登录错误
- 					wx.reLaunch({
- 						url: '/pages/admin/index/login/admin_login',
- 					});
- 					//reject(res.result);
- 					return;
- 				} else if (res.result.code != CODE.SUCC && res.result.code !== 0) {
- 					if (hint) {
- 						wx.showModal({
- 							title: '温馨提示',
- 							content: res.result.msg || '系统开小差了，请稍后重试',
- 							showCancel: false
- 						});
- 					}
- 					reject(res.result);
- 					return;
- 				}
-
- 				resolve(res.result);
- 			},
- 			fail: function (err) {
- 				if (hint) {
- 					console.log(err)
- 					if (err && err.errMsg && err.errMsg.includes('-501000') && err.errMsg.includes('Environment not found')) {
- 						wx.showModal({
- 							title: '',
- 							content: '未找到云环境ID，请按手册检查前端配置文件setting.js的配置项【CLOUD_ID】或咨询作者微信cclinux0730',
- 							showCancel: false
- 						});
-
- 					} else if (err && err.errMsg && err.errMsg.includes('-501000') && err.errMsg.includes('FunctionName')) {
- 						wx.showModal({
- 							title: '',
- 							content: '云函数未创建或者未上传，请参考手册或咨询作者微信cclinux0730',
- 							showCancel: false
- 						});
-
- 					} else if (err && err.errMsg && err.errMsg.includes('-501000') && err.errMsg.includes('performed in the current function state')) {
- 						wx.showModal({
- 							title: '',
- 							content: '云函数正在上传中或者上传有误，请稍候',
- 							showCancel: false
- 						});
- 					} else
- 						wx.showModal({
- 							title: '',
- 							content: '网络故障，请稍后重试',
- 							showCancel: false
- 						});
- 				}
- 				reject(err.result);
- 				return;
- 			},
- 			complete: function (res) {
- 				if (hint) {
- 					if (title == 'bar')
- 						wx.hideNavigationBarLoading();
- 					else
- 						wx.hideLoading();
- 				}
- 				// complete
- 			}
- 		});
  	});
+ }
+
+ // 添加_fail函数用于处理云函数调用失败的情况
+ function _fail(err, hint, reject) {
+ 	if (hint) {
+ 		console.log(err)
+ 		if (err && err.errMsg && err.errMsg.includes('-501000') && err.errMsg.includes('Environment not found')) {
+ 			wx.showModal({
+ 				title: '',
+ 				content: '未找到云环境ID，请按手册检查前端配置文件setting.js的配置项【CLOUD_ID】或咨询作者微信cclinux0730',
+ 				showCancel: false
+ 			});
+
+ 		} else if (err && err.errMsg && err.errMsg.includes('-501000') && err.errMsg.includes('FunctionName')) {
+ 			wx.showModal({
+ 				title: '',
+ 				content: '云函数未创建或者未上传，请参考手册或咨询作者微信cclinux0730',
+ 				showCancel: false
+ 			});
+
+ 		} else if (err && err.errMsg && err.errMsg.includes('-501000') && err.errMsg.includes('performed in the current function state')) {
+ 			wx.showModal({
+ 				title: '',
+ 				content: '云函数正在准备中或已超时，请稍后再试',
+ 				showCancel: false
+ 			});
+ 		} else {
+ 			wx.showModal({
+ 				title: '',
+ 				content: '网络故障，请稍后重试',
+ 				showCancel: false
+ 			});
+ 		}
+ 	}
+ 	reject(err);
  }
 
  /**

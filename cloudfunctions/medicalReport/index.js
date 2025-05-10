@@ -25,17 +25,15 @@ exports.main = async (event, context) => {
   console.log('云函数入口 - 微信上下文:', wxContext)
   
   // 参数兼容性处理
-  if (!params) {
-    console.error('参数格式错误，缺少params对象')
-    return { code: 400, msg: '参数格式错误' }
-  }
+  let actualParams = params || {}; // 确保params存在
   
   // 注入用户ID
-  if (!params.userId && wxContext.OPENID) {
+  if (!actualParams.userId && wxContext.OPENID) {
     console.log('注入用户ID:', wxContext.OPENID)
-    params.userId = wxContext.OPENID
-  } else if (!params.userId) {
+    actualParams.userId = wxContext.OPENID
+  } else if (!actualParams.userId) {
     console.warn('无法获取用户ID')
+    return { code: 1001, msg: '用户ID不能为空' }
   }
   
   // 路由分发
@@ -43,19 +41,19 @@ exports.main = async (event, context) => {
     let result = null
     switch (action) {
       case 'uploadReport':
-        result = await uploadReport.main(params, wxContext)
+        result = await uploadReport.main(actualParams, wxContext)
         break
       case 'getReportList':
-        result = await getReportList.main(params, wxContext)
+        result = await getReportList.main(actualParams, wxContext)
         break
       case 'getReportDetail':
-        result = await getReportDetail.main(params, wxContext)
+        result = await getReportDetail.main(actualParams, wxContext)
         break
       case 'analyzeReportByAI':
-        result = await analyzeReportByAI.main(params, wxContext)
+        result = await analyzeReportByAI.main(actualParams, wxContext)
         break
       case 'ocrReport':
-        result = await ocrReport.main(params, wxContext)
+        result = await ocrReport.main(actualParams, wxContext)
         break
       default:
         result = { code: 404, msg: '未知操作' }
