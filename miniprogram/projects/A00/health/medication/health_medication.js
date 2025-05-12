@@ -211,7 +211,11 @@ Page({
 	 */
 	bindAddTap: function() {
 		wx.navigateTo({
-			url: './medication_add/medication_add',
+			url: '/projects/A00/health/medication/medication_add/medication_add',
+			fail: function(err) {
+				console.error('跳转失败：', err);
+				pageHelper.showModal('页面跳转失败，请重试');
+			}
 		});
 	},
 

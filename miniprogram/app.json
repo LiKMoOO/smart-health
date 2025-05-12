@@ -25,7 +25,7 @@
 		"projects/A00/health/metrics/health_metrics",
 		"projects/A00/health/report/health_report",
 		"projects/A00/health/medication/health_medication",
-		"projects/A00/health/medication/medication_add",
+		"projects/A00/health/medication/medication_add/medication_add",
 		"projects/A00/health/medication/medication_detail/medication_detail",
 		"projects/A00/health/medication/medication_edit/medication_edit",
 		"projects/A00/health/journal/health_journal",
