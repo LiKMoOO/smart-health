@@ -15,13 +15,13 @@ Page({
 		// 健康分析数据
 		healthData: null,
 		
-		// 周期选择
+		// 周期选项
 		periodOptions: [
 			{ label: '最近一周', value: 'week' },
 			{ label: '最近一月', value: 'month' },
 			{ label: '最近一年', value: 'year' }
 		],
-		currentPeriod: 'month',
+		currentPeriod: 'month', // 默认一个月
 		
 		// 指标类型
 		metricTypes: [
@@ -33,13 +33,17 @@ Page({
 		
 		// 图表数据
 		chartSeries: [],
+		
+		// 图表ec配置映射
+		ecMap: {}
 	},
 
 	/**
 	 * 生命周期函数--监听页面加载
 	 */
-	onLoad(options) {
-		this._loadHealthAnalysisData();
+	onLoad: async function (options) {
+		console.log('[health_analysis] 页面加载开始...');
+		await this._loadHealthAnalysisData();
 	},
 	
 	/**
@@ -47,139 +51,203 @@ Page({
 	 */
 	async _loadHealthAnalysisData() {
 		try {
+			// 显示加载中
 			this.setData({ isLoading: true });
 			
-			// 获取所选指标类型
-			const selectedTypes = this.data.metricTypes
+			// 获取选中的健康指标 value 数组
+			const selectedMetrics = this.data.metricTypes
 				.filter(item => item.selected)
 				.map(item => item.value);
 			
-			// 调用云函数
-			const params = {
+			console.log('[health_analysis] 正在获取健康分析数据...', {
 				period: this.data.currentPeriod,
-				metricTypes: selectedTypes
-			};
+				metrics: selectedMetrics
+			});
 			
-			const result = await cloudHelper.callCloudData('health/gethealthanalysis', params);
+			// 调用云函数获取健康数据分析 (cloudHelper.callCloudData 成功时会返回解包后的 data 部分)
+			const cloudResult = await cloudHelper.callCloudData('health/gethealthanalysis', {
+				period: this.data.currentPeriod,
+				metrics: selectedMetrics
+			});
 			
-			if (result && result.data) {
-				// 处理图表数据
-				const chartSeries = this._processChartData(result.data.trendData);
-				
-				this.setData({
-					healthData: result.data,
-					chartSeries: chartSeries,
-					isLoading: false
-				});
-				
-				// 渲染图表
-				this._renderCharts();
+			console.log('[health_analysis] cloudHelper.callCloudData 返回结果:', JSON.stringify(cloudResult));
+			
+			// 检查 cloudHelper 是否返回了有效数据
+			if (!cloudResult) {
+				throw new Error('获取数据失败或无数据');
 			}
+			
+			// 直接从 cloudResult (即原始的 data 部分) 中提取数据
+			const trendData = cloudResult.trendData || {};
+			const healthAssessment = cloudResult.healthAssessment || {};
+			
+			console.log('[health_analysis] 用于处理的趋势数据:', trendData);
+			const chartSeries = this._processChartData(trendData);
+			console.log('[health_analysis] 图表数据处理完成:', chartSeries);
+			
+			console.log('[health_analysis] 准备设置页面数据并停止加载...');
+			
+			// 更新页面数据
+			this.setData({
+				healthData: {
+					trendData,
+					healthAssessment,
+					period: this.data.currentPeriod // 保持当前选择的周期
+				},
+				chartSeries: chartSeries,
+				isLoading: false
+			}, () => {
+				console.log('[health_analysis] 页面数据设置完成, isLoading:', this.data.isLoading);
+				
+				// 初始化并渲染图表
+				console.log('[health_analysis] 开始渲染图表...');
+				this._renderCharts();
+				console.log('[health_analysis] 图表渲染调用完成.');
+			});
 		} catch (err) {
-			console.error('获取健康分析数据失败:', err);
-			pageHelper.showNoneToast('获取数据失败，请稍后重试');
-			this.setData({ isLoading: false });
+			console.error('[health_analysis] 获取健康分析数据失败:', err);
+			this.setData({ 
+				isLoading: false,
+				chartSeries: []
+			});
+			pageHelper.showNoneToast('获取数据失败: ' + err.message);
 		}
 	},
 	
 	/**
 	 * 处理图表数据
+	 * @param {Object} trendData 从云函数返回的趋势数据
 	 */
 	_processChartData(trendData) {
-		const series = [];
+		console.log('[health_analysis] 开始处理图表数据:', trendData);
 		
-		// 血压数据处理（特殊处理，因为有收缩压和舒张压两个值）
+		if (!trendData) {
+			console.warn('[health_analysis] 图表数据为空');
+			return [];
+		}
+		
+		const chartSeries = [];
+		
+		// 处理血压数据（特殊处理，因为有收缩压和舒张压两个值）
 		if (trendData.blood_pressure && trendData.blood_pressure.length > 0) {
-			const systolicData = [];
-			const diastolicData = [];
-			const dates = [];
-			
-			trendData.blood_pressure.forEach(item => {
-				const date = timeHelper.formatDate(new Date(item.recordTime), 'MM-DD');
-				dates.push(date);
+			try {
+				const systolicData = [];
+				const diastolicData = [];
+				const dates = [];
 				
-				systolicData.push(item.value.systolic);
-				diastolicData.push(item.value.diastolic);
-			});
-			
-			series.push({
-				name: '血压',
-				categories: dates,
-				series: [
-					{
-						name: '收缩压',
-						data: systolicData,
-						color: '#F56C6C'
-					},
-					{
-						name: '舒张压',
-						data: diastolicData,
-						color: '#67C23A'
+				trendData.blood_pressure.forEach(item => {
+					if (!item.recordTime || !item.value) return;
+					
+					const date = timeHelper.timestamp2Time(item.recordTime, 'MM-DD');
+					dates.push(date);
+					
+					if (item.value.systolic && item.value.diastolic) {
+						systolicData.push(Number(item.value.systolic));
+						diastolicData.push(Number(item.value.diastolic));
 					}
-				]
-			});
+				});
+				
+				if (dates.length > 0) {
+					chartSeries.push({
+						name: '血压',
+						categories: dates,
+						series: [
+							{
+								name: '收缩压',
+								data: systolicData,
+								color: '#F56C6C',
+								unit: 'mmHg'
+							},
+							{
+								name: '舒张压',
+								data: diastolicData,
+								color: '#409EFF',
+								unit: 'mmHg'
+							}
+						]
+					});
+				}
+			} catch (e) {
+				console.error('[health_analysis] 处理血压数据出错:', e);
+			}
 		}
 		
 		// 处理其他类型数据
 		const metricTypeMap = {
-			'blood_sugar': { name: '血糖', color: '#409EFF', unit: 'mmol/L' },
+			'blood_sugar': { name: '血糖', color: '#67C23A', unit: 'mmol/L' },
 			'weight': { name: '体重', color: '#E6A23C', unit: 'kg' },
 			'heart_rate': { name: '心率', color: '#F56C6C', unit: 'bpm' }
 		};
 		
 		Object.keys(trendData).forEach(type => {
 			if (type !== 'blood_pressure' && metricTypeMap[type] && trendData[type].length > 0) {
-				const data = [];
-				const dates = [];
-				
-				trendData[type].forEach(item => {
-					const date = timeHelper.formatDate(new Date(item.recordTime), 'MM-DD');
-					dates.push(date);
-					data.push(type === 'weight' ? item.value : Number(item.value));
-				});
-				
-				series.push({
-					name: metricTypeMap[type].name,
-					categories: dates,
-					series: [
-						{
+				try {
+					const data = [];
+					const dates = [];
+					
+					trendData[type].forEach(item => {
+						if (!item.recordTime || item.value === undefined) return;
+						
+						const date = timeHelper.timestamp2Time(item.recordTime, 'MM-DD');
+						dates.push(date);
+						const value = type === 'weight' ? Number(item.value) : Number(item.value);
+						data.push(isNaN(value) ? 0 : value);
+					});
+					
+					if (dates.length > 0) {
+						chartSeries.push({
 							name: metricTypeMap[type].name,
-							data: data,
-							color: metricTypeMap[type].color,
-							unit: metricTypeMap[type].unit
-						}
-					]
-				});
+							categories: dates,
+							series: [
+								{
+									name: metricTypeMap[type].name,
+									data: data,
+									color: metricTypeMap[type].color,
+									unit: metricTypeMap[type].unit
+								}
+							]
+						});
+					}
+				} catch (e) {
+					console.error(`[health_analysis] 处理${type}数据出错:`, e);
+				}
 			}
 		});
 		
-		return series;
+		console.log('[health_analysis] 处理后的图表数据系列:', chartSeries);
+		return chartSeries;
 	},
 	
 	/**
 	 * 渲染图表
 	 */
 	_renderCharts() {
-		setTimeout(() => {
-			this.data.chartSeries.forEach((chartData, index) => {
-				const canvasId = `chart${index}`;
-				const canvas = this.selectComponent(`#${canvasId}`);
-				
-				if (canvas) {
-					canvas.init((canvas, width, height, dpr) => {
-						const chart = chartHelper.initLineChart({
-							canvas: canvas,
-							width: width,
-							height: height,
-							categories: chartData.categories,
-							series: chartData.series,
-							title: chartData.name
-						});
-						return chart;
+		console.log('[health_analysis] 进入 _renderCharts...');
+		// 初始化每个图表的ec对象
+		const ecMap = {};
+		this.data.chartSeries.forEach((chartData, index) => {
+			const canvasId = `chart${index}`;
+			ecMap[canvasId] = {
+				onInit: (canvas, width, height, dpr) => {
+					console.log(`[health_analysis] Canvas #${canvasId} init 回调执行, width:`, width, ", height:", height, ", dpr:", dpr);
+					const chart = chartHelper.initLineChart({
+						canvas: canvas,
+						width: width,
+						height: height,
+						categories: chartData.categories,
+						series: chartData.series,
+						title: chartData.name
 					});
+					console.log(`[health_analysis] 图表 ${canvasId} 初始化调用完成.`);
+					return chart;
 				}
-			});
-		}, 100);
+			};
+		});
+		
+		// 更新ecMap数据
+		this.setData({ ecMap: ecMap }, () => {
+			console.log('[health_analysis] ecMap数据已更新:', this.data.ecMap);
+		});
 	},
 	
 	/**
@@ -227,7 +295,7 @@ Page({
 			url: '../metrics/health_metrics'
 		});
 	},
-	
+
 	/**
 	 * 生命周期函数--监听页面初次渲染完成
 	 */

@@ -597,6 +597,8 @@ async function getHealthAnalysis(params) {
       condition.type = _.in(metricTypes);
     }
     
+    console.log('构建的查询条件:', JSON.stringify(condition));
+    
     // 获取健康指标数据
     const metricsResult = await db.collection(HEALTH_METRICS_COLLECTION)
       .where(condition)
@@ -632,7 +634,8 @@ async function getHealthAnalysis(params) {
     // 获取健康评估
     const healthAssessment = await generateHealthAssessment(userId, trendData);
     
-    return {
+    // 准备返回的数据结构
+    const response = {
       code: 0,
       data: {
         trendData,
@@ -641,6 +644,10 @@ async function getHealthAnalysis(params) {
       },
       msg: '获取成功'
     };
+    
+    console.log('【Health Cloud Function】准备返回健康分析数据:', JSON.stringify(response)); // 添加日志
+    
+    return response; // 返回准备好的数据
   } catch (err) {
     console.error('获取健康分析数据失败:', err);
     return {

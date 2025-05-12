@@ -77,7 +77,7 @@
       <view class="card chart-card" wx:for="{{chartSeries}}" wx:key="name">
         <view class="card-title">{{item.name}}趋势图</view>
         <view class="chart-container">
-          <ec-canvas id="chart{{index}}" canvas-id="chart{{index}}" class="chart"></ec-canvas>
+          <ec-canvas id="chart{{index}}" canvas-id="chart{{index}}" class="chart" ec="{{ ecMap['chart'+index] }}"></ec-canvas>
         </view>
       </view>
     </block>

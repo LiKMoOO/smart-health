@@ -76,6 +76,11 @@ exports.main = async (event, context) => {
       case 'health/gethealthanalysis':
         console.log('【Health Cloud Function】调用getHealthAnalysis');
         return await healthController.getHealthAnalysis(params);
+      
+      // 添加对驼峰命名的支持
+      case 'health/getHealthAnalysis':
+        console.log('【Health Cloud Function】调用getHealthAnalysis');
+        return await healthController.getHealthAnalysis(params);
         
       default:
         console.log('【Health Cloud Function】未找到对应接口:', route);
