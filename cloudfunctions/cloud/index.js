@@ -137,6 +137,62 @@ exports.main = async (event, context) => {
 		}
 	}
 
+	/**
+	 * 用药提醒模块路由处理
+	 * 说明：该模块用于处理用户的用药提醒相关功能
+	 * 路由名称: medicationReminder
+	 * 支持的操作:
+	 * 1. getMedicationList: 获取用户的用药提醒列表
+	 * 2. addMedication: 添加新的用药提醒
+	 * 3. updateMedication: 更新用药提醒
+	 * 4. deleteMedication: 删除用药提醒
+	 * 5. getMedicationDetail: 获取单个用药提醒的详细信息
+	 */
+	if (event.route && event.route.toLowerCase() === 'medicationreminder') {
+		try {
+			console.log('[cloud/index.js] 转发 medicationReminder 请求给 medicationReminder 云函数, event:', JSON.stringify(event));
+			
+			// 获取用户OpenID
+			const wxContext = cloud.getWXContext();
+			const openId = wxContext.OPENID;
+			
+			console.log('medicationReminder路由处理, OPENID:', openId);
+			
+			// 确保params对象存在
+			const params = event.params.params || {};
+			
+			// 添加用户标识到params
+			params.userId = openId; 
+			
+			// 直接调用 'medicationReminder' 云函数
+			return await cloud.callFunction({
+				name: 'medicationReminder', // 指定调用 medicationReminder 云函数包
+				data: {
+					action: event.params.action,
+					params: params
+				}
+			}).then(res => {
+                console.log('[cloud/index.js] medicationReminder 云函数返回结果:', JSON.stringify(res.result));
+                return res.result; //确保返回云函数实际执行的结果
+            }).catch(err => {
+                console.error('[cloud/index.js] 调用 medicationReminder 云函数失败:', err);
+                return {
+                    code: 500,
+                    msg: '调用用药提醒服务失败',
+                    error: err.message
+                };
+            });
+		} catch (err) {
+			// 统一错误处理
+			console.error('用药提醒路由转发处理错误:', err);
+			return {
+				code: 500,
+				msg: '服务器繁忙，请稍后重试',
+				err: err.message
+			};
+		}
+	}
+
 	// 处理其他所有原有路由
 	return await application.app(event, context);
 }

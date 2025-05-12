@@ -117,7 +117,7 @@ Page({
 			});
 
 			// 处理返回数据
-			if (!result) {
+			if (!result || !result.data) {
 				if (isReresh) {
 					this.setData({
 						isLoad: true,
@@ -132,16 +132,16 @@ Page({
 			// 拼接数据
 			let medicationList = [];
 			if (isReresh) {
-				medicationList = result.list;
+				medicationList = result.data.list || [];
 			} else {
-				medicationList = this.data.medicationList.concat(result.list);
+				medicationList = this.data.medicationList.concat(result.data.list || []);
 			}
 
 			this.setData({
 				isLoad: true,
 				medicationList: medicationList,
-				page: result.page,
-				total: result.total
+				page: result.data.page || 1,
+				total: result.data.total || 0
 			});
 
 		} catch (err) {
@@ -149,7 +149,9 @@ Page({
 			if (isReresh) {
 				this.setData({
 					isLoad: true,
-					medicationList: []
+					medicationList: [],
+					page: 1,
+					total: 0
 				});
 				pageHelper.showModal('加载失败，请稍后重试');
 			}

@@ -71,6 +71,16 @@
  			}; // 确保返回正确格式
  		}
 
+ 		// 处理medicationReminder云函数的返回结果
+ 		if (route === 'medicationReminder' && result.code === 0) {
+ 			console.log('medicationReminder返回结果:', result);
+ 			return {
+ 				data: result.data || result.result, // 优先获取data字段，兼容不同返回格式
+ 				code: result.code,
+ 				msg: result.msg
+ 			}; // 确保返回正确格式
+ 		}
+
  		// 直接提取数据
  		if (helper.isDefined(result.data)) {
  			let data = result.data;
@@ -163,6 +173,68 @@
  			
  			wx.cloud.callFunction({
  				name: 'medicalReport', // 直接调用medicalReport云函数
+ 				data: data,
+ 				success: function (res) {
+ 					if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA && res.result.code !== 0) {
+ 						console.log(res)
+ 						// 逻辑错误&数据校验错误 
+ 						if (hint) {
+ 							wx.showModal({
+ 								title: '温馨提示',
+ 								content: res.result.msg,
+ 								showCancel: false
+ 							});
+ 						}
+
+ 						reject(res.result);
+ 						return;
+ 					} else if (res.result.code == CODE.ADMIN_ERROR) {
+ 						// 后台登录错误
+ 						wx.reLaunch({
+ 							url: '/pages/admin/index/login/admin_login',
+ 						});
+ 						return;
+ 					} else if (res.result.code != CODE.SUCC && res.result.code !== 0) {
+ 						if (hint) {
+ 							wx.showModal({
+ 								title: '温馨提示',
+ 								content: res.result.msg || '系统开小差了，请稍后重试',
+ 								showCancel: false
+ 							});
+ 						}
+ 						reject(res.result);
+ 						return;
+ 					}
+
+ 					resolve(res.result);
+ 				},
+ 				fail: function (err) {
+ 					// 处理失败情况
+ 					_fail(err, hint, reject);
+ 				},
+ 				complete: function () {
+ 					if (hint) {
+ 						if (title == 'bar')
+ 							wx.hideNavigationBarLoading();
+ 						else
+ 							wx.hideLoading();
+ 					}
+ 				}
+ 			});
+ 		} else if (route === 'medicationReminder') {
+ 			// medicationReminder模块直接通过cloud路由调用
+ 			data = {
+ 				route: 'medicationReminder', // 设置路由为medicationReminder
+ 				params: {
+ 					action: params.action,
+ 					params: params.params || {}
+ 				}
+ 			};
+ 			
+ 			console.log('调用medicationReminder云函数, data:', data);
+ 			
+ 			wx.cloud.callFunction({
+ 				name: 'cloud', // 通过主云函数调用
  				data: data,
  				success: function (res) {
  					if (res.result.code == CODE.LOGIC || res.result.code == CODE.DATA && res.result.code !== 0) {

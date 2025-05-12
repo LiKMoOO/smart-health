@@ -9,10 +9,16 @@ const MAX_LIMIT = 100
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const openId = wxContext.OPENID
+  let openId = wxContext.OPENID
 
   // 获取操作类型和参数
   const { action, params } = event
+  
+  // 如果params中传递了userId，优先使用它
+  if (params && params.userId) {
+    openId = params.userId
+    console.log('使用传入的userId:', openId)
+  }
 
   // 验证用户ID
   if (!openId) {
@@ -66,11 +72,32 @@ exports.main = async (event, context) => {
  */
 async function getMedicationList(userId, params = {}) {
   try {
+    console.log('开始获取用药提醒列表, userId:', userId);
+    console.log('查询参数:', JSON.stringify(params));
+    
+    // 检查数据库集合是否存在
+    try {
+      const collections = await db.listCollections().get();
+      console.log('当前数据库集合列表:', collections.data.map(col => col.name));
+      
+      // 检查health_reminders集合是否存在
+      const hasCollection = collections.data.some(col => col.name === 'health_reminders');
+      if (!hasCollection) {
+        console.log('health_reminders集合不存在，尝试创建集合');
+        // 如果集合不存在，自动创建集合
+        await db.createCollection('health_reminders');
+      }
+    } catch (collErr) {
+      console.error('检查数据库集合时出错:', collErr);
+    }
+    
     // 构建查询条件
     const queryCondition = {
       userId: userId,
       isDeleted: false
     }
+    
+    console.log('查询条件:', JSON.stringify(queryCondition));
     
     // 如果有查询关键词，添加模糊搜索条件
     if (params.keyword) {
@@ -86,9 +113,12 @@ async function getMedicationList(userId, params = {}) {
     }
     
     // 查询总数
-    const countResult = await db.collection('medication_reminders')
+    console.log('开始查询总数...');
+    try {
+    const countResult = await db.collection('health_reminders')
       .where(queryCondition)
-      .count()
+        .count();
+      console.log('查询总数结果:', countResult);
       
     const total = countResult.total
     
@@ -104,7 +134,10 @@ async function getMedicationList(userId, params = {}) {
       let orderBy = params.orderBy || 'nextReminderTime'
       let orderDir = params.orderDir || 'asc'
       
-      const query = db.collection('medication_reminders')
+        console.log('使用排序字段:', orderBy, ', 排序方向:', orderDir);
+        
+        try {
+      const query = db.collection('health_reminders')
         .where(queryCondition)
         .skip(skip)
         .limit(size)
@@ -116,10 +149,41 @@ async function getMedicationList(userId, params = {}) {
         query.orderBy(orderBy, 'desc')
       }
       
+          console.log('执行查询...');
       const result = await query.get()
+          console.log('查询结果:', result);
       medications = result.data
-    }
-    
+        } catch (queryErr) {
+          console.error('查询数据时出错:', queryErr);
+          // 如果是排序字段的问题，尝试不使用排序再查询一次
+          if (queryErr.message && queryErr.message.includes('orderBy')) {
+            console.log('排序字段错误，尝试不使用排序再次查询');
+            try {
+              const simpleResult = await db.collection('health_reminders')
+                .where(queryCondition)
+                .skip(skip)
+                .limit(size)
+                .get();
+              medications = simpleResult.data;
+            } catch (retryErr) {
+              console.error('重试查询仍然失败:', retryErr);
+              return {
+                code: 1,
+                msg: '查询数据失败: ' + retryErr.message,
+                data: null
+              };
+            }
+          } else {
+            return {
+              code: 1,
+              msg: '查询数据失败: ' + queryErr.message,
+              data: null
+            };
+          }
+        }
+      }
+      
+      console.log('查询完成，返回数据条数:', medications.length);
     return {
       code: 0,
       msg: '获取成功',
@@ -129,13 +193,21 @@ async function getMedicationList(userId, params = {}) {
         size: size,
         total: total,
         count: Math.ceil(total / size)
+        }
+      }
+    } catch (countErr) {
+      console.error('查询总数时出错:', countErr);
+      return {
+        code: 1,
+        msg: '查询总数时出错',
+        data: null
       }
     }
   } catch (err) {
     console.error('获取用药提醒列表失败：', err)
     return {
       code: 1,
-      msg: '获取用药提醒列表失败',
+      msg: '获取用药提醒列表失败: ' + (err.message || err.toString()),
       data: null
     }
   }
@@ -179,7 +251,7 @@ async function addMedication(userId, params) {
     }
     
     // 存入数据库
-    const result = await db.collection('medication_reminders').add({
+    const result = await db.collection('health_reminders').add({
       data: medicationData
     })
     
@@ -218,7 +290,7 @@ async function updateMedication(userId, params) {
     }
     
     // 检查记录是否存在且属于当前用户
-    const medication = await db.collection('medication_reminders')
+    const medication = await db.collection('health_reminders')
       .doc(params.id)
       .get()
     
@@ -252,7 +324,7 @@ async function updateMedication(userId, params) {
     if (params.beforeMeal !== undefined) updateData.beforeMeal = params.beforeMeal
     
     // 更新记录
-    await db.collection('medication_reminders')
+    await db.collection('health_reminders')
       .doc(params.id)
       .update({
         data: updateData
@@ -291,7 +363,7 @@ async function deleteMedication(userId, params) {
     }
     
     // 检查记录是否存在且属于当前用户
-    const medication = await db.collection('medication_reminders')
+    const medication = await db.collection('health_reminders')
       .doc(params.id)
       .get()
     
@@ -304,7 +376,7 @@ async function deleteMedication(userId, params) {
     }
     
     // 软删除记录
-    await db.collection('medication_reminders')
+    await db.collection('health_reminders')
       .doc(params.id)
       .update({
         data: {
@@ -346,7 +418,7 @@ async function getMedicationDetail(userId, params) {
     }
     
     // 查询记录
-    const medication = await db.collection('medication_reminders')
+    const medication = await db.collection('health_reminders')
       .doc(params.id)
       .get()
     
