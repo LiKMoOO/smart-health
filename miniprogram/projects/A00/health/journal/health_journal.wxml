@@ -1,2 +1,232 @@
 <!--projects/A00/health/journal/health_journal.wxml-->
-<text>projects/A00/health/journal/health_journal.wxml</text>
+<view class="container">
+  <!-- 顶部标题 -->
+  <view class="header">
+    <view class="title">健康日志</view>
+    <view class="desc">记录每日健康状况和心情</view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="simple-buttons">
+    <button class="simple-btn add-btn" bindtap="showAddJournalModal">添加日志</button>
+    <button class="simple-btn filter-btn" bindtap="showFilterModal">筛选</button>
+  </view>
+
+  <!-- 日志列表展示 -->
+  <view class="list-view">
+    <view wx:if="{{isLoad && journalList.length > 0}}" class="journal-list">
+      <view class="journal-item" wx:for="{{journalList}}" wx:key="_id" bindtap="viewDetail" data-index="{{index}}">
+        <view class="journal-header">
+          <text class="date">{{item.date}}</text>
+          <text class="mood">{{item.mood}}</text>
+        </view>
+        <view class="journal-body">
+          <view class="info-item">
+            <text class="label">睡眠时长:</text>
+            <text class="value">{{item.sleepHours}}小时</text>
+          </view>
+          <view class="info-item">
+            <text class="label">活动量:</text>
+            <text class="value">{{item.activityLevel}}</text>
+          </view>
+          <view class="symptoms-box" wx:if="{{item.symptoms && item.symptoms.length > 0}}">
+            <text class="label">症状:</text>
+            <view class="symptoms-list">
+              <text class="symptom-tag" wx:for="{{item.symptoms}}" wx:key="*this" wx:for-item="symptom">{{symptom}}</text>
+            </view>
+          </view>
+          <view class="notes" wx:if="{{item.notes}}">
+            <text>{{item.notes}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空态 -->
+    <view wx:if="{{isLoad && journalList.length === 0}}" class="empty-state">
+      <image class="empty-image" src="/projects/A00/skin/images/health/journal.png" mode="aspectFit"></image>
+      <view class="empty-text">暂无健康日志</view>
+      <view class="empty-desc">点击上方添加日志按钮开始记录</view>
+    </view>
+
+    <!-- 加载中 -->
+    <view wx:if="{{!isLoad}}" class="loading">
+      <view class="loading-icon"></view>
+      <view class="loading-text">加载中...</view>
+    </view>
+  </view>
+
+  <!-- 添加日志弹窗 -->
+  <view class="modal add-modal {{showAddModal ? 'modal-visible' : ''}}">
+    <view class="modal-bg" bindtap="hideAddModal"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text>{{isEdit ? '编辑' : '添加'}}健康日志</text>
+        <view class="close-btn" bindtap="hideAddModal">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">日期</text>
+          <picker mode="date" value="{{formJournal.date}}" bindchange="onDateChange">
+            <view class="form-picker">{{formJournal.date || '请选择日期'}}</view>
+          </picker>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">心情</text>
+          <picker bindchange="onMoodChange" value="{{moodIndex}}" range="{{moods}}">
+            <view class="form-picker">{{moods[moodIndex] || '请选择心情'}}</view>
+          </picker>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">睡眠时长</text>
+          <view class="value-input-group">
+            <input class="form-input" type="digit" value="{{formJournal.sleepHours}}" 
+              bindinput="onJournalInput" data-field="sleepHours" 
+              placeholder="请输入睡眠时长" />
+            <text class="unit-text">小时</text>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">活动量</text>
+          <picker bindchange="onActivityChange" value="{{activityIndex}}" range="{{activityLevels}}">
+            <view class="form-picker">{{activityLevels[activityIndex] || '请选择活动量'}}</view>
+          </picker>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">症状</text>
+          <view class="symptoms-selector">
+            <view class="symptom-tag {{selectedSymptoms[symptom] ? 'selected' : ''}}" 
+              wx:for="{{symptomsOptions}}" wx:key="*this" wx:for-item="symptom"
+              bindtap="toggleSymptom" data-symptom="{{symptom}}">
+              {{symptom}}
+            </view>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">备注信息</text>
+          <textarea class="form-textarea" value="{{formJournal.notes}}" 
+            bindinput="onJournalInput" data-field="notes" 
+            placeholder="可以添加更详细的健康记录..." />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="hideAddModal">取消</button>
+        <button class="btn-submit" bindtap="submitJournal">保存</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 详情弹窗 -->
+  <view class="modal detail-modal {{showDetailModal ? 'modal-visible' : ''}}">
+    <view class="modal-bg" bindtap="hideDetailModal"></view>
+    <view class="modal-content detail-content">
+      <view class="modal-header detail-header">
+        <text>健康日志详情</text>
+        <view class="close-btn" bindtap="hideDetailModal">×</view>
+      </view>
+      
+      <view class="modal-body detail-body">
+        <!-- 日期显示 - 居中大字显示 -->
+        <view class="detail-date-box">
+          <text class="detail-date">{{currentDetail.date}}</text>
+        </view>
+        
+        <!-- 主要信息区 -->
+        <view class="detail-info-grid">
+          <!-- 心情 -->
+          <view class="detail-grid-item">
+            <view class="detail-icon-box mood-icon">
+              <view class="detail-icon">心</view>
+            </view>
+            <view class="detail-item-content">
+              <text class="detail-label">心情</text>
+              <text class="detail-value">{{currentDetail.mood}}</text>
+            </view>
+          </view>
+          
+          <!-- 睡眠时长 -->
+          <view class="detail-grid-item">
+            <view class="detail-icon-box sleep-icon">
+              <view class="detail-icon">睡</view>
+            </view>
+            <view class="detail-item-content">
+              <text class="detail-label">睡眠时长</text>
+              <text class="detail-value">{{currentDetail.sleepHours}} 小时</text>
+            </view>
+          </view>
+          
+          <!-- 活动量 -->
+          <view class="detail-grid-item">
+            <view class="detail-icon-box activity-icon">
+              <view class="detail-icon">动</view>
+            </view>
+            <view class="detail-item-content">
+              <text class="detail-label">活动量</text>
+              <text class="detail-value">{{currentDetail.activityLevel}}</text>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 症状区域 -->
+        <view class="detail-section" wx:if="{{currentDetail.symptoms && currentDetail.symptoms.length > 0}}">
+          <view class="detail-section-header">
+            <text class="detail-section-title">症状</text>
+          </view>
+          <view class="detail-symptoms">
+            <text class="symptom-tag detail-symptom-tag" wx:for="{{currentDetail.symptoms}}" wx:key="*this" wx:for-item="symptom">{{symptom}}</text>
+          </view>
+        </view>
+        
+        <!-- 备注信息 -->
+        <view class="detail-section" wx:if="{{currentDetail.notes}}">
+          <view class="detail-section-header">
+            <text class="detail-section-title">备注信息</text>
+          </view>
+          <view class="detail-notes">
+            <text>{{currentDetail.notes}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="modal-footer detail-footer">
+        <button class="btn-delete" bindtap="deleteJournal" data-id="{{currentDetail._id}}">删除</button>
+        <button class="btn-edit" bindtap="editJournal" data-id="{{currentDetail._id}}">编辑</button>
+        <button class="btn-close" bindtap="hideDetailModal">关闭</button>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 筛选弹窗 -->
+  <view class="modal filter-modal {{showFilterModal ? 'modal-visible' : ''}}">
+    <view class="modal-bg" bindtap="hideFilterModal"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text>筛选日志</text>
+        <view class="close-btn" bindtap="hideFilterModal">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">开始日期</text>
+          <picker mode="date" value="{{filter.startDate}}" bindchange="onFilterInput" data-field="startDate">
+            <view class="form-picker">{{filter.startDate || '请选择开始日期'}}</view>
+          </picker>
+        </view>
+        <view class="form-group">
+          <text class="form-label">结束日期</text>
+          <picker mode="date" value="{{filter.endDate}}" bindchange="onFilterInput" data-field="endDate">
+            <view class="form-picker">{{filter.endDate || '请选择结束日期'}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-cancel" bindtap="hideFilterModal">取消</button>
+        <button class="btn-submit" bindtap="applyFilter">应用筛选</button>
+      </view>
+    </view>
+  </view>
+</view>

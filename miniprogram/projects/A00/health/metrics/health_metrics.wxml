@@ -28,9 +28,21 @@
 
   <!-- 图表展示 -->
   <view class="chart-view" wx:if="{{showChart && isLoad && indicatorList.length > 0}}">
-    <view class="chart-placeholder">
-      <text>图表功能敬请期待</text>
-      <text class="chart-desc">此处将展示{{metricTypes[activeTypeIndex].name}}变化趋势图表</text>
+    <block wx:if="{{chartDataReady}}">
+      <canvas canvas-id="healthChart" class="health-chart-canvas" style="width: 100%; height: 500rpx;"></canvas>
+      <view class="chart-legend">
+        <view class="chart-title">{{metricTypes[activeTypeIndex].name}}趋势图</view>
+        <view class="chart-type-selector">
+          <view class="chart-type-item {{chartType === 'line' ? 'active' : ''}}" 
+                bindtap="switchChartType" data-type="line">折线图</view>
+          <view class="chart-type-item {{chartType === 'column' ? 'active' : ''}}" 
+                bindtap="switchChartType" data-type="column">柱状图</view>
+        </view>
+      </view>
+    </block>
+    <view class="chart-placeholder" wx:else>
+      <text>{{indicatorList.length < 2 ? '数据不足' : '加载中...'}}</text>
+      <text class="chart-desc">{{indicatorList.length < 2 ? '至少需要2条记录才能生成图表' : '正在为您生成' + metricTypes[activeTypeIndex].name + '变化趋势图'}}</text>
     </view>
   </view>
 
@@ -72,7 +84,7 @@
   </view>
 
   <!-- 添加记录弹窗 -->
-  <view class="modal" wx:if="{{showAddModal}}">
+  <view class="modal add-modal {{showAddModal ? 'modal-visible' : ''}}">
     <view class="modal-bg" bindtap="hideAddMetricModal"></view>
     <view class="modal-content">
       <view class="modal-header">
@@ -138,7 +150,7 @@
   </view>
 
   <!-- 详情弹窗 -->
-  <view class="modal" wx:if="{{showDetailModal}}">
+  <view class="modal detail-modal {{showDetailModal ? 'modal-visible' : ''}}">
     <view class="modal-bg" bindtap="hideDetailModal"></view>
     <view class="modal-content">
       <view class="modal-header">
@@ -185,7 +197,7 @@
   </view>
   
   <!-- 筛选弹窗 -->
-  <view class="modal" wx:if="{{showFilterModal}}">
+  <view class="modal filter-modal {{showFilterModal ? 'modal-visible' : ''}}">
     <view class="modal-bg" bindtap="hideFilterModal"></view>
     <view class="modal-content">
       <view class="modal-header">

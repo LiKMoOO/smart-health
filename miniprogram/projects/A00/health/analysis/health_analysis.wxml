@@ -1,2 +1,97 @@
 <!--projects/A00/health/analysis/health_analysis.wxml-->
-<text>projects/A00/health/analysis/health_analysis.wxml</text>
+<view class="container">
+  <!-- 加载中 -->
+  <view class="loading-box" wx:if="{{isLoading}}">
+    <image src="/images/loading.gif" mode="aspectFit" class="loading"></image>
+  </view>
+  
+  <block wx:else>
+    <!-- 顶部标题 -->
+    <view class="top-box">
+      <view class="title">健康分析</view>
+      <view class="desc">基于您记录的健康数据生成分析报告</view>
+    </view>
+    
+    <!-- 健康评分卡片 -->
+    <view class="card health-score-card" wx:if="{{healthData.healthAssessment}}">
+      <view class="score-box">
+        <view class="score">{{healthData.healthAssessment.overallScore || 0}}</view>
+        <view class="score-label">健康评分</view>
+      </view>
+      <view class="summary">{{healthData.healthAssessment.summary || '暂无健康评估数据'}}</view>
+    </view>
+    
+    <!-- 健康评估项 -->
+    <view class="card assessment-card" wx:if="{{healthData.healthAssessment.items.length > 0}}">
+      <view class="card-title">健康评估</view>
+      <view class="assessment-list">
+        <view class="assessment-item" wx:for="{{healthData.healthAssessment.items}}" wx:key="name">
+          <view class="item-name">{{item.name}}</view>
+          <view class="item-value" wx:if="{{item.value}}">{{item.value}}</view>
+          <view class="item-status status-{{item.status}}">{{item.description}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 健康建议 -->
+    <view class="card suggestion-card" wx:if="{{healthData.healthAssessment.suggestions.length > 0}}">
+      <view class="card-title">健康建议</view>
+      <view class="suggestion-list">
+        <view class="suggestion-item" wx:for="{{healthData.healthAssessment.suggestions}}" wx:key="*this">
+          <text class="item-icon">•</text>
+          <text class="item-text">{{item}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 周期选择器 -->
+    <view class="card filter-card">
+      <view class="filter-title">查看周期</view>
+      <view class="period-options">
+        <view class="period-option {{currentPeriod == item.value ? 'active' : ''}}" 
+              wx:for="{{periodOptions}}" 
+              wx:key="value"
+              data-period="{{item.value}}"
+              bindtap="onPeriodChange">
+          {{item.label}}
+        </view>
+      </view>
+    </view>
+    
+    <!-- 指标选择器 -->
+    <view class="card filter-card">
+      <view class="filter-title">指标选择</view>
+      <view class="metric-options">
+        <view class="metric-option {{item.selected ? 'active' : ''}}" 
+              wx:for="{{metricTypes}}" 
+              wx:key="value"
+              data-index="{{index}}"
+              bindtap="onMetricChange">
+          {{item.label}}
+        </view>
+      </view>
+    </view>
+    
+    <!-- 图表展示 -->
+    <block wx:if="{{chartSeries.length > 0}}">
+      <view class="card chart-card" wx:for="{{chartSeries}}" wx:key="name">
+        <view class="card-title">{{item.name}}趋势图</view>
+        <view class="chart-container">
+          <ec-canvas id="chart{{index}}" canvas-id="chart{{index}}" class="chart"></ec-canvas>
+        </view>
+      </view>
+    </block>
+    
+    <!-- 无数据提示 -->
+    <view class="card empty-card" wx:if="{{chartSeries.length == 0}}">
+      <image src="/images/icon/empty.png" mode="aspectFit" class="empty-icon"></image>
+      <view class="empty-text">暂无健康数据记录</view>
+      <view class="btn-add" bindtap="onAddHealthMetric">记录健康指标</view>
+    </view>
+    
+    <!-- 底部分享按钮 -->
+    <view class="footer">
+      <button class="btn-share" bindtap="onShareReport">分享健康报告</button>
+    </view>
+  </block>
+</view>

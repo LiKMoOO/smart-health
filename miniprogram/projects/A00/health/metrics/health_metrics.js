@@ -2,6 +2,7 @@
 const pageHelper = require('../../../../helper/page_helper.js');
 const cloudHelper = require('../../../../helper/cloud_helper.js');
 const timeHelper = require('../../../../helper/time_helper.js');
+const { WxChart } = require('../../../../lib/tools/wxcharts.js');
 const MAX_RECORDS_PER_PAGE = 15; // 每页记录数
 
 Page({
@@ -52,6 +53,8 @@ Page({
 		
 		// 图表相关
 		showChart: false,
+		chartDataReady: false,
+		chartType: 'line', // 默认为折线图
 		// chartData: [] // 暂时不用
 		
 		// 分页相关
@@ -143,7 +146,11 @@ Page({
 
 			if (isRefresh) {
 				console.log('[health_metrics.js] Refreshing data, resetting indicatorList and _total.');
-				this.setData({ indicatorList: [], _total: 0 });
+				this.setData({ 
+					indicatorList: [], 
+					_total: 0,
+					chartDataReady: false // 重置图表数据状态
+				});
 			}
 			// 初始设置 isLoad 为 false 以显示加载动画，_canLoadMore 设为 true 允许加载
 			this.setData({ isLoad: false, _canLoadMore: true }); 
@@ -186,6 +193,11 @@ Page({
 					_canLoadMore: canLoadMore,
 					// isLoad: true, // 将 isLoad 的设置移到 finally 块
 				});
+				
+				// 数据加载完成后，准备图表数据
+				if (this.data.showChart && newList.length >= 2) {
+					this._prepareChartData();
+				}
 			} else {
 				console.warn('[health_metrics.js] Cloud function result.list is not an array or result is null.');
 				// 如果云函数返回的不是预期格式，也应该能处理，比如认为没有更多数据了
@@ -215,41 +227,39 @@ Page({
 			activeTypeIndex: index,
 			_page: 1, // 重置分页
 			_canLoadMore: true,
+			chartDataReady: false // 重置图表数据状态
 		});
 		this._resetFormMetric(); // 根据新类型重置表单中 type, unit, value结构
 		this._loadData(true); // 重新加载数据
 	},
 	
 	/**
-	 * 显示添加记录弹窗
+	 * 显示添加记录弹窗 - 使用visibility控制
 	 */
 	showAddMetricModal() {
-		console.log('[DEBUG] showAddMetricModal called!');
-		try {
-			// 重置表单数据
-			this._resetFormMetric(); // 确保表单基于当前激活的类型
-			
-			// 设置默认日期为今天
-			const today = this._formatDate(new Date());
-			console.log('[DEBUG] 默认日期:', today);
-			
-			// 更新页面状态，显示模态框
-			this.setData({
-				'formMetric.recordTime': today,
-				'formMetric.notes': '', // 清空备注
-				showAddModal: true
-			});
-			
-			console.log('[DEBUG] showAddModal设置完成, 当前值:', this.data.showAddModal);
-		} catch (e) {
-			console.error('[DEBUG] Error in showAddMetricModal:', e);
-		}
+		console.log('[健康指标] 显示添加记录弹窗');
+		
+		// 重置表单数据
+		this._resetFormMetric(); // 确保表单基于当前激活的类型
+		
+		// 设置默认日期为今天
+		const today = this._formatDate(new Date());
+		
+		// 更新页面状态，显示模态框
+		this.setData({
+			'formMetric.recordTime': today,
+			'formMetric.notes': '', // 清空备注
+			isEdit: false,
+			editRecordId: null,
+			showAddModal: true
+		});
 	},
 	
 	/**
 	 * 隐藏添加记录弹窗
 	 */
 	hideAddMetricModal() {
+		console.log('[健康指标] 隐藏添加记录弹窗');
 		this.setData({
 			showAddModal: false,
 			isEdit: false,
@@ -289,6 +299,7 @@ Page({
 	 * 查看详情
 	 */
 	viewDetail(e) {
+		console.log('[健康指标] 查看详情');
 		const index = e.currentTarget.dataset.index;
 		const record = this.data.indicatorList[index];
 		if (record) {
@@ -296,7 +307,6 @@ Page({
 				currentDetail: record,
 				showDetailModal: true
 			});
-			console.log('[DEBUG] 查看记录详情:', record);
 		}
 	},
 	
@@ -304,6 +314,7 @@ Page({
 	 * 隐藏详情弹窗
 	 */
 	hideDetailModal() {
+		console.log('[健康指标] 隐藏详情弹窗');
 		this.setData({
 			showDetailModal: false,
 			currentDetail: null
@@ -509,21 +520,17 @@ Page({
 	 * 显示筛选弹窗
 	 */
 	showFilterModalTap() {
-		console.log('[DEBUG] showFilterModalTap called!');
-		try {
-			this.setData({
-				showFilterModal: true
-			});
-			console.log('[DEBUG] showFilterModal set to true:', this.data.showFilterModal);
-		} catch (e) {
-			console.error('[DEBUG] Error in showFilterModalTap:', e);
-		}
+		console.log('[健康指标] 显示筛选弹窗');
+		this.setData({
+			showFilterModal: true
+		});
 	},
 	
 	/**
 	 * 隐藏筛选弹窗
 	 */
 	hideFilterModal() {
+		console.log('[健康指标] 隐藏筛选弹窗');
 		this.setData({
 			showFilterModal: false
 		});
@@ -544,7 +551,10 @@ Page({
 	 */
 	applyFilter() {
 		this.hideFilterModal();
-		this.setData({_page: 1}); // 重置分页
+		this.setData({
+			_page: 1,
+			chartDataReady: false // 重置图表数据状态
+		}); // 重置分页
 		this._loadData(true);
 	},
 	
@@ -559,8 +569,120 @@ Page({
 				showChart: newShowChart
 			});
 			console.log('[DEBUG] showChart set to:', newShowChart);
+			
+			// 如果切换到图表视图，准备图表数据
+			if (newShowChart && this.data.indicatorList.length >= 2) {
+				this._prepareChartData();
+			}
 		} catch (e) {
 			console.error('[DEBUG] Error in toggleChart:', e);
+		}
+	},
+	
+	/**
+	 * 切换图表类型：折线图/柱状图
+	 */
+	switchChartType(e) {
+		const type = e.currentTarget.dataset.type;
+		this.setData({
+			chartType: type
+		});
+		// 重新绘制图表
+		this._drawChart();
+	},
+	
+	/**
+	 * 准备图表数据
+	 */
+	_prepareChartData() {
+		// 确保有足够的数据绘制图表
+		if (this.data.indicatorList.length < 2) {
+			this.setData({
+				chartDataReady: false
+			});
+			return;
+		}
+		
+		// 按照时间排序（从旧到新）
+		const sortedList = [...this.data.indicatorList].sort((a, b) => a.recordTime - b.recordTime);
+		
+		// 最多显示最近10条记录，避免图表过于拥挤
+		const displayList = sortedList.slice(-10);
+		
+		// 准备图表所需的日期和数据
+		const categories = displayList.map(item => this._formatDate(new Date(item.recordTime)));
+		const currentType = this.data.metricTypes[this.data.activeTypeIndex];
+		
+		// 设置图表数据标志位
+		this.setData({
+			chartDataReady: true
+		}, () => {
+			// 设置完成后立即绘制图表
+			this._drawChart(displayList, categories, currentType);
+		});
+	},
+	
+	/**
+	 * 绘制图表
+	 */
+	_drawChart(displayList, categories, currentType) {
+		if (!displayList) {
+			const sortedList = [...this.data.indicatorList].sort((a, b) => a.recordTime - b.recordTime);
+			displayList = sortedList.slice(-10);
+			categories = displayList.map(item => this._formatDate(new Date(item.recordTime)));
+			currentType = this.data.metricTypes[this.data.activeTypeIndex];
+		}
+		
+		try {
+			// 获取系统信息，计算画布大小
+			const systemInfo = wx.getSystemInfoSync();
+			const canvasWidth = (systemInfo.windowWidth - 60) * 0.95; // 减去边距
+			const canvasHeight = 200; // 固定高度
+			
+			// 准备图表数据
+			let seriesData = [];
+			
+			// 处理多值指标（如血压）
+			if (currentType.hasMultipleValues) {
+				// 血压有收缩压和舒张压两个值
+				const systolicData = displayList.map(item => item.value.systolic);
+				const diastolicData = displayList.map(item => item.value.diastolic);
+				
+				seriesData = [{
+					name: currentType.name,
+					data: displayList.map(item => item.value),
+					names: {
+						systolic: '收缩压(高压)',
+						diastolic: '舒张压(低压)'
+					}
+				}];
+			} else {
+				// 单值指标
+				seriesData = [{
+					name: currentType.name,
+					data: displayList.map(item => parseFloat(item.value))
+				}];
+			}
+			
+			// 创建图表实例
+			const chart = new WxChart({
+				canvasId: 'healthChart',
+				width: canvasWidth,
+				height: canvasHeight,
+				type: this.data.chartType, // 使用设置的图表类型
+				categories: categories,
+				series: seriesData,
+				title: `${currentType.name}趋势`,
+				colors: ['#2858DF', '#ff7733', '#4CAF50', '#9C27B0', '#FF5252']
+			});
+			
+			// 绘制图表
+			chart.draw();
+			
+			console.log('[DEBUG] 图表绘制成功');
+		} catch (error) {
+			console.error('[DEBUG] 图表绘制失败:', error);
+			pageHelper.showNoneToast('图表绘制失败，请重试');
 		}
 	},
 	
@@ -586,7 +708,11 @@ Page({
 	 * 格式化日期 YYYY-MM-DD
 	 */
 	_formatDate(date) {
-		return timeHelper.timestamp2Time(date.getTime(), 'Y-M-D');
+		// 不再依赖timeHelper，直接使用原生JS格式化日期
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
 	},
 	
 	/**
@@ -597,46 +723,23 @@ Page({
 	},
 
 	// 全局测试点击
-	testTap: function() {
-		console.log('全局点击测试 - 成功触发!');
-		wx.showToast({
-			title: '点击成功!',
-			icon: 'none'
-		});
-	},
+	
 
 	// 添加记录直接函数
 	addRecord: function() {
-		console.log('[DEBUG] addRecord 按钮被点击!');
-		wx.showToast({
-			title: '添加记录!',
-			icon: 'none',
-			duration: 1000
-		});
-		
-		// 确保模态框显示
-		setTimeout(() => {
-			this.showAddMetricModal();
-		}, 500);
+		console.log('[健康指标] 添加记录按钮被点击');
+		this.showAddMetricModal();
 	},
 
 	// 筛选直接函数
 	filterRecord: function() {
-		console.log('筛选按钮被点击!');
-		wx.showToast({
-			title: '筛选!',
-			icon: 'none'
-		});
+		console.log('[健康指标] 筛选按钮被点击');
 		this.showFilterModalTap();
 	},
 
 	// 图表直接函数
 	chartToggle: function() {
-		console.log('图表按钮被点击!');
-		wx.showToast({
-			title: '切换图表!',
-			icon: 'none'
-		});
+		console.log('[健康指标] 图表按钮被点击');
 		this.toggleChart();
 	},
 })

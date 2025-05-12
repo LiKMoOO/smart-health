@@ -1,0 +1,256 @@
+/* projects/A00/health/analysis/health_analysis.wxss */
+
+.container {
+  padding: 30rpx;
+  min-height: 100vh;
+  background-color: #f6f7fb;
+}
+
+/* 加载中 */
+.loading-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300rpx;
+}
+
+.loading {
+  width: 80rpx;
+  height: 80rpx;
+}
+
+/* 顶部标题 */
+.top-box {
+  margin-bottom: 20rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.desc {
+  font-size: 24rpx;
+  color: #888;
+  margin-top: 10rpx;
+}
+
+/* 卡片通用样式 */
+.card {
+  background-color: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+  position: relative;
+  padding-left: 20rpx;
+}
+
+.card-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8rpx;
+  width: 8rpx;
+  height: 28rpx;
+  background-color: #4e8df7;
+  border-radius: 4rpx;
+}
+
+/* 健康评分卡片 */
+.health-score-card {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #4e8df7, #3b7eeb);
+  color: #fff;
+}
+
+.score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 40rpx;
+}
+
+.score {
+  font-size: 60rpx;
+  font-weight: bold;
+}
+
+.score-label {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+.summary {
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+/* 健康评估项 */
+.assessment-list {
+  margin-top: 20rpx;
+}
+
+.assessment-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.assessment-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.item-name {
+  font-size: 28rpx;
+  color: #333;
+  width: 140rpx;
+}
+
+.item-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+  margin: 0 20rpx;
+}
+
+.item-status {
+  flex: 1;
+  text-align: right;
+  font-size: 26rpx;
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+.status-normal {
+  color: #67C23A;
+  background-color: rgba(103, 194, 58, 0.1);
+}
+
+.status-warning {
+  color: #E6A23C;
+  background-color: rgba(230, 162, 60, 0.1);
+}
+
+.status-danger {
+  color: #F56C6C;
+  background-color: rgba(245, 108, 108, 0.1);
+}
+
+/* 健康建议 */
+.suggestion-list {
+  margin-top: 10rpx;
+}
+
+.suggestion-item {
+  display: flex;
+  margin-bottom: 16rpx;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.item-icon {
+  margin-right: 10rpx;
+  flex-shrink: 0;
+}
+
+.item-text {
+  flex: 1;
+}
+
+/* 过滤器 */
+.filter-title {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.period-options, .metric-options {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.period-option, .metric-option {
+  padding: 12rpx 30rpx;
+  background-color: #f5f7fa;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.period-option.active, .metric-option.active {
+  background-color: #4e8df7;
+  color: #fff;
+}
+
+/* 图表卡片 */
+.chart-container {
+  height: 500rpx;
+  width: 100%;
+  margin-top: 20rpx;
+}
+
+.chart {
+  width: 100%;
+  height: 100%;
+}
+
+/* 空状态 */
+.empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 30rpx;
+}
+
+.empty-icon {
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+.btn-add {
+  padding: 16rpx 40rpx;
+  background-color: #4e8df7;
+  color: #fff;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+}
+
+/* 底部 */
+.footer {
+  margin: 40rpx 0 60rpx;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-share {
+  background-color: #4e8df7;
+  color: #fff;
+  font-size: 28rpx;
+  padding: 18rpx 60rpx;
+  border-radius: 40rpx;
+} 

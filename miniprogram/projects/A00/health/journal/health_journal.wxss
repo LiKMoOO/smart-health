@@ -1,0 +1,615 @@
+/* projects/A00/health/journal/health_journal.wxss */
+
+.container {
+  min-height: 100vh;
+  background-color: #f5f6fa;
+  padding-bottom: 30rpx;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* 顶部标题 */
+.header {
+  background: linear-gradient(135deg, #4168E0 0%, #2858DF 100%);
+  padding: 40rpx 30rpx 50rpx;
+  color: #fff;
+  border-radius: 0 0 30rpx 30rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.desc {
+  font-size: 26rpx;
+  opacity: 0.8;
+}
+
+/* 操作按钮 */
+.simple-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin: 20rpx;
+}
+
+.simple-btn {
+  flex: 1;
+  margin: 0 10rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  color: #fff;
+  border: none;
+}
+
+.simple-btn::after {
+  border: none;
+}
+
+.add-btn {
+  background: linear-gradient(135deg, #4168E0 0%, #2858DF 100%);
+  margin-left: 0;
+}
+
+.filter-btn {
+  background: linear-gradient(135deg, #FF9966 0%, #FF7733 100%);
+  margin-right: 0;
+}
+
+/* 日志列表 */
+.list-view {
+  margin: 20rpx;
+}
+
+.journal-list {
+  margin-bottom: 20rpx;
+}
+
+.journal-item {
+  background-color: #fff;
+  border-radius: 15rpx;
+  padding: 20rpx;
+  margin-bottom: 15rpx;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.journal-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1rpx solid #f0f0f0;
+  padding-bottom: 15rpx;
+  margin-bottom: 15rpx;
+}
+
+.date {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.mood {
+  font-size: 28rpx;
+  color: #2858DF;
+}
+
+.journal-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item {
+  display: flex;
+  margin-bottom: 10rpx;
+}
+
+.label {
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 10rpx;
+}
+
+.value {
+  font-size: 26rpx;
+  color: #333;
+}
+
+.symptoms-box {
+  margin-top: 10rpx;
+}
+
+.symptoms-list {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 5rpx;
+}
+
+.symptom-tag {
+  background-color: #f0f4ff;
+  color: #2858DF;
+  font-size: 24rpx;
+  padding: 6rpx 15rpx;
+  border-radius: 20rpx;
+  margin-right: 10rpx;
+  margin-bottom: 10rpx;
+}
+
+.notes {
+  margin-top: 15rpx;
+  font-size: 26rpx;
+  color: #666;
+  background-color: #f9f9f9;
+  padding: 15rpx;
+  border-radius: 8rpx;
+}
+
+/* 空态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 0;
+}
+
+.empty-image {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+  font-weight: bold;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 加载中 */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30rpx 0;
+}
+
+.loading-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border: 6rpx solid #f3f3f3;
+  border-top: 6rpx solid #2858DF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 通用弹窗样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 默认隐藏 */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
+  /* 确保背景层在隐藏时不可交互 */
+  pointer-events: none;
+}
+
+/* 弹窗可见时的样式 */
+.modal.modal-visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: auto; /* 允许交互 */
+}
+
+.modal-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  /* 背景层也需要过渡效果 */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.modal.modal-visible .modal-bg {
+  opacity: 1; /* 背景层可见 */
+}
+
+.modal-content {
+  width: 650rpx;
+  background-color: #fff;
+  border-radius: 20rpx;
+  position: relative;
+  z-index: 1001;
+  overflow: hidden;
+  max-height: 900rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 25rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header text {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.close-btn {
+  font-size: 40rpx;
+  color: #999;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 30rpx;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 20rpx 30rpx;
+  border-top: 1rpx solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 表单组件样式 */
+.form-group {
+  margin-bottom: 25rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.form-input {
+  background-color: #f5f6fa;
+  height: 80rpx;
+  border-radius: 10rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+}
+
+.form-picker {
+  background-color: #f5f6fa;
+  height: 80rpx;
+  border-radius: 10rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  line-height: 80rpx;
+}
+
+.form-textarea {
+  background-color: #f5f6fa;
+  width: 100%;
+  height: 180rpx;
+  box-sizing: border-box;
+  border-radius: 10rpx;
+  padding: 20rpx;
+  font-size: 28rpx;
+}
+
+.value-input-group {
+  display: flex;
+  align-items: center;
+}
+
+.value-input-group .form-input {
+  flex: 1;
+}
+
+.unit-text {
+  margin-left: 10rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 症状选择器 */
+.symptoms-selector {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #f5f6fa;
+  border-radius: 10rpx;
+  padding: 15rpx;
+}
+
+.symptom-tag {
+  background-color: #fff;
+  color: #666;
+  padding: 10rpx 20rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  margin-right: 15rpx;
+  margin-bottom: 15rpx;
+}
+
+.symptom-tag.selected {
+  background-color: #2858DF;
+  color: #fff;
+}
+
+/* 按钮样式 */
+.btn-cancel, .btn-submit, .btn-delete, .btn-edit, .btn-close {
+  margin: 0 10rpx;
+  font-size: 28rpx;
+  padding: 0 30rpx;
+  height: 70rpx;
+  line-height: 70rpx;
+  border-radius: 10rpx;
+  border: none;
+}
+
+.btn-cancel {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.btn-submit {
+  background-color: #2858DF;
+  color: #fff;
+}
+
+.btn-delete {
+  background-color: #ff4d4f;
+  color: #fff;
+}
+
+.btn-edit {
+  background-color: #1890ff;
+  color: #fff;
+}
+
+.btn-close {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.btn-cancel::after, .btn-submit::after, .btn-delete::after, .btn-edit::after, .btn-close::after {
+  border: none;
+}
+
+/* 详情弹窗样式 */
+.detail-item {
+  margin-bottom: 20rpx;
+}
+
+.detail-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 5rpx;
+  display: block;
+}
+
+.detail-value {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.detail-symptoms {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10rpx;
+}
+
+/* 详情弹窗样式 */
+.detail-content {
+  max-height: 85vh;
+  background-color: #fff;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+
+.detail-header {
+  background: linear-gradient(135deg, #4168E0 0%, #2858DF 100%);
+  color: #fff;
+  padding: 30rpx;
+  position: relative;
+  border-bottom: none;
+}
+
+.detail-header text {
+  color: #fff;
+  font-weight: bold;
+  font-size: 32rpx;
+}
+
+.detail-header .close-btn {
+  color: #fff;
+  font-size: 44rpx;
+}
+
+.detail-body {
+  padding: 0;
+  overflow-y: auto;
+}
+
+/* 日期显示区 */
+.detail-date-box {
+  text-align: center;
+  padding: 30rpx 0;
+  background-color: #f8f9fd;
+  border-bottom: 1rpx solid #eeeeee;
+}
+
+.detail-date {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 详情信息网格布局 */
+.detail-info-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20rpx;
+  background: #fff;
+}
+
+.detail-grid-item {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+
+.detail-icon-box {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+}
+
+.detail-icon {
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.mood-icon {
+  background: linear-gradient(135deg, #FF9966 0%, #FF7733 100%);
+}
+
+.sleep-icon {
+  background: linear-gradient(135deg, #6C8EFF 0%, #4168E0 100%);
+}
+
+.activity-icon {
+  background: linear-gradient(135deg, #7ED321 0%, #4CAF50 100%);
+}
+
+.detail-item-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 详情节段样式 */
+.detail-section {
+  padding: 20rpx 30rpx;
+  border-top: 12rpx solid #f5f6fa;
+}
+
+.detail-section-header {
+  margin-bottom: 15rpx;
+}
+
+.detail-section-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  position: relative;
+  padding-left: 20rpx;
+}
+
+.detail-section-title:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10rpx;
+  height: 30rpx;
+  width: 8rpx;
+  background: #4168E0;
+  border-radius: 4rpx;
+}
+
+/* 症状标签样式 */
+.detail-symptoms {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10rpx;
+}
+
+.detail-symptom-tag {
+  background-color: #f0f4ff;
+  color: #4168E0;
+  font-size: 26rpx;
+  padding: 10rpx 20rpx;
+  margin: 8rpx;
+  border-radius: 30rpx;
+}
+
+/* 备注样式 */
+.detail-notes {
+  background-color: #f9f9f9;
+  padding: 20rpx;
+  border-radius: 10rpx;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 底部按钮样式 */
+.detail-footer {
+  padding: 20rpx;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1rpx solid #eeeeee;
+}
+
+.detail-footer button {
+  margin: 0 8rpx;
+  border-radius: 50rpx;
+  font-size: 28rpx;
+  padding: 0 30rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, #FF5252 0%, #FF3333 100%);
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, #29B6F6 0%, #1E88E5 100%);
+}
+
+.btn-close {
+  background: #f0f0f0;
+} 
