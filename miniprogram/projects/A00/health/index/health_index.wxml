@@ -38,17 +38,17 @@
     </view>
 
     <!-- 健康模块导航 -->
-    <view class="module-list">
-      <view class="module-item" wx:for="{{moduleList}}" wx:key="index" bindtap="gotoModule" data-index="{{index}}">
-        <image class="module-icon" src="{{item.icon}}" mode="aspectFit"></image>
-        <view class="module-name">{{item.name}}</view>
+    <view class="module-list" style="display: flex; flex-wrap: wrap; width: 100%; justify-content: center; padding: 20rpx 0;">
+      <view class="module-item" wx:for="{{moduleList}}" wx:key="index" bindtap="gotoModule" data-index="{{index}}" style="width: 33.33%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 30rpx;">
+        <image class="module-icon" src="{{item.icon}}" mode="aspectFit" style="width: 80rpx; height: 80rpx;"></image>
+        <view class="module-name" style="text-align: center; margin-top: 10rpx; font-size: 28rpx;">{{item.name}}</view>
       </view>
     </view>
 
     <!-- 健康数据概览 -->
-    <view class="section health-overview" wx:if="{{healthInfo}}">
+    <view class="section health-overview" wx:if="{{healthInfo}}" style="width: 94%; margin: 0 auto;">
       <view class="section-title">健康概览</view>
-      <view class="overview-content">
+      <view class="overview-content" style="display: flex; justify-content: space-around; padding: 20rpx 0; background-color: #f8f8f8; border-radius: 12rpx;">
         <view class="overview-item">
           <view class="item-label">身高</view>
           <view class="item-value">{{healthInfo.basicInfo.height || '--'}} <text class="unit">cm</text></view>
@@ -60,6 +60,29 @@
         <view class="overview-item">
           <view class="item-label">BMI</view>
           <view class="item-value {{healthInfo.basicInfo.bmi > 28 || healthInfo.basicInfo.bmi < 18.5 ? 'warning' : ''}}">{{healthInfo.basicInfo.bmi || '--'}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 新增个人信息卡片 -->
+    <view class="section personal-info" style="width: 94%; margin: 20rpx auto;">
+      <view class="section-title">个人信息</view>
+      <view class="info-content" style="padding: 20rpx; background-color: #f8f8f8; border-radius: 12rpx;">
+        <view class="info-row" style="display: flex; justify-content: space-between; margin-bottom: 15rpx;">
+          <view class="info-label" style="color: #666;">血型</view>
+          <view class="info-value">{{healthInfo.basicInfo.bloodTypeDisplay || '--'}}</view>
+        </view>
+        <view class="info-row" style="display: flex; justify-content: space-between; margin-bottom: 15rpx;">
+          <view class="info-label" style="color: #666;">年龄</view>
+          <view class="info-value">{{_calculateAge(healthInfo.basicInfo.birthDate) || '--'}}岁</view>
+        </view>
+        <view class="info-row" style="display: flex; justify-content: space-between; margin-bottom: 15rpx;">
+          <view class="info-label" style="color: #666;">性别</view>
+          <view class="info-value">{{healthInfo.basicInfo.gender === 'male' ? '男' : healthInfo.basicInfo.gender === 'female' ? '女' : '--'}}</view>
+        </view>
+        <view class="info-row" style="display: flex; justify-content: space-between;">
+          <view class="info-label" style="color: #666;">过敏史</view>
+          <view class="info-value">{{healthInfo.basicInfo.allergies || '无'}}</view>
         </view>
       </view>
     </view>
@@ -123,8 +146,8 @@
   </block>
 
   <!-- 刷新按钮 -->
-  <view class="refresh-btn" bindtap="refreshData">
-    <image class="icon-refresh" src="/projects/A00/skin/images/health/refresh.png" mode="aspectFit"></image>
+  <view class="refresh-btn" bindtap="refreshData" style="position: fixed; bottom: 120rpx; right: 30rpx; z-index: 100; width: 80rpx; height: 80rpx; border-radius: 50%; background-color: #4D8FFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 6rpx 16rpx rgba(0,0,0,0.1);">
+    <image class="icon-refresh" src="/projects/A00/skin/images/health/refresh.png" mode="aspectFit" style="width: 44rpx; height: 44rpx;"></image>
   </view>
 </view>
 
@@ -179,4 +202,32 @@ function isReminderUrgent(timestamp) {
 }
 
 module.exports = isReminderUrgent;
+</wxs>
+
+<!-- 添加回计算年龄的WXS模块 -->
+<wxs module="_calculateAge">
+function _calculateAge(birthDateStr) {
+  if (!birthDateStr) return '';
+  
+  var birthParts = birthDateStr.split('-');
+  if (birthParts.length !== 3) return '';
+  
+  var birthYear = parseInt(birthParts[0]);
+  var birthMonth = parseInt(birthParts[1]) - 1;
+  var birthDay = parseInt(birthParts[2]);
+  
+  var birthDate = getDate(birthYear, birthMonth, birthDay);
+  var now = getDate();
+  
+  var age = now.getFullYear() - birthDate.getFullYear();
+  var m = now.getMonth() - birthDate.getMonth();
+  
+  if (m < 0 || (m === 0 && now.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  
+  return age;
+}
+
+module.exports = _calculateAge;
 </wxs> 

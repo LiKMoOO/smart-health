@@ -1,2 +1,152 @@
 <!--projects/A00/health/medication/health_medication.wxml-->
-<text>projects/A00/health/medication/health_medication.wxml</text>
+<view class="container">
+  <view class="header">
+    <view class="title">用药提醒</view>
+    <view class="desc">不再忘记按时服药，保持健康规律生活</view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-box">
+      <view class="icon-search">
+      </view>
+      <input type="text" placeholder="搜索药品名称" bindinput="bindSearchInput" confirm-type="search" value="{{search}}"/>
+    </view>
+  </view>
+
+  <!-- 筛选栏 -->
+  <view class="filter-bar">
+    <view class="filter-item {{currentStatus === 'all' ? 'active' : ''}}" bindtap="bindFilterTap" data-status="all">全部</view>
+    <view class="filter-item {{currentStatus === 1 ? 'active' : ''}}" bindtap="bindFilterTap" data-status="1">进行中</view>
+    <view class="filter-item {{currentStatus === 0 ? 'active' : ''}}" bindtap="bindFilterTap" data-status="0">已完成</view>
+    <view class="filter-item {{currentStatus === 2 ? 'active' : ''}}" bindtap="bindFilterTap" data-status="2">已暂停</view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{!isLoad}}">
+    <view class="loading-icon"></view>
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 用药列表 -->
+  <block wx:elif="{{isLoad && medicationList.length > 0}}">
+    <scroll-view class="medication-list" scroll-y="{{true}}" bindscrolltolower="bindReachBottom" lower-threshold="100">
+      <view class="medication-item" wx:for="{{medicationList}}" wx:key="_id" bindtap="bindMedicationTap" data-id="{{item._id}}">
+        <view class="medication-card">
+          <!-- 头部信息 -->
+          <view class="medication-header">
+            <view class="medication-info">
+              <view class="medication-name">{{item.medicationName}}</view>
+              <view class="medication-dosage">{{item.dosage}} {{item.unit}}</view>
+            </view>
+            <view class="status-tag status-{{item.status}}">
+              <text wx:if="{{item.status == 1}}">进行中</text>
+              <text wx:elif="{{item.status == 0}}">已完成</text>
+              <text wx:elif="{{item.status == 2}}">已暂停</text>
+            </view>
+          </view>
+          
+          <!-- 提醒时间 -->
+          <view class="medication-times">
+            <view class="time-label">提醒时间：</view>
+            <view class="time-list">
+              <text class="time-item" wx:for="{{item.reminderTime}}" wx:key="*this" wx:for-item="time">{{time}}</text>
+              <text wx:if="{{!item.reminderTime || item.reminderTime.length === 0}}" class="time-empty">未设置提醒</text>
+            </view>
+          </view>
+          
+          <!-- 频率和服用方式 -->
+          <view class="medication-detail">
+            <view class="detail-item">
+              <text class="detail-label">频率：</text>
+              <text class="detail-value">{{item.frequency}}</text>
+            </view>
+            <view class="detail-item">
+              <text class="detail-label">服用方式：</text>
+              <text class="detail-value">{{item.beforeMeal ? '饭前服用' : '饭后服用'}}</text>
+            </view>
+          </view>
+          
+          <!-- 备注信息 -->
+          <view class="medication-notes" wx:if="{{item.notes}}">
+            <text class="notes-label">备注：</text>
+            <text class="notes-content">{{item.notes}}</text>
+          </view>
+          
+          <!-- 下次提醒 -->
+          <view class="next-reminder" wx:if="{{item.nextReminderTime && item.status == 1}}">
+            <text class="reminder-label">下次提醒：</text>
+            <text class="reminder-time">{{timeHelper.timestamp(item.nextReminderTime, 'M月D日 h:m')}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </block>
+
+  <!-- 空数据提示 -->
+  <view class="empty-box" wx:elif="{{isLoad && medicationList.length === 0}}">
+    <image class="empty-icon" src="/projects/A00/skin/images/icon/empty.png"></image>
+    <view class="empty-text">暂无用药提醒</view>
+    <view class="empty-tip">点击下方按钮添加用药提醒</view>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="add-btn-area">
+    <view class="add-btn" bindtap="bindAddTap">
+      <view class="icon-plus">
+      </view>
+      <text>添加用药提醒</text>
+    </view>
+  </view>
+</view>
+
+<wxs module="timeHelper">
+module.exports = {
+  timestamp: function(dateStr, fmt) {
+    if (!dateStr) return '';
+    
+    var date = getDate(dateStr);
+    
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    var second = date.getSeconds();
+    
+    // 格式化为两位数
+    var pad = function(n) {
+      return n < 10 ? '0' + n : '' + n;
+    };
+    
+    // 简单字符串替换
+    var result = fmt;
+    
+    // 替换月份
+    if (result.indexOf('M') > -1) {
+      result = result.replace('M', month);
+    }
+    
+    // 替换日期
+    if (result.indexOf('D') > -1) {
+      result = result.replace('D', day);
+    }
+    
+    // 替换小时
+    if (result.indexOf('h') > -1) {
+      result = result.replace('h', hour);
+    }
+    
+    // 替换分钟
+    if (result.indexOf('m') > -1) {
+      result = result.replace('m', minute);
+    }
+    
+    // 替换秒数
+    if (result.indexOf('s') > -1) {
+      result = result.replace('s', second);
+    }
+    
+    return result;
+  }
+}
+</wxs>
