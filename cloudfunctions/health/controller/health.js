@@ -664,6 +664,9 @@ async function getHealthAnalysis(params) {
  */
 async function generateHealthAssessment(userId, trendData) {
   try {
+    // 初始化必要的常量和库
+    const cloud = require('wx-server-sdk');
+    
     // 获取用户健康档案
     const profileResult = await db.collection(HEALTH_PROFILE_COLLECTION)
       .where({ userId })
@@ -675,7 +678,8 @@ async function generateHealthAssessment(userId, trendData) {
     const assessment = {
       overallScore: 0,
       items: [],
-      suggestions: []
+      suggestions: [],
+      aiSuggestion: '' // 新增AI建议字段
     };
     
     // 如果没有健康档案，提供基础评估
@@ -689,6 +693,7 @@ async function generateHealthAssessment(userId, trendData) {
       
       assessment.suggestions.push('请填写您的健康档案基本信息，以便获得更准确的健康评估');
       assessment.overallScore = 60;
+      assessment.aiSuggestion = '建议您完善健康档案信息，以便AI助手能够为您提供更精准的健康建议。';
       return assessment;
     }
     
@@ -854,15 +859,107 @@ async function generateHealthAssessment(userId, trendData) {
       assessment.summary = '您的健康状况需要改善，建议咨询医生获取专业建议';
     }
     
+    // 调用AI生成健康建议
+    try {
+      // 准备AI输入数据
+      const aiPrompt = {
+        healthData: {
+          profile: profile ? {
+            age: profile.basicInfo?.age || '未知',
+            gender: profile.basicInfo?.gender || '未知',
+            height: profile.basicInfo?.height || '未知',
+            weight: profile.basicInfo?.weight || '未知',
+            bmi: profile.basicInfo?.height && profile.basicInfo?.weight ? 
+              (profile.basicInfo.weight / Math.pow(profile.basicInfo.height/100, 2)).toFixed(1) : '未知'
+          } : null,
+          metrics: assessment.items.map(item => ({
+            name: item.name,
+            value: item.value,
+            status: item.status
+          })),
+          score: assessment.overallScore
+        }
+      };
+      
+      console.log('准备调用AI健康建议，输入数据:', JSON.stringify(aiPrompt));
+      
+      // 调用云函数获取AI建议
+      const aiResult = await cloud.callFunction({
+        name: 'aiAssistant',
+        data: {
+          action: 'getHealthAdvice',
+          data: aiPrompt
+        }
+      });
+      
+      console.log('AI健康建议返回结果:', aiResult);
+      
+      // 处理AI返回的建议
+      if (aiResult && aiResult.result && aiResult.result.advice) {
+        assessment.aiSuggestion = aiResult.result.advice;
+      } else {
+        // 如果AI调用失败，使用基于规则的建议
+        assessment.aiSuggestion = generateDefaultAISuggestion(assessment);
+      }
+    } catch (aiError) {
+      console.error('调用AI健康建议失败:', aiError);
+      // 生成默认的AI建议
+      assessment.aiSuggestion = generateDefaultAISuggestion(assessment);
+    }
+    
     return assessment;
   } catch (err) {
     console.error('生成健康评估失败:', err);
     return {
       overallScore: 60,
       items: [],
-      suggestions: ['健康评估生成失败，请稍后再试']
+      suggestions: ['健康评估生成失败，请稍后再试'],
+      aiSuggestion: '抱歉，暂时无法提供AI健康建议，请稍后再试。'
     };
   }
+}
+
+/**
+ * 生成默认的AI健康建议（当AI服务不可用时使用）
+ */
+function generateDefaultAISuggestion(assessment) {
+  const score = assessment.overallScore;
+  const hasHighBP = assessment.items.some(item => 
+    item.name === '血压' && (item.status === 'warning' || item.status === 'danger'));
+  const hasHighBS = assessment.items.some(item => 
+    item.name === '血糖' && (item.status === 'warning' || item.status === 'danger'));
+  const hasBMIIssue = assessment.items.some(item => 
+    item.name === 'BMI指数' && (item.status === 'warning' || item.status === 'danger'));
+  
+  let suggestion = `根据您的健康评分${score}分，`;
+  
+  if (score >= 90) {
+    suggestion += '您的健康状况非常好！建议您继续保持当前的生活方式，定期进行体检，保持适量运动和均衡饮食。每天保证7-8小时的充足睡眠，多喝水，少食用加工食品。';
+  } else if (score >= 70) {
+    suggestion += '您的健康状况良好，但仍有改进空间。';
+    
+    if (hasHighBP) {
+      suggestion += '针对您的血压情况，建议减少钠盐摄入，避免高脂肪食物，每天坚持30分钟中等强度的有氧运动，保持心情舒畅，避免长期精神紧张。';
+    }
+    
+    if (hasHighBS) {
+      suggestion += '关于血糖管理，建议控制碳水化合物的摄入，增加膳食纤维，定时定量进餐，避免过度饥饿或暴饮暴食。每天适当运动有助于提高胰岛素敏感性。';
+    }
+    
+    if (hasBMIIssue) {
+      suggestion += '关于体重管理，建议您合理控制每日热量摄入，增加蛋白质和蔬菜水果的比例，减少精制碳水化合物和油脂的摄入。结合有氧运动和力量训练，每周至少150分钟的运动量。';
+    }
+  } else {
+    suggestion += '您的健康状况需要更多关注。建议您尽快咨询专业医生获取具体的健康建议。平时应保持规律作息，均衡饮食，适量运动，避免烟酒，减轻精神压力。';
+    
+    if (hasHighBP || hasHighBS) {
+      suggestion += '定期监测您的健康指标（如血压、血糖等），严格遵循医嘱用药和生活方式调整。';
+    }
+  }
+  
+  suggestion += '此外，建议您使用健康记录功能持续记录健康数据，这将帮助您更好地了解自己的健康趋势。';
+  
+  return suggestion;
 }
 
 // 导出模块

@@ -11,13 +11,10 @@ function initLineChart(options) {
   
   // 引入echarts
   const echarts = require('../components/ec-canvas/echarts');
+  const dpr = wx.getSystemInfoSync().pixelRatio;
   
-  // 初始化图表
-  const chart = echarts.init(canvas, null, {
-    width: width,
-    height: height,
-    devicePixelRatio: wx.getSystemInfoSync().pixelRatio
-  });
+  // 初始化图表 - 直接传递 width 和 height
+  const chart = echarts.init(canvas, width, height, dpr);
   canvas.setChart(chart);
   
   // 图表配置
