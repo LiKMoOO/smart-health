@@ -1,2 +1,143 @@
 <!--projects/A00/health/medication/medication_edit/medication_edit.wxml-->
-<text>projects/A00/health/medication/medication_edit/medication_edit.wxml</text>
+<view class="container">
+  <view class="header">
+    <view class="title">编辑用药提醒</view>
+    <view class="desc">修改您的用药提醒信息</view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{!isLoad}}">
+    <view class="loading-icon"></view>
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 编辑表单 -->
+  <view class="form-container" wx:else>
+    <form bindsubmit="bindFormSubmit">
+      <!-- 药品名称 -->
+      <view class="form-group">
+        <view class="form-label required">药品名称</view>
+        <input class="form-input" name="medicationName" placeholder="请输入药品名称" value="{{formData.medicationName}}" maxlength="30" />
+      </view>
+      
+      <!-- 剂量和单位 -->
+      <view class="form-group flex-row">
+        <view class="form-col">
+          <view class="form-label">剂量</view>
+          <input class="form-input" type="digit" name="dosage" placeholder="请输入剂量" value="{{formData.dosage}}" />
+        </view>
+        <view class="form-col">
+          <view class="form-label">单位</view>
+          <picker mode="selector" range="{{unitOptions}}" value="{{unitIndex}}" bindchange="bindUnitChange">
+            <view class="form-picker">
+              <text>{{unitOptions[unitIndex]}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+      
+      <!-- 服用频率 -->
+      <view class="form-group">
+        <view class="form-label">服用频率</view>
+        <picker mode="selector" range="{{frequencyOptions}}" value="{{frequencyIndex}}" bindchange="bindFrequencyChange">
+          <view class="form-picker">
+            <text>{{frequencyOptions[frequencyIndex]}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+      
+      <!-- 服用方式 -->
+      <view class="form-group">
+        <view class="form-label">服用方式</view>
+        <view class="radio-group">
+          <view class="radio-item {{formData.beforeMeal ? 'active' : ''}}" bindtap="bindBeforeMealTap" data-value="{{true}}">
+            <text class="radio-icon">{{formData.beforeMeal ? '●' : '○'}}</text>
+            <text class="radio-text">饭前服用</text>
+          </view>
+          <view class="radio-item {{!formData.beforeMeal ? 'active' : ''}}" bindtap="bindBeforeMealTap" data-value="{{false}}">
+            <text class="radio-icon">{{!formData.beforeMeal ? '●' : '○'}}</text>
+            <text class="radio-text">饭后服用</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 提醒时间 -->
+      <view class="form-group">
+        <view class="form-label">提醒时间</view>
+        <view class="time-picker-group">
+          <view class="time-list">
+            <view class="time-item" wx:for="{{formData.reminderTime}}" wx:key="index">
+              <text class="time-value">{{item}}</text>
+              <view class="time-delete" catchtap="bindDeleteTime" data-index="{{index}}">
+                <text class="delete-icon">×</text>
+              </view>
+            </view>
+            <view class="time-add" bindtap="bindAddTimeTap">
+              <text class="add-icon">+</text>
+              <text>添加时间</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 服用时段 -->
+      <view class="form-group">
+        <view class="form-label">服用时段</view>
+        <view class="date-picker-group">
+          <picker mode="date" value="{{formData.startDate}}" start="2020-01-01" end="2050-12-31" bindchange="bindStartDateChange">
+            <view class="date-picker">
+              <text>{{formData.startDate || '请选择开始日期'}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+          <text class="date-separator">至</text>
+          <picker mode="date" value="{{formData.endDate}}" start="{{formData.startDate || '2020-01-01'}}" end="2050-12-31" bindchange="bindEndDateChange">
+            <view class="date-picker">
+              <text>{{formData.endDate || '长期服用'}}</text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+      
+      <!-- 备注 -->
+      <view class="form-group">
+        <view class="form-label">备注</view>
+        <textarea class="form-textarea" name="notes" placeholder="请输入备注信息（选填）" value="{{formData.notes}}" maxlength="200"></textarea>
+        <view class="textarea-counter">{{formData.notes.length || 0}}/200</view>
+      </view>
+      
+      <!-- 提交按钮 -->
+      <view class="form-btn-group">
+        <button class="btn-cancel" bindtap="bindCancelTap">取消</button>
+        <button class="btn-submit" form-type="submit" disabled="{{isSubmitting}}">保存</button>
+      </view>
+    </form>
+  </view>
+  
+  <!-- 时间选择弹窗 -->
+  <view class="modal" wx:if="{{showTimePicker}}">
+    <view class="modal-mask" bindtap="bindCloseTimePicker"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">选择提醒时间</text>
+        <text class="modal-close" bindtap="bindCloseTimePicker">×</text>
+      </view>
+      <view class="modal-body">
+        <picker-view indicator-style="height: 50px;" style="width: 100%; height: 250px;" value="{{timePickerValue}}" bindchange="bindTimePickerChange">
+          <picker-view-column>
+            <view class="picker-item" wx:for="{{hours}}" wx:key="*this">{{item}}</view>
+          </picker-view-column>
+          <picker-view-column>
+            <view class="picker-item" wx:for="{{minutes}}" wx:key="*this">{{item}}</view>
+          </picker-view-column>
+        </picker-view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn-confirm" bindtap="bindConfirmTimePicker">确定</button>
+      </view>
+    </view>
+  </view>
+</view>

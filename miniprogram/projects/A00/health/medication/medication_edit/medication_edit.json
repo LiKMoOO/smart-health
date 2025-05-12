@@ -1,3 +1,6 @@
 {
-	"usingComponents": {}
+	"usingComponents": {},
+	"navigationBarTitleText": "编辑用药提醒",
+	"enablePullDownRefresh": true,
+	"backgroundColor": "#f6f7fb"
 }
