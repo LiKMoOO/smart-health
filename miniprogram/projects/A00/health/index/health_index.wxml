@@ -51,11 +51,11 @@
       <view class="overview-content" style="display: flex; justify-content: space-around; padding: 20rpx 0; background-color: #f8f8f8; border-radius: 12rpx;">
         <view class="overview-item">
           <view class="item-label">身高</view>
-          <view class="item-value">{{healthInfo.basicInfo.height || '--'}} <text class="unit">cm</text></view>
+          <view class="item-value">{{healthInfo.basicInfo.height ? healthInfo.basicInfo.height : '--'}} <text class="unit" wx:if="{{healthInfo.basicInfo.height}}">cm</text></view>
         </view>
         <view class="overview-item">
           <view class="item-label">体重</view>
-          <view class="item-value">{{healthInfo.basicInfo.weight || '--'}} <text class="unit">kg</text></view>
+          <view class="item-value">{{healthInfo.basicInfo.weight ? healthInfo.basicInfo.weight : '--'}} <text class="unit" wx:if="{{healthInfo.basicInfo.weight}}">kg</text></view>
         </view>
         <view class="overview-item">
           <view class="item-label">BMI</view>
@@ -64,7 +64,7 @@
       </view>
     </view>
 
-    <!-- 新增个人信息卡片 -->
+    <!-- 个人信息卡片 -->
     <view class="section personal-info" style="width: 94%; margin: 20rpx auto;">
       <view class="section-title">个人信息</view>
       <view class="info-content" style="padding: 20rpx; background-color: #f8f8f8; border-radius: 12rpx;">
@@ -74,21 +74,33 @@
         </view>
         <view class="info-row" style="display: flex; justify-content: space-between; margin-bottom: 15rpx;">
           <view class="info-label" style="color: #666;">年龄</view>
-          <view class="info-value">{{_calculateAge(healthInfo.basicInfo.birthDate) || '--'}}岁</view>
+          <view class="info-value">{{_calculateAge(healthInfo.basicInfo.birthDate) || '--'}}{{healthInfo.basicInfo.birthDate ? '岁' : ''}}</view>
         </view>
         <view class="info-row" style="display: flex; justify-content: space-between; margin-bottom: 15rpx;">
           <view class="info-label" style="color: #666;">性别</view>
-          <view class="info-value">{{healthInfo.basicInfo.gender === 'male' ? '男' : healthInfo.basicInfo.gender === 'female' ? '女' : '--'}}</view>
+          <view class="info-value">
+            <block wx:if="{{healthInfo.basicInfo.genderDisplay}}">{{healthInfo.basicInfo.genderDisplay}}</block>
+            <block wx:elif="{{healthInfo.basicInfo.gender === 'male'}}">男</block>
+            <block wx:elif="{{healthInfo.basicInfo.gender === 'female'}}">女</block>
+            <block wx:else>--</block>
+          </view>
         </view>
         <view class="info-row" style="display: flex; justify-content: space-between;">
           <view class="info-label" style="color: #666;">过敏史</view>
-          <view class="info-value">{{healthInfo.basicInfo.allergies || '无'}}</view>
+          <view class="info-value">
+            <block wx:if="{{healthInfo.basicInfo.allergies}}">{{healthInfo.basicInfo.allergies}}</block>
+            <block wx:elif="{{healthInfo.allergies && healthInfo.allergies.length > 0}}">
+              <block wx:if="{{Array.isArray(healthInfo.allergies)}}">{{healthInfo.allergies.join(', ')}}</block>
+              <block wx:else>{{healthInfo.allergies}}</block>
+            </block>
+            <block wx:else>无</block>
+          </view>
         </view>
       </view>
     </view>
 
     <!-- 最近健康记录 -->
-    <view class="section recent-metrics" wx:if="{{recentMetrics.length > 0}}">
+    <view class="section recent-metrics" wx:if="{{recentMetrics.length > 0}}" style="width: 94%; margin: 20rpx auto;">
       <view class="section-header">
         <view class="section-title">最近记录</view>
         <view class="section-more" bindtap="gotoModule" data-index="1">更多 ></view>

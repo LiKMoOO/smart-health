@@ -50,6 +50,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    // 不主动清除缓存，避免影响正常数据加载
     this._showLoading();
     this._loadData().then(() => {
       this._hideLoading();
@@ -64,6 +65,15 @@ Page({
     // 检查是否需要刷新数据
     const lastUpdate = wx.getStorageSync('last_health_update');
     if (!lastUpdate || Date.now() - lastUpdate > 5 * 60 * 1000) {
+      this.refreshData();
+      return;
+    }
+    
+    // 检查是否有全局刷新标志
+    const app = getApp();
+    if (app && app.globalData && app.globalData.refreshHealthIndex) {
+      console.log('检测到全局刷新标志，刷新健康数据');
+      app.globalData.refreshHealthIndex = false; // 重置标志
       this.refreshData();
     }
   },
@@ -122,6 +132,18 @@ Page({
         console.warn('健康数据验证失败，使用默认空数据');
       }
       
+      // 确保profile存在，避免healthInfo为null
+      if (!healthData.profile) {
+        healthData.profile = {
+          basicInfo: { height: '', weight: '', gender: '', bloodType: 'unknown', bloodTypeDisplay: '未知' }
+        };
+      }
+      
+      // 确保basicInfo存在
+      if (!healthData.profile.basicInfo) {
+        healthData.profile.basicInfo = { height: '', weight: '', gender: '', bloodType: 'unknown', bloodTypeDisplay: '未知' };
+      }
+      
       // 计算BMI值
       if (healthData.profile && healthData.profile.basicInfo && 
           healthData.profile.basicInfo.height && healthData.profile.basicInfo.weight) {
@@ -129,6 +151,26 @@ Page({
           healthData.profile.basicInfo.height,
           healthData.profile.basicInfo.weight
         );
+      }
+      
+      // 确保性别和年龄显示正确
+      if (healthData.profile.basicInfo) {
+        // 处理性别显示
+        if (healthData.profile.basicInfo.gender === 'male') {
+          healthData.profile.basicInfo.genderDisplay = '男';
+        } else if (healthData.profile.basicInfo.gender === 'female') {
+          healthData.profile.basicInfo.genderDisplay = '女';
+        }
+        
+        // 确保bloodTypeDisplay存在
+        if (!healthData.profile.basicInfo.bloodTypeDisplay) {
+          const bloodType = healthData.profile.basicInfo.bloodType;
+          if (bloodType === 'A') healthData.profile.basicInfo.bloodTypeDisplay = 'A型';
+          else if (bloodType === 'B') healthData.profile.basicInfo.bloodTypeDisplay = 'B型';
+          else if (bloodType === 'AB') healthData.profile.basicInfo.bloodTypeDisplay = 'AB型';
+          else if (bloodType === 'O') healthData.profile.basicInfo.bloodTypeDisplay = 'O型';
+          else healthData.profile.basicInfo.bloodTypeDisplay = '未知';
+        }
       }
       
       // 检查健康指标是否有异常
@@ -159,9 +201,9 @@ Page({
       console.error('加载健康数据失败：', err);
       this.setData({
         isLoad: true,
-        healthInfo: null,
-        recentMetrics: [],
-        recentReminders: []
+        healthInfo: this.data.healthInfo || null, // 保留原有数据
+        recentMetrics: this.data.recentMetrics || [],
+        recentReminders: this.data.recentReminders || []
       });
       return null;
     }
@@ -202,6 +244,9 @@ Page({
         throw new Error('获取数据失败');
       }
       
+      // 输出原始数据，检查数据结构
+      console.log('云函数返回的原始数据:', JSON.stringify(res));
+      
       // 更新缓存
       wx.setStorageSync(CACHE_KEY, {
         data: res,
@@ -238,6 +283,32 @@ Page({
           // 默认空对象
           healthData.profile.basicInfo = {};
         }
+        
+        // 确保过敏史数据正确获取，保留原有数据结构
+        if (Array.isArray(healthData.profile.allergies)) {
+          // 如果在profile根级别有allergies数组，则使用该数组
+          console.log('在profile根级别发现allergies数组:', healthData.profile.allergies);
+          healthData.profile.basicInfo.allergies = healthData.profile.allergies.join(', ');
+        } else if (healthData.profile.basicInfo && Array.isArray(healthData.profile.basicInfo.allergies)) {
+          // 如果basicInfo中的allergies是数组，转为字符串
+          console.log('在basicInfo中发现allergies数组:', healthData.profile.basicInfo.allergies);
+          healthData.profile.basicInfo.allergies = healthData.profile.basicInfo.allergies.join(', ');
+        } else if (typeof healthData.profile.allergies === 'string' && healthData.profile.allergies.trim() !== '') {
+          // 如果过敏史是字符串类型且不为空
+          console.log('在profile根级别发现allergies字符串:', healthData.profile.allergies);
+          healthData.profile.basicInfo.allergies = healthData.profile.allergies;
+        } else if (typeof healthData.profile.basicInfo.allergies === 'string' && healthData.profile.basicInfo.allergies.trim() !== '') {
+          // 如果basicInfo中的过敏史是字符串类型且不为空
+          console.log('在basicInfo中发现allergies字符串:', healthData.profile.basicInfo.allergies);
+          // 已经是字符串，不需要再处理
+        } else if (healthData.profile.basicInfo && !healthData.profile.basicInfo.allergies) {
+          // 如果basicInfo中没有allergies，默认为空
+          console.log('未找到allergies数据，设置为空');
+          healthData.profile.basicInfo.allergies = '';
+        }
+        
+        // 调试信息：输出处理后的数据
+        console.log('处理后的健康数据:', JSON.stringify(healthData.profile.basicInfo));
       }
       
       return healthData;
@@ -304,8 +375,24 @@ Page({
 
   // 刷新页面
   refreshData: function() {
+    // 清除缓存，强制刷新
+    wx.removeStorageSync(CACHE_KEY);
+    wx.setStorageSync('last_health_update', Date.now());
+    
     this._showLoading();
-    this._loadData().finally(() => {
+    
+    // 不完全重置数据，避免页面闪烁
+    this._loadData().then(data => {
+      console.log('数据刷新完成');
+      
+      // 如果加载失败，保留原来的数据
+      if (!data || !data.profile) {
+        console.warn('刷新数据失败，保留原数据');
+      }
+      
+      this._hideLoading();
+    }).catch(err => {
+      console.error('刷新数据出错:', err);
       this._hideLoading();
     });
   },
@@ -429,19 +516,38 @@ Page({
       return false;
     }
     
-    // 验证基本信息
-    if (data.profile?.basicInfo) {
-      const { height, weight } = data.profile.basicInfo;
-      if (height && (parseFloat(height) < 50 || parseFloat(height) > 250)) {
-        console.warn('身高数据异常:', height);
-        return false;
-      }
-      if (weight && (parseFloat(weight) < 20 || parseFloat(weight) > 200)) {
-        console.warn('体重数据异常:', weight);
-        return false;
+    // 验证profile结构
+    if (!data.profile) {
+      console.warn('健康档案数据为空');
+      return false;
+    }
+    
+    // 如果HEALTH_PROFILE_BASIC是字符串，尝试解析
+    if (typeof data.profile.HEALTH_PROFILE_BASIC === 'string') {
+      try {
+        const basicInfo = JSON.parse(data.profile.HEALTH_PROFILE_BASIC);
+        // 临时给data.profile添加basicInfo，用于后续验证
+        data.profile.basicInfo = basicInfo;
+      } catch (e) {
+        console.error('解析基本信息失败:', e);
+        // 解析失败但不影响整体验证
       }
     }
     
+    // 验证基本信息
+    if (data.profile.basicInfo) {
+      const { height, weight } = data.profile.basicInfo;
+      if (height && (parseFloat(height) < 50 || parseFloat(height) > 250)) {
+        console.warn('身高数据异常:', height);
+        // 不急着返回false，继续验证
+      }
+      if (weight && (parseFloat(weight) < 20 || parseFloat(weight) > 200)) {
+        console.warn('体重数据异常:', weight);
+        // 不急着返回false，继续验证
+      }
+    }
+    
+    // 即使有小问题，也尽量允许数据通过，修正而不是拒绝
     return true;
   },
   

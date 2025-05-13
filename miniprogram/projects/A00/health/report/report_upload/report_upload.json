@@ -1,5 +1,7 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "ocr-navigator": "plugin://ocr-plugin/ocr-navigator"
+  },
   "navigationBarTitleText": "上传体检报告",
   "navigationBarBackgroundColor": "#3894FF",
   "navigationBarTextStyle": "white"

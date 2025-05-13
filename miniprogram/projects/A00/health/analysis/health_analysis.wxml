@@ -99,10 +99,17 @@
     
     <!-- 图表展示 -->
     <block wx:if="{{chartSeries.length > 0}}">
-      <view class="card chart-card" wx:for="{{chartSeries}}" wx:key="name" style="width: 693rpx; height: 522rpx; display: block; box-sizing: border-box">
-        <view class="card-title">{{item.name}}趋势图</view>
-        <view class="chart-container">
-          <ec-canvas id="chart{{index}}" canvas-id="chart{{index}}" class="chart" ec="{{ ecMap['chart'+index] }}" style="position: relative; left: 0rpx; top: 49rpx"></ec-canvas>
+      <view class="card chart-card" wx:for="{{chartSeries}}" wx:key="name">
+        <view class="card-title">
+          <text>{{item.name}}趋势图</text>
+          <view class="chart-refresh-btn" bindtap="reloadCharts">
+            <text class="refresh-icon">↻</text>
+          </view>
+        </view>
+        <view class="chart-outer-container">
+          <view class="chart-container">
+            <ec-canvas id="chart{{index}}" canvas-id="chart{{index}}" class="chart" ec="{{ ecMap['chart'+index] }}"></ec-canvas>
+          </view>
         </view>
       </view>
     </block>

@@ -18,7 +18,9 @@ module.exports = Behavior({
     previewMode: false, // 文件预览模式
     currentPreviewUrl: '', // 当前预览的文件URL
     reportItems: [],
-    reportTypeOptions: ['常规体检', '年度体检', '健康证体检', '婚前体检', '糖尿病筛查', '心脑血管检查', '体检套餐', '其他']
+    reportTypeOptions: ['常规体检', '年度体检', '健康证体检', '婚前体检', '糖尿病筛查', '心脑血管检查', '体检套餐', '其他'],
+    ocrShowDetail: false, // 是否展示OCR识别详情
+    ocrParsedFields: {} // OCR识别出的结构化字段
   },
   methods: {
     onLoad: function () {
@@ -46,6 +48,21 @@ module.exports = Behavior({
     // 切换OCR识别状态
     toggleOcr: function() {
       this.setData({ enableOcr: !this.data.enableOcr });
+      
+      // 如果关闭OCR，则清空OCR相关数据
+      if (!this.data.enableOcr) {
+        this.setData({
+          ocrResult: '',
+          ocrShowDetail: false,
+          ocrParsedFields: {}
+        });
+      }
+    },
+    // 切换OCR详情显示
+    toggleOcrDetail: function() {
+      this.setData({
+        ocrShowDetail: !this.data.ocrShowDetail
+      });
     },
     // 选择报告文件
     bindChooseFile: function() {
@@ -131,6 +148,11 @@ module.exports = Behavior({
           
           fileIDs.push(uploadRes.fileID);
           fileNames.push(file.name);
+          
+          // 如果是第一个文件并且是图片文件，尝试OCR识别
+          if (i === 0 && this.data.enableOcr && /\.(jpg|jpeg|png)$/i.test(file.name)) {
+            await this.processOcr(uploadRes.fileID);
+          }
         }
         
         this.setData({
@@ -148,33 +170,148 @@ module.exports = Behavior({
     
     // OCR识别处理
     processOcr: async function(fileID) {
-      this.setData({ isOcrProcessing: true });
-      try {
-        wx.showLoading({ title: 'OCR识别中...', mask: true });
-        
-        // 调用OCR云函数
-        const params = {
-          action: 'ocrReport',
-          params: { fileID }
-        };
-        
-        const result = await cloudHelper.callCloudData('medicalReport', params);
-        
-        if (result && result.code === 0 && result.data) {
-          this.setData({
-            ocrResult: result.data.text,
-            summary: result.data.summary || this.data.summary
-          });
-          pageHelper.showSuccToast('OCR识别成功');
-        } else {
-          pageHelper.showModal('OCR识别失败，请手动填写信息');
+      this.setData({ 
+        isOcrProcessing: true,
+        ocrResult: '正在进行OCR识别，请稍候...'
+      });
+      
+      let retryCount = 0;
+      const maxRetries = 2;
+      
+      const doOcrProcessing = async () => {
+        try {
+          wx.showLoading({ title: 'OCR智能识别中...', mask: true });
+          
+          // 调用OCR云函数
+          const params = {
+            action: 'ocrReport',
+            params: { 
+              fileID,
+              userId: wx.getStorageSync('openid') || '' 
+            }
+          };
+          
+          console.log('准备调用OCR云函数，参数:', params);
+          const result = await cloudHelper.callCloudData('medicalReport', params, { timeout: 15000 });
+          console.log('OCR云函数返回结果:', result);
+          
+          if (result && result.code === 0 && result.data) {
+            const ocrData = result.data;
+            
+            // 保存OCR识别结果和解析出的字段
+            const ocrParsedFields = {
+              hospital: ocrData.hospital || '',
+              reportDate: ocrData.reportDate || '',
+              reportType: ocrData.reportType || '',
+              summary: ocrData.summary || ''
+            };
+            
+            this.setData({
+              ocrResult: ocrData.text || '未能识别到文本内容',
+              ocrParsedFields
+            });
+            
+            // 自动填充表单字段
+            const formUpdate = {};
+            
+            // 只有当字段为空时，才自动填充
+            if (!this.data.hospital && ocrParsedFields.hospital) {
+              formUpdate.hospital = ocrParsedFields.hospital;
+            }
+            
+            if (!this.data.summary && ocrParsedFields.summary) {
+              formUpdate.summary = ocrParsedFields.summary;
+            }
+            
+            // 报告日期，只有当是当天日期或者为空时才更新
+            const today = timeHelper.time('Y-M-D');
+            if ((this.data.reportDate === today || !this.data.reportDate) && ocrParsedFields.reportDate) {
+              formUpdate.reportDate = ocrParsedFields.reportDate;
+            }
+            
+            // 报告类型，需要匹配选项
+            if (!this.data.reportType && ocrParsedFields.reportType) {
+              const typeIndex = this.data.reportTypeOptions.findIndex(
+                type => type === ocrParsedFields.reportType
+              );
+              
+              if (typeIndex !== -1) {
+                formUpdate.reportType = this.data.reportTypeOptions[typeIndex];
+              }
+            }
+            
+            // 应用自动填充
+            if (Object.keys(formUpdate).length > 0) {
+              this.setData(formUpdate);
+              pageHelper.showNoneToast('OCR已自动填充识别出的信息');
+            } else {
+              pageHelper.showSuccToast('OCR识别完成');
+            }
+            
+            return true; // 识别成功
+          } else {
+            throw new Error(result && result.msg ? result.msg : 'OCR识别失败');
+          }
+        } catch (err) {
+          console.error('OCR识别出错:', err);
+          
+          // 检查是否为超时错误
+          const isTimeoutError = err.message && (
+            err.message.includes('timed out') || 
+            err.message.includes('timeout') || 
+            err.message.includes('TIME_LIMIT_EXCEEDED')
+          );
+          
+          if (isTimeoutError && retryCount < maxRetries) {
+            // 如果是超时错误并且未超过最大重试次数，则重试
+            retryCount++;
+            this.setData({
+              ocrResult: `OCR识别超时，正在进行第${retryCount}次重试...`
+            });
+            
+            // 等待1秒后重试
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return false; // 需要重试
+          } else {
+            // 超过重试次数或其他错误
+            this.setData({
+              ocrResult: isTimeoutError ? 
+                '由于图片处理时间较长，OCR识别超时。您可以手动填写信息或稍后再试。' : 
+                '处理出错：' + (err.message || '未知错误')
+            });
+            
+            // 显示错误信息
+            const tipMsg = isTimeoutError ? 
+              '图片处理超时，请尝试上传较小的图片，或手动填写信息。' : 
+              'OCR识别失败，请手动填写信息。';
+            
+            pageHelper.showModal(tipMsg);
+            return true; // 不再重试
+          }
+        } finally {
+          wx.hideLoading();
         }
-      } catch (err) {
-        pageHelper.showModal('OCR识别失败，请手动填写信息');
-      } finally {
-        this.setData({ isOcrProcessing: false });
-        wx.hideLoading();
+      };
+      
+      // 开始OCR识别流程
+      let processingComplete = false;
+      while (!processingComplete) {
+        processingComplete = await doOcrProcessing();
       }
+      
+      this.setData({ isOcrProcessing: false });
+    },
+    
+    // 应用OCR识别结果中的特定字段
+    applyOcrField: function(e) {
+      const field = e.currentTarget.dataset.field;
+      if (!field || !this.data.ocrParsedFields[field]) return;
+      
+      const update = {};
+      update[field] = this.data.ocrParsedFields[field];
+      
+      this.setData(update);
+      pageHelper.showSuccToast(`已应用OCR识别的${field}信息`);
     },
     
     // 关闭预览
@@ -190,7 +327,9 @@ module.exports = Behavior({
       this.setData({
         reportFileId: '',
         reportFileName: '',
-        ocrResult: ''
+        ocrResult: '',
+        ocrParsedFields: {},
+        ocrShowDetail: false
       });
       pageHelper.showSuccToast('已删除文件');
     },

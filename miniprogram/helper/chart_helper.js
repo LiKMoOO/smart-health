@@ -29,10 +29,10 @@ function initLineChart(options) {
     },
     grid: {
       containLabel: true,
-      left: 20,
-      right: 20,
+      left: 50,
+      right: 50,
       top: 40,
-      bottom: 20
+      bottom: 50
     },
     tooltip: {
       trigger: 'axis',

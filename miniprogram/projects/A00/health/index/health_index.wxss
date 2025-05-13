@@ -294,6 +294,35 @@
   font-weight: normal;
 }
 
+/* 个人信息模块 */
+.personal-info {
+  background-color: #fff;
+  border-radius: 15rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.info-content {
+  background-color: #f8f8f8;
+  border-radius: 12rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10rpx 0;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
 /* 健康记录列表 */
 .metrics-list {
   margin-bottom: 20rpx;

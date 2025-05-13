@@ -141,6 +141,11 @@ Page({
 				dataType: 'profile',
 				data: updatedProfile
 			});
+			
+			// 清除健康首页的缓存，确保数据同步
+			wx.removeStorageSync('health_index_data');
+			wx.setStorageSync('last_health_update', Date.now());
+			
 			this.setData({ profile: updatedProfile }); // 保存成功后，用更新后的profile更新本地
 			pageHelper.showSuccToast(successMsg);
 			if (typeof getApp === 'function' && getApp().globalData) {
@@ -230,6 +235,7 @@ Page({
 
 	// --- 既往病史模块 ---
 	onAddMedicalHistory() { // WXML bindtap="onAddMedicalHistory"
+		console.log('点击添加既往病史按钮');
 		this.setData({
 			showMedicalHistoryModal: true,
 			editMedicalHistoryIndex: null,
@@ -238,6 +244,7 @@ Page({
 	},
 
 	onEditMedicalHistory(e) { // WXML bindtap="onEditMedicalHistory"
+		console.log('点击编辑既往病史按钮');
 		const index = e.currentTarget.dataset.index;
 		const medicalRecord = this.data.profile.medicalHistory[index];
 		if (medicalRecord) {
@@ -250,6 +257,7 @@ Page({
 	},
 
 	onCloseMedicalHistoryModal() { // WXML bindtap="onCloseMedicalHistoryModal"
+		console.log('关闭既往病史弹窗');
 		this.setData({ showMedicalHistoryModal: false });
 	},
 
@@ -301,6 +309,7 @@ Page({
 
 	// --- 过敏史模块 ---
 	onAddAllergy() { // WXML bindtap="onAddAllergy"
+		console.log('点击添加过敏史按钮');
 		this.setData({
 			showAllergyModal: true,
 			formAllergy: '' 
@@ -308,7 +317,15 @@ Page({
 	},
 
 	onCloseAllergyModal() { // WXML bindtap="onCloseAllergyModal"
+		console.log('关闭过敏史弹窗');
 		this.setData({ showAllergyModal: false });
+	},
+
+	// 防止事件冒泡的空函数
+	preventTap() {
+		console.log('阻止事件冒泡');
+		// 空函数，仅用于阻止点击事件冒泡
+		return;
 	},
 
 	onAllergyInput(e) { // WXML bindinput="onAllergyInput"

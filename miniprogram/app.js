@@ -17,7 +17,10 @@ App({
 			})
 		}
 
-		this.globalData = {};
+		this.globalData = {
+			// 用于标记是否需要刷新健康首页数据
+			refreshHealthIndex: false  
+		};
 
 		// 用于自定义导航栏
 		wx.getSystemInfo({

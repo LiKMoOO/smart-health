@@ -265,7 +265,9 @@
 .chart-container {
   height: 300rpx;
   width: 100%;
-  margin-top: 20rpx;
+  margin-top: 30rpx;
+  padding-right: 30rpx;
+  
 }
 
 .chart {

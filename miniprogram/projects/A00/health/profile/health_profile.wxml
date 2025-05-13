@@ -184,12 +184,13 @@
     </view>
   </block>
 
-  <!-- 医疗历史添加/编辑弹窗 -->
-  <view class="modal" wx:if="{{showMedicalHistoryModal}}">
-    <view class="modal-content">
+  <!-- 医疗历史添加/编辑弹窗 (重构) -->
+  <view class="modal-wrapper" wx:if="{{showMedicalHistoryModal}}">
+    <view class="modal-mask" bindtap="onCloseMedicalHistoryModal"></view>
+    <view class="modal-dialog" catchtap="preventTap">
       <view class="modal-header">
         <text>{{editMedicalHistoryIndex !== null ? '编辑病史' : '添加病史'}}</text>
-        <view class="close-btn" bindtap="onCloseMedicalHistoryModal">×</view>
+        <view class="close-icon" catchtap="onCloseMedicalHistoryModal">×</view>
       </view>
       <view class="modal-body">
         <view class="form-group">
@@ -208,18 +209,19 @@
         </view>
       </view>
       <view class="modal-footer">
-        <button class="btn-cancel" bindtap="onCloseMedicalHistoryModal">取消</button>
-        <button class="btn-save" bindtap="onSaveMedicalHistory">保存</button>
+        <button class="btn-cancel" catchtap="onCloseMedicalHistoryModal">取消</button>
+        <button class="btn-save" catchtap="onSaveMedicalHistory">保存</button>
       </view>
     </view>
   </view>
 
-  <!-- 过敏史添加弹窗 -->
-  <view class="modal" wx:if="{{showAllergyModal}}">
-    <view class="modal-content">
+  <!-- 过敏史添加弹窗 (重构) -->
+  <view class="modal-wrapper" wx:if="{{showAllergyModal}}">
+    <view class="modal-mask" bindtap="onCloseAllergyModal"></view>
+    <view class="modal-dialog" catchtap="preventTap">
       <view class="modal-header">
         <text>添加过敏史</text>
-        <view class="close-btn" bindtap="onCloseAllergyModal">×</view>
+        <view class="close-icon" catchtap="onCloseAllergyModal">×</view>
       </view>
       <view class="modal-body">
         <view class="form-group">
@@ -228,8 +230,8 @@
         </view>
       </view>
       <view class="modal-footer">
-        <button class="btn-cancel" bindtap="onCloseAllergyModal">取消</button>
-        <button class="btn-save" bindtap="onSaveAllergy">保存</button>
+        <button class="btn-cancel" catchtap="onCloseAllergyModal">取消</button>
+        <button class="btn-save" catchtap="onSaveAllergy">保存</button>
       </view>
     </view>
   </view>
