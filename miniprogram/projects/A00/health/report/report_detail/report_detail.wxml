@@ -47,7 +47,7 @@
       </view>
       
       <!-- AI分析结果 -->
-      <view class="section ai-section {{showAiResult ? 'expanded' : ''}}" wx:if="{{report.aiAnalysis}}">
+      <view class="section ai-section {{showAiResult ? 'expanded' : ''}}" wx:if="{{report.aiAnalysis || report.aiAnalysisText}}">
         <view class="section-title" bindtap="toggleAiResult">
           <view class="title-text">
             <text class="title-icon">🤖</text>
@@ -64,13 +64,13 @@
           
           <view class="risk-level">
             <view class="risk-label">健康风险评级：</view>
-            <view class="risk-value {{report.aiAnalysis.indexOf('高风险') >= 0 ? 'high' : (report.aiAnalysis.indexOf('中风险') >= 0 ? 'medium' : 'low')}}">
-              {{report.aiAnalysis.indexOf('高风险') >= 0 ? '高' : (report.aiAnalysis.indexOf('中风险') >= 0 ? '中' : '低')}}
+            <view class="risk-value {{report.aiRiskLevel == 'high' ? 'high' : (report.aiRiskLevel == 'medium' ? 'medium' : 'low')}}">
+              {{report.aiRiskLevel == 'high' ? '高' : (report.aiRiskLevel == 'medium' ? '中' : '低')}}
             </view>
           </view>
           
           <view class="ai-markdown">
-            <text user-select decode>{{report.aiAnalysis}}</text>
+            <text user-select decode>{{report.aiAnalysisText || report.aiAnalysis}}</text>
           </view>
         </view>
       </view>

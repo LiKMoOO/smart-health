@@ -18,6 +18,7 @@ const config = require('../config/config.js')
  * @param {String} params.userId - 用户ID
  * @param {String} params.reportContent - 报告内容摘要
  * @param {String} params.fileIds - 报告文件ID（多个ID用逗号分隔）
+ * @param {Boolean} params.forceRefresh - 强制刷新，不使用之前的分析结果
  * @param {Object} wxContext - 微信上下文
  * @returns {Object} - 返回结果
  */
@@ -42,6 +43,12 @@ exports.main = async (params, wxContext) => {
     const userId = params.userId || wxContext.OPENID;
     console.log('[AI分析] 使用的用户ID:', userId);
 
+    // 检查是否需要强制刷新
+    const forceRefresh = params.forceRefresh === true;
+    if (forceRefresh) {
+      console.log('[AI分析] 检测到强制刷新标志，将重新生成分析结果');
+    }
+
     // 先查询报告是否存在
     let reportResult;
     try {
@@ -62,6 +69,24 @@ exports.main = async (params, wxContext) => {
     if (reportResult.data.userId !== userId) {
       console.error('[AI分析] 无权访问该报告，报告userId:', reportResult.data.userId, '请求userId:', userId);
       return { code: 1005, msg: '无权访问该报告' }
+    }
+
+    // 如果有分析结果且不需要强制刷新，则直接返回
+    if (!forceRefresh && reportResult.data.aiAnalysis) {
+      console.log('[AI分析] 检测到已有分析结果且未要求强制刷新，直接返回');
+      
+      try {
+        // 尝试解析现有的分析结果
+        const existingAnalysis = JSON.parse(reportResult.data.aiAnalysis);
+        return {
+          code: 0,
+          msg: '使用现有分析结果',
+          data: existingAnalysis
+        };
+      } catch (parseErr) {
+        console.error('[AI分析] 解析现有分析结果失败, 将重新生成:', parseErr);
+        // 解析失败，继续执行重新分析
+      }
     }
 
     // 获取报告内容，优先使用传入的内容，否则使用存储的内容
@@ -168,42 +193,31 @@ exports.main = async (params, wxContext) => {
       console.log('[AI分析] AI服务返回结果长度:', typeof aiResult === 'string' ? aiResult.length : '非字符串结果');
       
       // 处理分析结果，确保保存格式统一且前端能够解析
-      let resultToSave = '';
-      let resultToReturn = null;
+      let resultObject = null;
       
       if (typeof aiResult === 'object') {
-        // 如果是对象格式（备用分析），转换为Markdown格式字符串
-        console.log('[AI分析] 检测到对象格式结果，转换为Markdown文本');
+        // 如果是对象格式，直接使用
+        resultObject = aiResult;
+      } else if (typeof aiResult === 'string') {
+        // 如果是文本格式，提取风险等级和建议
+        let riskLevel = 'low';
+        if (aiResult.includes('高风险')) riskLevel = 'high';
+        else if (aiResult.includes('中风险')) riskLevel = 'medium';
         
-        const riskText = aiResult.riskLevel === 'low' ? '低风险' : 
-                      aiResult.riskLevel === 'medium' ? '中风险' : '高风险';
-        
-        resultToSave = `# 体检报告AI分析\n\n## 风险评级\n${riskText}\n\n`;
-        
-        if (aiResult.suggestion) {
-          resultToSave += `## 健康建议\n${aiResult.suggestion}\n\n`;
-        }
-        
-        if (aiResult.details) {
-          resultToSave += aiResult.details;
-        }
-        
-        // 保留原始对象用于返回
-        resultToReturn = {
-          text: resultToSave,
-          suggestion: aiResult.suggestion || '',
-          riskLevel: aiResult.riskLevel || 'low'
+        // 创建标准格式的结果对象
+        resultObject = {
+          suggestion: aiResult.includes('健康建议') ? 
+                     aiResult.split('健康建议')[1].split('\n')[0].trim() : 
+                     '保持均衡饮食，适量运动，定期体检，及时就医。',
+          riskLevel: riskLevel,
+          details: aiResult
         };
-      } else {
-        // 已经是字符串，直接使用
-        resultToSave = aiResult;
-        resultToReturn = { text: aiResult };
       }
       
-      // 更新报告的AI分析结果
+      // 更新报告的AI分析结果，存储为JSON字符串
       await db.collection(reportCollection).doc(params.reportId).update({
         data: {
-          aiAnalysis: resultToSave,
+          aiAnalysis: JSON.stringify(resultObject),
           aiAnalysisTime: new Date()
         }
       });
@@ -212,40 +226,27 @@ exports.main = async (params, wxContext) => {
       return {
         code: 0,
         msg: 'AI分析成功',
-        data: resultToReturn
+        data: resultObject
       };
     } catch (aiErr) {
       console.error('[AI分析] 调用AI服务失败:', aiErr);
       
       // 生成备用分析结果
-      const backupResult = generateBackupAnalysis(prompt);
+      const backupText = generateBackupAnalysis(prompt);
       console.log('[AI分析] 生成备用分析结果成功');
       
-      // 确保备用分析也是Markdown格式字符串
-      let backupTextToSave = '';
+      // 从备用文本创建结构化对象
+      const backupObject = {
+        suggestion: '保持均衡饮食，适量运动，定期体检，及时就医。',
+        riskLevel: 'low',
+        details: backupText
+      };
       
-      if (typeof backupResult === 'object') {
-        const riskText = backupResult.riskLevel === 'low' ? '低风险' : 
-                       backupResult.riskLevel === 'medium' ? '中风险' : '高风险';
-        
-        backupTextToSave = `# 体检报告AI分析\n\n## 风险评级\n${riskText}\n\n`;
-        
-        if (backupResult.suggestion) {
-          backupTextToSave += `## 健康建议\n${backupResult.suggestion}\n\n`;
-        }
-        
-        if (backupResult.details) {
-          backupTextToSave += backupResult.details;
-        }
-      } else {
-        backupTextToSave = backupResult;
-      }
-      
-      // 保存备用分析结果到数据库
+      // 保存备用分析结果到数据库，同样保存为JSON字符串
       try {
         await db.collection(reportCollection).doc(params.reportId).update({
           data: {
-            aiAnalysis: backupTextToSave,
+            aiAnalysis: JSON.stringify(backupObject),
             aiAnalysisTime: new Date()
           }
         });
@@ -257,11 +258,7 @@ exports.main = async (params, wxContext) => {
       return {
         code: 0,
         msg: '使用备用分析',
-        data: { 
-          text: backupTextToSave,
-          suggestion: typeof backupResult === 'object' ? backupResult.suggestion : '',
-          riskLevel: typeof backupResult === 'object' ? backupResult.riskLevel : 'low'
-        }
+        data: backupObject
       };
     }
   } catch (err) {

@@ -51,41 +51,43 @@ exports.main = async (params, wxContext) => {
       }
       
       // 处理分析结果存储
-      console.log('[保存分析] 检查现有分析结果格式');
+      console.log('[保存分析] 分析结果格式:', typeof params.aiAnalysis);
+      console.log('[保存分析] 分析结果内容示例:', typeof params.aiAnalysis === 'string' ? 
+                  params.aiAnalysis.substring(0, 50) + '...' : 'not string');
       
-      // 检查aiAnalysis是否为对象格式
-      if (typeof params.aiAnalysis === 'object') {
-        // 将对象转换为字符串格式，与现有数据保持一致
-        console.log('[保存分析] 转换对象格式为字符串格式');
-        let analysisText = '';
-        
-        // 如果有details字段，使用它的内容
-        if (params.aiAnalysis.details) {
-          analysisText = params.aiAnalysis.details;
-        } else if (params.aiAnalysis.suggestion) {
-          // 否则，使用suggestion和riskLevel构建内容
-          const riskText = params.aiAnalysis.riskLevel === 'low' ? '低风险' : 
-                        params.aiAnalysis.riskLevel === 'medium' ? '中风险' : '高风险';
-          
-          analysisText = `# 体检报告AI分析\n\n## 风险等级\n${riskText}\n\n## 健康建议\n${params.aiAnalysis.suggestion}`;
-        }
-        
-        // 更新报告的AI分析结果
-        await db.collection(reportCollection).doc(params.reportId).update({
-          data: {
-            aiAnalysis: analysisText,
-            aiAnalysisTime: params.aiAnalysisTime || new Date().getTime()
-          }
-        });
-      } else {
-        // 如果已经是字符串，直接更新
-        await db.collection(reportCollection).doc(params.reportId).update({
-          data: {
-            aiAnalysis: params.aiAnalysis,
-            aiAnalysisTime: params.aiAnalysisTime || new Date().getTime()
-          }
-        });
+      let analysisToSave = params.aiAnalysis;
+      
+      // 确保保存的是字符串格式
+      if (typeof analysisToSave !== 'string') {
+        console.log('[保存分析] 转换对象为JSON字符串');
+        analysisToSave = JSON.stringify(analysisToSave);
       }
+      
+      // 检查是否已经是有效的JSON
+      try {
+        // 尝试解析后再重新转换，保证它是有效的JSON
+        const testParse = JSON.parse(analysisToSave);
+        if (typeof testParse === 'object') {
+          console.log('[保存分析] 验证JSON格式有效');
+        }
+      } catch (jsonError) {
+        // 不是有效的JSON，可能是纯文本，转换为标准格式
+        console.log('[保存分析] 不是有效的JSON格式，转换为标准格式');
+        const standardObj = {
+          suggestion: '保持均衡饮食，适量运动，定期体检，及时就医。',
+          riskLevel: 'low',
+          details: analysisToSave // 使用原文本作为details
+        };
+        analysisToSave = JSON.stringify(standardObj);
+      }
+      
+      // 更新报告的AI分析结果
+      await db.collection(reportCollection).doc(params.reportId).update({
+        data: {
+          aiAnalysis: analysisToSave,
+          aiAnalysisTime: params.aiAnalysisTime || new Date().getTime()
+        }
+      });
       
       console.log('[保存分析] 分析结果保存成功');
       return { code: 0, msg: '保存成功' };

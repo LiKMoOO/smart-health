@@ -97,6 +97,46 @@ Page({
         }
       }
       
+      // 处理AI分析结果格式
+      if (reportData.aiAnalysis) {
+        console.log('处理AI分析结果，原始数据类型:', typeof reportData.aiAnalysis);
+        console.log('AI分析数据前50个字符:', typeof reportData.aiAnalysis === 'string' ? 
+          reportData.aiAnalysis.substring(0, 50) : 'not string');
+        
+        // 如果aiAnalysis是字符串，尝试解析成对象
+        if (typeof reportData.aiAnalysis === 'string') {
+          try {
+            // 尝试解析JSON
+            const parsedAnalysis = JSON.parse(reportData.aiAnalysis);
+            console.log('成功将AI分析结果解析为对象:', parsedAnalysis);
+            
+            // 提取details作为显示文本，如果没有details则使用suggestion
+            if (parsedAnalysis.details) {
+              reportData.aiAnalysisText = parsedAnalysis.details;
+            } else if (parsedAnalysis.suggestion) {
+              reportData.aiAnalysisText = parsedAnalysis.suggestion;
+            } else {
+              reportData.aiAnalysisText = '暂无分析结果';
+            }
+            
+            // 保存风险等级和建议，用于UI显示
+            reportData.aiRiskLevel = parsedAnalysis.riskLevel || 'low';
+            reportData.aiSuggestion = parsedAnalysis.suggestion || '';
+            
+            console.log('处理后的AI分析文本:', reportData.aiAnalysisText.substring(0, 100) + '...');
+          } catch (e) {
+            console.error('JSON解析失败，使用原始文本:', e);
+            reportData.aiAnalysisText = reportData.aiAnalysis;
+            reportData.aiRiskLevel = 'low';
+          }
+        } else if (typeof reportData.aiAnalysis === 'object') {
+          // 已经是对象，直接提取内容
+          reportData.aiAnalysisText = reportData.aiAnalysis.details || reportData.aiAnalysis.suggestion || '暂无分析结果';
+          reportData.aiRiskLevel = reportData.aiAnalysis.riskLevel || 'low';
+          reportData.aiSuggestion = reportData.aiAnalysis.suggestion || '';
+        }
+      }
+      
       if (reportData.aiAnalysisTime) {
         // 时间戳格式转换为可读格式
         console.log('AI分析时间:', reportData.aiAnalysisTime);
@@ -105,10 +145,10 @@ Page({
       this.setData({
         report: reportData,
         isLoad: true,
-        showAiResult: reportData && reportData.aiAnalysis
+        showAiResult: reportData && (reportData.aiAnalysis || reportData.aiAnalysisText)
       });
       
-      console.log('报告数据已设置到页面');
+      console.log('报告数据已设置到页面，分析文本是否存在:', !!reportData.aiAnalysisText);
       return reportData;
     } catch (err) {
       console.error('加载报告详情失败:', err);
@@ -294,7 +334,7 @@ Page({
   },
 
   /**
-   * AI分析报告
+   * 启动AI分析
    */
   bindAnalyzeByAI: async function() {
     if (!this.data.report) {
@@ -311,6 +351,27 @@ Page({
     
     try {
       wx.showLoading({ title: 'AI分析中...', mask: true });
+      
+      // 如果是重新分析，先删除现有的分析结果
+      if (this.data.report.aiAnalysis || this.data.report.aiAnalysisText) {
+        console.log('检测到已存在分析结果，执行重新分析');
+        
+        try {
+          // 清除本地数据中的分析结果
+          const report = this.data.report;
+          delete report.aiAnalysis;
+          delete report.aiAnalysisText;
+          delete report.aiRiskLevel;
+          delete report.aiSuggestion;
+          this.setData({ report });
+          
+          // 允许小程序界面更新
+          await new Promise(resolve => setTimeout(resolve, 100));
+        } catch (err) {
+          console.error('清除现有分析结果失败:', err);
+          // 继续执行，不影响后续流程
+        }
+      }
       
       // 获取用户ID
       const userId = wx.getStorageSync('OPENID');
@@ -350,7 +411,8 @@ Page({
       const params = {
         userId: userId,
         reportId: this.data.reportId,
-        reportContent: reportContent
+        reportContent: reportContent,
+        forceRefresh: true // 添加强制刷新标志
       };
       
       // 添加文件ID信息，让AI直接根据文件进行分析
@@ -438,9 +500,11 @@ Page({
       if (result && (result.code === 0 || result.code === 408)) {
         // 成功获取分析或使用备用分析
         if (result.code === 408) {
+          console.log('云函数超时，使用本地备用分析，数据:', result.data);
           // 如果是使用本地备份分析，需要保存到数据库
-          this._saveLocalAnalysisToReport(result.data);
+          await this._saveLocalAnalysisToReport(result.data);
         } else {
+          console.log('成功获取AI分析结果，重新加载报告详情');
           // 正常情况，重新加载报告以获取AI分析结果
           await this._loadReportDetail();
         }
@@ -476,16 +540,14 @@ Page({
     console.log('生成本地备用分析');
     const report = this.data.report;
     
-    // 生成风险评估
-    const riskLevel = 'low'; // 默认低风险
-    
+    // 直接返回对象格式的分析结果
     return {
       suggestion: `根据您在${report.reportDate}于${report.hospital}进行的${report.reportType}，建议您：
 1. 保持均衡饮食，增加蔬果摄入，减少高糖高脂食物
 2. 坚持适量运动，每周至少进行3次30分钟的有氧运动
 3. 保持良好作息，每晚保证7-8小时睡眠
 4. 定期体检，建立健康档案，追踪健康指标变化`,
-      riskLevel: riskLevel,
+      riskLevel: 'low',
       details: `# ${report.hospital}体检报告分析
 
 ## 体检基本信息
@@ -539,46 +601,43 @@ Page({
     if (!this.data.reportId || !analysisResult) return;
     
     try {
-      console.log('准备保存本地分析结果:', typeof analysisResult);
+      console.log('准备保存本地分析结果:', typeof analysisResult, analysisResult);
       
-      // 构建分析结果文本
-      let analysisText = '';
-      
-      // 如果是对象格式，需要转换为字符串
-      if (typeof analysisResult === 'object') {
-        console.log('检测到对象格式的分析结果，转换为文本');
-        // 使用详细分析作为文本内容
-        if (analysisResult.details) {
-          analysisText = analysisResult.details;
-        } else {
-          // 如果没有详细分析，使用建议和风险等级构建
-          const riskText = analysisResult.riskLevel === 'low' ? '低风险' : 
-                        analysisResult.riskLevel === 'medium' ? '中风险' : '高风险';
-          
-          analysisText = `# 体检报告AI分析\n\n## 风险等级\n${riskText}\n\n## 健康建议\n${analysisResult.suggestion || '未提供具体健康建议。'}`;
-        }
-      } else {
-        // 已经是字符串，直接使用
-        analysisText = analysisResult;
-      }
+      // 确保保存JSON格式的分析结果
+      let analysisToSave = typeof analysisResult === 'string' ? 
+        analysisResult : JSON.stringify(analysisResult);
       
       // 使用云函数保存结果
       const result = await cloudHelper.callCloudSumbit('medicalReport', {
         action: 'saveAnalysisResult',
         params: {
           reportId: this.data.reportId,
-          aiAnalysis: analysisText,
+          aiAnalysis: analysisToSave,
           aiAnalysisTime: new Date().getTime()
         }
       });
       
       if (result && result.code === 0) {
         console.log('本地分析结果保存成功');
-        // 更新本地数据
+        
+        // 更新本地数据 - 使用结构化对象更新
         const report = this.data.report;
-        report.aiAnalysis = analysisText;
+        report.aiAnalysis = analysisToSave;
         report.aiAnalysisTime = new Date().getTime();
-        this.setData({ report: report });
+        
+        // 提取分析文本
+        if (typeof analysisResult === 'object') {
+          report.aiAnalysisText = analysisResult.details || analysisResult.suggestion;
+          report.aiRiskLevel = analysisResult.riskLevel || 'low';
+          report.aiSuggestion = analysisResult.suggestion || '';
+        }
+        
+        this.setData({ 
+          report: report,
+          showAiResult: true 
+        });
+        
+        console.log('本地数据已更新，分析文本:', !!report.aiAnalysisText);
       } else {
         console.error('保存本地分析结果失败:', result);
       }

@@ -1,0 +1,2648 @@
+{
+  "replayResult": "passed",
+  "startTime": 1747141740723,
+  "endTime": 1747141789979,
+  "replayResults": [
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 0,
+      "status": "processing",
+      "command": {
+        "layer": "tool",
+        "commandType": "operate",
+        "command": "startRecord",
+        "waitfor": 0,
+        "timeStamp": 1747141674730,
+        "desc": ""
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 1,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "button",
+        "command": "touchstart",
+        "target": "button.upload-btn",
+        "value": null,
+        "path": "projects/A00/health/report/health_report",
+        "text": "上传体检报告",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 207.1875,
+              "clientY": 692.7396240234375,
+              "force": 1,
+              "pageX": 207.1875,
+              "pageY": 692.7396240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 382,
+              "screenY": 794.6666870117188
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 207.1875,
+              "clientY": 692.7396240234375,
+              "force": 1,
+              "pageX": 207.1875,
+              "pageY": 692.7396240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 382,
+              "screenY": 794.6666870117188
+            }
+          ]
+        },
+        "targetCandidates": [
+          "button.upload-btn",
+          ".upload-btn",
+          "/view/view[3]/button"
+        ],
+        "timeStamp": 3036,
+        "waitfor": 3036,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 9
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 2,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "button",
+        "command": "touchend",
+        "target": "button.upload-btn",
+        "value": null,
+        "path": "projects/A00/health/report/health_report",
+        "text": "上传体检报告",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 207.1875,
+              "clientY": 692.7396240234375,
+              "pageX": 207.1875,
+              "pageY": 692.7396240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 382,
+              "screenY": 794.6666870117188
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "button.upload-btn",
+          ".upload-btn",
+          "/view/view[3]/button"
+        ],
+        "timeStamp": 3119,
+        "waitfor": 83,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 9
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 3,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "button",
+        "command": "tap",
+        "target": "button.upload-btn",
+        "value": null,
+        "path": "projects/A00/health/report/health_report",
+        "text": "上传体检报告",
+        "eventData": {
+          "detail": {
+            "x": 207.1875,
+            "y": 692.7396240234375
+          },
+          "changedTouches": [
+            {
+              "clientX": 207.1875,
+              "clientY": 692.7396240234375,
+              "force": 1,
+              "pageX": 207.1875,
+              "pageY": 692.7396240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 382,
+              "screenY": 794.6666870117188
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 207.1875,
+              "clientY": 692.7396240234375,
+              "force": 1,
+              "pageX": 207.1875,
+              "pageY": 692.7396240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 382,
+              "screenY": 794.6666870117188
+            }
+          ]
+        },
+        "targetCandidates": [
+          "button.upload-btn",
+          ".upload-btn",
+          "/view/view[3]/button"
+        ],
+        "timeStamp": 3119,
+        "waitfor": 0,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 9
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 4,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "view",
+        "command": "touchstart",
+        "target": "/view/view[2]/view[2]",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "医院名称\n请输入医院名称",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 234.83331298828125,
+              "clientY": 152.89581298828125,
+              "force": 1,
+              "pageX": 234.83331298828125,
+              "pageY": 152.89581298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 404.66668701171875,
+              "screenY": 352
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 234.83331298828125,
+              "clientY": 152.89581298828125,
+              "force": 1,
+              "pageX": 234.83331298828125,
+              "pageY": 152.89581298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 404.66668701171875,
+              "screenY": 352
+            }
+          ]
+        },
+        "targetCandidates": [
+          "/view/view[2]/view[2]"
+        ],
+        "timeStamp": 4203,
+        "waitfor": 1084,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 5,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "view",
+        "command": "touchend",
+        "target": "/view/view[2]/view[2]",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "医院名称\n请输入医院名称",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 234.83331298828125,
+              "clientY": 152.89581298828125,
+              "pageX": 234.83331298828125,
+              "pageY": 152.89581298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 404.66668701171875,
+              "screenY": 352
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "/view/view[2]/view[2]"
+        ],
+        "timeStamp": 4288,
+        "waitfor": 85,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 6,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "view",
+        "command": "tap",
+        "target": "/view/view[2]/view[2]",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "医院名称\n请输入医院名称",
+        "eventData": {
+          "detail": {
+            "x": 234.83331298828125,
+            "y": 152.89581298828125
+          },
+          "changedTouches": [
+            {
+              "clientX": 234.83331298828125,
+              "clientY": 152.89581298828125,
+              "force": 1,
+              "pageX": 234.83331298828125,
+              "pageY": 152.89581298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 404.66668701171875,
+              "screenY": 352
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 234.83331298828125,
+              "clientY": 152.89581298828125,
+              "force": 1,
+              "pageX": 234.83331298828125,
+              "pageY": 152.89581298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 404.66668701171875,
+              "screenY": 352
+            }
+          ]
+        },
+        "targetCandidates": [
+          "/view/view[2]/view[2]"
+        ],
+        "timeStamp": 4289,
+        "waitfor": 1,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 7,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "input",
+        "command": "touchstart",
+        "target": "input.form-input",
+        "childName": "input",
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请输入医院名称",
+        "eventData": {
+          "detail": {}
+        },
+        "targetCandidates": [
+          "input.form-input",
+          "/view/view[2]/view[2]/input"
+        ],
+        "timeStamp": 5637,
+        "waitfor": 1348,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 8,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "input",
+        "command": "touchend",
+        "target": "input.form-input",
+        "childName": "input",
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请输入医院名称",
+        "eventData": {
+          "detail": {}
+        },
+        "targetCandidates": [
+          "input.form-input",
+          "/view/view[2]/view[2]/input"
+        ],
+        "timeStamp": 5638,
+        "waitfor": 1,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 9,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "input",
+        "command": "tap",
+        "target": "input.form-input",
+        "childName": "input",
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请输入医院名称",
+        "eventData": {
+          "detail": {
+            "x": 203.9375457763672,
+            "y": 139.8853759765625
+          }
+        },
+        "targetCandidates": [
+          "input.form-input",
+          "/view/view[2]/view[2]/input"
+        ],
+        "timeStamp": 5640,
+        "waitfor": 2,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 10,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "input",
+      "command": {
+        "tagName": "input",
+        "command": "input",
+        "target": "input.form-input",
+        "value": "市医院",
+        "childName": "input",
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "",
+        "eventData": {},
+        "targetCandidates": [
+          "input.form-input",
+          "/view/view[2]/view[2]/input"
+        ],
+        "timeStamp": 7322,
+        "waitfor": 1682,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 11,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "view",
+        "command": "touchstart",
+        "target": "/view/view[2]/view[3]/picker/view",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请选择报告类型",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 300.6874694824219,
+              "clientY": 204.11456298828125,
+              "force": 1,
+              "pageX": 300.6874694824219,
+              "pageY": 204.11456298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 458.66668701171875,
+              "screenY": 394
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 300.6874694824219,
+              "clientY": 204.11456298828125,
+              "force": 1,
+              "pageX": 300.6874694824219,
+              "pageY": 204.11456298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 458.66668701171875,
+              "screenY": 394
+            }
+          ]
+        },
+        "targetCandidates": [
+          "/view/view[2]/view[3]/picker/view"
+        ],
+        "timeStamp": 8025,
+        "waitfor": 703,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 12,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "view",
+        "command": "touchend",
+        "target": "/view/view[2]/view[3]/picker/view",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请选择报告类型",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 300.6874694824219,
+              "clientY": 204.11456298828125,
+              "pageX": 300.6874694824219,
+              "pageY": 204.11456298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 458.66668701171875,
+              "screenY": 394
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "/view/view[2]/view[3]/picker/view"
+        ],
+        "timeStamp": 8122,
+        "waitfor": 97,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 13,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "view",
+        "command": "tap",
+        "target": "/view/view[2]/view[3]/picker/view",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请选择报告类型",
+        "eventData": {
+          "detail": {
+            "x": 300.6874694824219,
+            "y": 204.11456298828125
+          },
+          "changedTouches": [
+            {
+              "clientX": 300.6874694824219,
+              "clientY": 204.11456298828125,
+              "force": 1,
+              "pageX": 300.6874694824219,
+              "pageY": 204.11456298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 458.66668701171875,
+              "screenY": 394
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 300.6874694824219,
+              "clientY": 204.11456298828125,
+              "force": 1,
+              "pageX": 300.6874694824219,
+              "pageY": 204.11456298828125,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 458.66668701171875,
+              "screenY": 394
+            }
+          ]
+        },
+        "targetCandidates": [
+          "/view/view[2]/view[3]/picker/view"
+        ],
+        "timeStamp": 8122,
+        "waitfor": 0,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 14,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "hidePickerView",
+      "command": {
+        "timeStamp": 8909,
+        "waitfor": 787,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "native",
+        "command": "hidePickerView",
+        "data": {
+          "value": "0"
+        },
+        "target": "/view/view[2]/view[3]/picker",
+        "useExparserEvent": true
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 15,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "textarea",
+        "command": "touchstart",
+        "target": "textarea.form-textarea",
+        "childName": "textarea",
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请输入报告概述或主要结论\na",
+        "eventData": {
+          "detail": {}
+        },
+        "targetCandidates": [
+          "textarea.form-textarea",
+          ".form-textarea",
+          "/view/view[2]/view[4]/textarea"
+        ],
+        "timeStamp": 9881,
+        "waitfor": 972,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 16,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "textarea",
+        "command": "touchend",
+        "target": "textarea.form-textarea",
+        "childName": "textarea",
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请输入报告概述或主要结论\na",
+        "eventData": {
+          "detail": {}
+        },
+        "targetCandidates": [
+          "textarea.form-textarea",
+          ".form-textarea",
+          "/view/view[2]/view[4]/textarea"
+        ],
+        "timeStamp": 9883,
+        "waitfor": 2,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 17,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "textarea",
+        "command": "tap",
+        "target": "textarea.form-textarea",
+        "childName": "textarea",
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请输入报告概述或主要结论\na",
+        "eventData": {
+          "detail": {
+            "x": 195,
+            "y": 300.05206298828125
+          }
+        },
+        "targetCandidates": [
+          "textarea.form-textarea",
+          ".form-textarea",
+          "/view/view[2]/view[4]/textarea"
+        ],
+        "timeStamp": 9884,
+        "waitfor": 1,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 18,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "change",
+      "command": {
+        "tagName": "picker",
+        "command": "change",
+        "target": "/view/view[2]/view[3]/picker",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "请选择报告类型",
+        "eventData": {
+          "detail": {
+            "value": "0"
+          },
+          "changedTouches": [],
+          "touches": []
+        },
+        "targetCandidates": [
+          "/view/view[2]/view[3]/picker"
+        ],
+        "timeStamp": 9912,
+        "waitfor": 28,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 19,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "input",
+      "command": {
+        "tagName": "textarea",
+        "command": "input",
+        "target": "textarea.form-textarea",
+        "value": "test",
+        "childName": "textarea",
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "test",
+        "eventData": {},
+        "targetCandidates": [
+          "textarea.form-textarea",
+          ".form-textarea",
+          "/view/view[2]/view[4]/textarea"
+        ],
+        "timeStamp": 12509,
+        "waitfor": 2597,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 20,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "view",
+        "command": "touchstart",
+        "target": "view.upload-placeholder",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "+\n点击上传PDF/图片文件",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 236.45834350585938,
+              "clientY": 526.0729370117188,
+              "force": 1,
+              "pageX": 236.45834350585938,
+              "pageY": 526.0729370117188,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 406,
+              "screenY": 658
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 236.45834350585938,
+              "clientY": 526.0729370117188,
+              "force": 1,
+              "pageX": 236.45834350585938,
+              "pageY": 526.0729370117188,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 406,
+              "screenY": 658
+            }
+          ]
+        },
+        "targetCandidates": [
+          "view.upload-placeholder",
+          ".upload-placeholder",
+          "/view/view[2]/view[6]/view[2]/view"
+        ],
+        "timeStamp": 13602,
+        "waitfor": 1093,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 21,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "view",
+        "command": "touchend",
+        "target": "view.upload-placeholder",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "+\n点击上传PDF/图片文件",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 236.45834350585938,
+              "clientY": 526.0729370117188,
+              "pageX": 236.45834350585938,
+              "pageY": 526.0729370117188,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 406,
+              "screenY": 658
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "view.upload-placeholder",
+          ".upload-placeholder",
+          "/view/view[2]/view[6]/view[2]/view"
+        ],
+        "timeStamp": 13700,
+        "waitfor": 98,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 22,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "view",
+        "command": "tap",
+        "target": "view.upload-placeholder",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "+\n点击上传PDF/图片文件",
+        "eventData": {
+          "detail": {
+            "x": 236.45834350585938,
+            "y": 526.0729370117188
+          },
+          "changedTouches": [
+            {
+              "clientX": 236.45834350585938,
+              "clientY": 526.0729370117188,
+              "force": 1,
+              "pageX": 236.45834350585938,
+              "pageY": 526.0729370117188,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 406,
+              "screenY": 658
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 236.45834350585938,
+              "clientY": 526.0729370117188,
+              "force": 1,
+              "pageX": 236.45834350585938,
+              "pageY": 526.0729370117188,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 406,
+              "screenY": 658
+            }
+          ]
+        },
+        "targetCandidates": [
+          "view.upload-placeholder",
+          ".upload-placeholder",
+          "/view/view[2]/view[6]/view[2]/view"
+        ],
+        "timeStamp": 13701,
+        "waitfor": 1,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 23,
+      "replayResult": "passed",
+      "command": {
+        "layer": "appservice",
+        "command": "mock",
+        "rule": {
+          "ruleId": "d45add74-9ee4-47ca-9ec4-a10f7446dd31",
+          "ruleName": "chooseMessageFile",
+          "apiName": "chooseMessageFile",
+          "enable": true,
+          "verifyFail": false,
+          "isOneTime": true,
+          "filterList": [],
+          "returnConfig": {
+            "returnType": "succ",
+            "generateType": "manual",
+            "manual": {
+              "succ": {
+                "resStr": "{\"errMsg\":\"chooseMessageFile:ok\",\"tempFiles\":[{\"name\":\"图片2.png\",\"size\":19505,\"time\":1747140107,\"path\":\"http://tmp/r4ne6U8Fz5AJe2f5cf619808abc1a1230b372739342f.png\",\"type\":\"image\"}]}"
+              },
+              "fail": {
+                "resStr": ""
+              }
+            }
+          },
+          "originArgs": [
+            {
+              "count": 1,
+              "type": "file",
+              "extension": [
+                "pdf",
+                "jpg",
+                "jpeg",
+                "png"
+              ]
+            }
+          ],
+          "mediaFiles": {
+            "http://tmp/r4ne6U8Fz5AJe2f5cf619808abc1a1230b372739342f.png": "r4ne6U8Fz5AJe2f5cf619808abc1a1230b372739342f.png"
+          }
+        },
+        "desc": ""
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 24,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "view",
+        "command": "touchstart",
+        "target": "view.close-btn",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "×",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 358.40625,
+              "clientY": 30.1353759765625,
+              "force": 1,
+              "pageX": 358.40625,
+              "pageY": 30.1353759765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 506,
+              "screenY": 251.33334350585938
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 358.40625,
+              "clientY": 30.1353759765625,
+              "force": 1,
+              "pageX": 358.40625,
+              "pageY": 30.1353759765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 506,
+              "screenY": 251.33334350585938
+            }
+          ]
+        },
+        "targetCandidates": [
+          "view.close-btn",
+          ".close-btn",
+          "/view[2]/view[1]/view"
+        ],
+        "timeStamp": 19632,
+        "waitfor": 5931,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 25,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "view",
+        "command": "touchend",
+        "target": "view.close-btn",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "×",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 358.40625,
+              "clientY": 30.1353759765625,
+              "pageX": 358.40625,
+              "pageY": 30.1353759765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 506,
+              "screenY": 251.33334350585938
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "view.close-btn",
+          ".close-btn",
+          "/view[2]/view[1]/view"
+        ],
+        "timeStamp": 19735,
+        "waitfor": 103,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 26,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "view",
+        "command": "tap",
+        "target": "view.close-btn",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "×",
+        "eventData": {
+          "detail": {
+            "x": 358.40625,
+            "y": 30.1353759765625
+          },
+          "changedTouches": [
+            {
+              "clientX": 358.40625,
+              "clientY": 30.1353759765625,
+              "force": 1,
+              "pageX": 358.40625,
+              "pageY": 30.1353759765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 506,
+              "screenY": 251.33334350585938
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 358.40625,
+              "clientY": 30.1353759765625,
+              "force": 1,
+              "pageX": 358.40625,
+              "pageY": 30.1353759765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 506,
+              "screenY": 251.33334350585938
+            }
+          ]
+        },
+        "targetCandidates": [
+          "view.close-btn",
+          ".close-btn",
+          "/view[2]/view[1]/view"
+        ],
+        "timeStamp": 19735,
+        "waitfor": 0,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 27,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "button",
+        "command": "touchstart",
+        "target": "button.btn-submit",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "提交",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 99.06251525878906,
+              "clientY": 694.3646240234375,
+              "force": 1,
+              "pageX": 99.06251525878906,
+              "pageY": 694.3646240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 293.3333435058594,
+              "screenY": 796
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 99.06251525878906,
+              "clientY": 694.3646240234375,
+              "force": 1,
+              "pageX": 99.06251525878906,
+              "pageY": 694.3646240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 293.3333435058594,
+              "screenY": 796
+            }
+          ]
+        },
+        "targetCandidates": [
+          "button.btn-submit",
+          ".btn-submit",
+          "/view/view[3]/button"
+        ],
+        "timeStamp": 20402,
+        "waitfor": 667,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 28,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "button",
+        "command": "touchend",
+        "target": "button.btn-submit",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "提交",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 99.06251525878906,
+              "clientY": 694.3646240234375,
+              "pageX": 99.06251525878906,
+              "pageY": 694.3646240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 293.3333435058594,
+              "screenY": 796
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "button.btn-submit",
+          ".btn-submit",
+          "/view/view[3]/button"
+        ],
+        "timeStamp": 20494,
+        "waitfor": 92,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 29,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "button",
+        "command": "tap",
+        "target": "button.btn-submit",
+        "value": null,
+        "path": "projects/A00/health/report/report_upload/report_upload",
+        "text": "提交",
+        "eventData": {
+          "detail": {
+            "x": 99.06251525878906,
+            "y": 694.3646240234375
+          },
+          "changedTouches": [
+            {
+              "clientX": 99.06251525878906,
+              "clientY": 694.3646240234375,
+              "force": 1,
+              "pageX": 99.06251525878906,
+              "pageY": 694.3646240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 293.3333435058594,
+              "screenY": 796
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 99.06251525878906,
+              "clientY": 694.3646240234375,
+              "force": 1,
+              "pageX": 99.06251525878906,
+              "pageY": 694.3646240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 293.3333435058594,
+              "screenY": 796
+            }
+          ]
+        },
+        "targetCandidates": [
+          "button.btn-submit",
+          ".btn-submit",
+          "/view/view[3]/button"
+        ],
+        "timeStamp": 20495,
+        "waitfor": 1,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 10
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 30,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "confirmModal",
+      "command": {
+        "timeStamp": 21775,
+        "waitfor": 1280,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "native",
+        "command": "confirmModal",
+        "text": "立即分析",
+        "useExparserEvent": true
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 31,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "view",
+        "command": "touchstart",
+        "target": "/view/view[3]/view[2]/view[1]",
+        "value": null,
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "📝\n报告摘要",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 330.77081298828125,
+              "clientY": 402.4896240234375,
+              "force": 1,
+              "pageX": 330.77081298828125,
+              "pageY": 402.4896240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 483.3333435058594,
+              "screenY": 556.6666870117188
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 330.77081298828125,
+              "clientY": 402.4896240234375,
+              "force": 1,
+              "pageX": 330.77081298828125,
+              "pageY": 402.4896240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 483.3333435058594,
+              "screenY": 556.6666870117188
+            }
+          ]
+        },
+        "targetCandidates": [
+          "/view/view[3]/view[2]/view[1]"
+        ],
+        "timeStamp": 33018,
+        "waitfor": 10000,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 32,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "view",
+        "command": "touchend",
+        "target": "/view/view[3]/view[2]/view[1]",
+        "value": null,
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "📝\n报告摘要",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 331.17889404296875,
+              "clientY": 402.16259765625,
+              "pageX": 331.17889404296875,
+              "pageY": 402.16259765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 484,
+              "screenY": 556.6666870117188
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "/view/view[3]/view[2]/view[1]"
+        ],
+        "timeStamp": 33138,
+        "waitfor": 120,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 33,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "view",
+        "command": "tap",
+        "target": "/view/view[3]/view[2]/view[1]",
+        "value": null,
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "📝\n报告摘要",
+        "eventData": {
+          "detail": {
+            "x": 331.17889404296875,
+            "y": 402.16259765625
+          },
+          "changedTouches": [
+            {
+              "clientX": 330.77081298828125,
+              "clientY": 402.4896240234375,
+              "force": 1,
+              "pageX": 330.77081298828125,
+              "pageY": 402.4896240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 483.3333435058594,
+              "screenY": 556.6666870117188
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 330.77081298828125,
+              "clientY": 402.4896240234375,
+              "force": 1,
+              "pageX": 330.77081298828125,
+              "pageY": 402.4896240234375,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 483.3333435058594,
+              "screenY": 556.6666870117188
+            }
+          ]
+        },
+        "targetCandidates": [
+          "/view/view[3]/view[2]/view[1]"
+        ],
+        "timeStamp": 33139,
+        "waitfor": 1,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 34,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 365.8536682128906,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 33631,
+        "waitfor": 492,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 35,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 487.8049011230469,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 34348,
+        "waitfor": 717,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 36,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 609.756103515625,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 34615,
+        "waitfor": 267,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 37,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 731.7073364257812,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 34813,
+        "waitfor": 198,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 38,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 853.6586303710938,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 34997,
+        "waitfor": 184,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 39,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 975.60986328125,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 35729,
+        "waitfor": 732,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 40,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 1097.5611572265625,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 35880,
+        "waitfor": 151,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 41,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 1128.6666259765625,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 36063,
+        "waitfor": 183,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 42,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 884.76416015625,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 36813,
+        "waitfor": 750,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 43,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 762.8129272460938,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 36996,
+        "waitfor": 183,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 44,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 640.8616943359375,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 37163,
+        "waitfor": 167,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 45,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 518.9104614257812,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 37313,
+        "waitfor": 150,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 46,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 396.9592590332031,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 37930,
+        "waitfor": 617,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 47,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 275.008056640625,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 38113,
+        "waitfor": 183,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 48,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 153.0568389892578,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 38429,
+        "waitfor": 316,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 49,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "text",
+        "command": "touchstart",
+        "target": "text.toggle-icon",
+        "value": null,
+        "childName": "main",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "收起",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 351.0937194824219,
+              "clientY": 360.21881103515625,
+              "force": 1,
+              "pageX": 351.0937194824219,
+              "pageY": 513.275634765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500,
+              "screenY": 522
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 351.0937194824219,
+              "clientY": 360.21881103515625,
+              "force": 1,
+              "pageX": 351.0937194824219,
+              "pageY": 513.275634765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500,
+              "screenY": 522
+            }
+          ]
+        },
+        "targetCandidates": [
+          "text.toggle-icon",
+          ".toggle-icon",
+          "/view/view[3]/view[3]/view[1]/text"
+        ],
+        "timeStamp": 39031,
+        "waitfor": 602,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 50,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "text",
+        "command": "touchend",
+        "target": "text.toggle-icon",
+        "value": null,
+        "childName": "main",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "收起",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 350.6911315917969,
+              "clientY": 360.69927978515625,
+              "pageX": 350.6911315917969,
+              "pageY": 513.756103515625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500,
+              "screenY": 522.6666870117188
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "text.toggle-icon",
+          ".toggle-icon",
+          "/view/view[3]/view[3]/view[1]/text"
+        ],
+        "timeStamp": 39140,
+        "waitfor": 109,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 51,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "text",
+        "command": "tap",
+        "target": "text.toggle-icon",
+        "value": null,
+        "childName": "main",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "收起",
+        "eventData": {
+          "detail": {
+            "x": 350.6911315917969,
+            "y": 513.756103515625
+          },
+          "changedTouches": [
+            {
+              "clientX": 351.0937194824219,
+              "clientY": 360.21881103515625,
+              "force": 1,
+              "pageX": 351.0937194824219,
+              "pageY": 513.275634765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500,
+              "screenY": 522
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 351.0937194824219,
+              "clientY": 360.21881103515625,
+              "force": 1,
+              "pageX": 351.0937194824219,
+              "pageY": 513.275634765625,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500,
+              "screenY": 522
+            }
+          ]
+        },
+        "targetCandidates": [
+          "text.toggle-icon",
+          ".toggle-icon",
+          "/view/view[3]/view[3]/view[1]/text"
+        ],
+        "timeStamp": 39454,
+        "waitfor": 314,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 52,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 0,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 39930,
+        "waitfor": 476,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 53,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "text",
+        "command": "touchstart",
+        "target": "/view/view[3]/view[1]/view[4]/text[2]",
+        "value": null,
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "市医院",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 335.6458435058594,
+              "clientY": 356.9583435058594,
+              "force": 1,
+              "pageX": 335.6458435058594,
+              "pageY": 356.9583435058594,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 487.3333435058594,
+              "screenY": 519.3333740234375
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 335.6458435058594,
+              "clientY": 356.9583435058594,
+              "force": 1,
+              "pageX": 335.6458435058594,
+              "pageY": 356.9583435058594,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 487.3333435058594,
+              "screenY": 519.3333740234375
+            }
+          ]
+        },
+        "targetCandidates": [
+          "/view/view[3]/view[1]/view[4]/text[2]"
+        ],
+        "timeStamp": 39941,
+        "waitfor": 11,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 54,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "text",
+        "command": "touchend",
+        "target": "/view/view[3]/view[1]/view[4]/text[2]",
+        "value": null,
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "市医院",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 335.6458435058594,
+              "clientY": 356.9583435058594,
+              "pageX": 335.6458435058594,
+              "pageY": 356.9583435058594,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 487.3333435058594,
+              "screenY": 519.3333740234375
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "/view/view[3]/view[1]/view[4]/text[2]"
+        ],
+        "timeStamp": 40023,
+        "waitfor": 82,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 55,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "text",
+        "command": "tap",
+        "target": "/view/view[3]/view[1]/view[4]/text[2]",
+        "value": null,
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "市医院",
+        "eventData": {
+          "detail": {
+            "x": 335.6458435058594,
+            "y": 356.9583435058594
+          },
+          "changedTouches": [
+            {
+              "clientX": 335.6458435058594,
+              "clientY": 356.9583435058594,
+              "force": 1,
+              "pageX": 335.6458435058594,
+              "pageY": 356.9583435058594,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 487.3333435058594,
+              "screenY": 519.3333740234375
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 335.6458435058594,
+              "clientY": 356.9583435058594,
+              "force": 1,
+              "pageX": 335.6458435058594,
+              "pageY": 356.9583435058594,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 487.3333435058594,
+              "screenY": 519.3333740234375
+            }
+          ]
+        },
+        "targetCandidates": [
+          "/view/view[3]/view[1]/view[4]/text[2]"
+        ],
+        "timeStamp": 40025,
+        "waitfor": 2,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 56,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "text",
+        "command": "touchstart",
+        "target": "text.toggle-icon",
+        "value": null,
+        "childName": "main",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "展开",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 351.90625,
+              "clientY": 551.2709350585938,
+              "force": 1,
+              "pageX": 351.90625,
+              "pageY": 551.2709350585938,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500.66668701171875,
+              "screenY": 678.6666870117188
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 351.90625,
+              "clientY": 551.2709350585938,
+              "force": 1,
+              "pageX": 351.90625,
+              "pageY": 551.2709350585938,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500.66668701171875,
+              "screenY": 678.6666870117188
+            }
+          ]
+        },
+        "targetCandidates": [
+          "text.toggle-icon",
+          ".toggle-icon",
+          "/view/view[3]/view[3]/view[1]/text"
+        ],
+        "timeStamp": 40730,
+        "waitfor": 705,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 57,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "text",
+        "command": "touchend",
+        "target": "text.toggle-icon",
+        "value": null,
+        "childName": "main",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "展开",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 351.90625,
+              "clientY": 551.2709350585938,
+              "pageX": 351.90625,
+              "pageY": 551.2709350585938,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500.66668701171875,
+              "screenY": 678.6666870117188
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "text.toggle-icon",
+          ".toggle-icon",
+          "/view/view[3]/view[3]/view[1]/text"
+        ],
+        "timeStamp": 40815,
+        "waitfor": 85,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 58,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "text",
+        "command": "tap",
+        "target": "text.toggle-icon",
+        "value": null,
+        "childName": "main",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "展开",
+        "eventData": {
+          "detail": {
+            "x": 351.90625,
+            "y": 551.2709350585938
+          },
+          "changedTouches": [
+            {
+              "clientX": 351.90625,
+              "clientY": 551.2709350585938,
+              "force": 1,
+              "pageX": 351.90625,
+              "pageY": 551.2709350585938,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500.66668701171875,
+              "screenY": 678.6666870117188
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 351.90625,
+              "clientY": 551.2709350585938,
+              "force": 1,
+              "pageX": 351.90625,
+              "pageY": 551.2709350585938,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 500.66668701171875,
+              "screenY": 678.6666870117188
+            }
+          ]
+        },
+        "targetCandidates": [
+          "text.toggle-icon",
+          ".toggle-icon",
+          "/view/view[3]/view[3]/view[1]/text"
+        ],
+        "timeStamp": 40819,
+        "waitfor": 4,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 59,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 853.6586303710938,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 41780,
+        "waitfor": 961,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 60,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 1128.6666259765625,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 42129,
+        "waitfor": 349,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 61,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchstart",
+      "command": {
+        "tagName": "button",
+        "command": "touchstart",
+        "target": "button.btn-primary",
+        "value": null,
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "查看原始报告",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 92.55208587646484,
+              "clientY": 713.0625,
+              "force": 1,
+              "pageX": 92.55208587646484,
+              "pageY": 1841.729248046875,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 288,
+              "screenY": 811.3333740234375
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 92.55208587646484,
+              "clientY": 713.0625,
+              "force": 1,
+              "pageX": 92.55208587646484,
+              "pageY": 1841.729248046875,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 288,
+              "screenY": 811.3333740234375
+            }
+          ]
+        },
+        "targetCandidates": [
+          "button.btn-primary",
+          ".btn-primary",
+          "/view/view[4]/button[1]"
+        ],
+        "timeStamp": 42610,
+        "waitfor": 481,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 62,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "touchend",
+      "command": {
+        "tagName": "button",
+        "command": "touchend",
+        "target": "button.btn-primary",
+        "value": null,
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "查看原始报告",
+        "eventData": {
+          "detail": {},
+          "changedTouches": [
+            {
+              "clientX": 92.55208587646484,
+              "clientY": 713.0625,
+              "pageX": 92.55208587646484,
+              "pageY": 1841.729248046875,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 288,
+              "screenY": 811.3333740234375
+            }
+          ],
+          "touches": []
+        },
+        "targetCandidates": [
+          "button.btn-primary",
+          ".btn-primary",
+          "/view/view[4]/button[1]"
+        ],
+        "timeStamp": 42698,
+        "waitfor": 88,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 63,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "tap",
+      "command": {
+        "tagName": "button",
+        "command": "tap",
+        "target": "button.btn-primary",
+        "value": null,
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "text": "查看原始报告",
+        "eventData": {
+          "detail": {
+            "x": 92.55208587646484,
+            "y": 1841.729248046875
+          },
+          "changedTouches": [
+            {
+              "clientX": 92.55208587646484,
+              "clientY": 713.0625,
+              "force": 1,
+              "pageX": 92.55208587646484,
+              "pageY": 1841.729248046875,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 288,
+              "screenY": 811.3333740234375
+            }
+          ],
+          "touches": [
+            {
+              "clientX": 92.55208587646484,
+              "clientY": 713.0625,
+              "force": 1,
+              "pageX": 92.55208587646484,
+              "pageY": 1841.729248046875,
+              "radiusX": 11.5,
+              "radiusY": 11.5,
+              "screenX": 288,
+              "screenY": 811.3333740234375
+            }
+          ]
+        },
+        "targetCandidates": [
+          "button.btn-primary",
+          ".btn-primary",
+          "/view/view[4]/button[1]"
+        ],
+        "timeStamp": 42915,
+        "waitfor": 217,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 64,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 396.9592590332031,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 45845,
+        "waitfor": 2930,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 65,
+      "status": "processing",
+      "replayResult": "passed",
+      "commandName": "scroll",
+      "command": {
+        "tagName": "",
+        "command": "scroll",
+        "target": "/",
+        "path": "projects/A00/health/report/report_detail/report_detail",
+        "eventData": {
+          "scrollDetail": {
+            "scrollTop": 0,
+            "scrollLeft": 0
+          }
+        },
+        "targetCandidates": [],
+        "timeStamp": 46095,
+        "waitfor": 250,
+        "desc": "",
+        "commandType": "operate",
+        "layer": "pageframe",
+        "useExparserEvent": true,
+        "pageId": 12
+      }
+    },
+    {
+      "caseId": "9e591a6c-bd17-4181-a801-22001afabd3c",
+      "commandIndex": 66,
+      "status": "processing",
+      "command": {
+        "timeStamp": 47122,
+        "waitfor": 1027,
+        "desc": "",
+        "layer": "tool",
+        "commandType": "operate",
+        "command": "stopRecord"
+      }
+    }
+  ]
+}
