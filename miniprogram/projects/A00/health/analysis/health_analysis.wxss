@@ -173,6 +173,67 @@
   flex: 1;
 }
 
+/* AI健康建议卡片 */
+.ai-suggestion-card {
+  border: 1rpx solid rgba(78, 141, 247, 0.3);
+  background-color: rgba(78, 141, 247, 0.02);
+}
+
+.ai-suggestion-card .card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 0;
+}
+
+.ai-suggestion-card .card-title::before {
+  display: none;
+}
+
+.title-with-icon {
+  display: flex;
+  align-items: center;
+}
+
+.ai-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 12rpx;
+  border-radius: 50%;
+}
+
+.refresh-btn {
+  background-color: #4e8df7;
+  color: #fff;
+  padding: 6rpx 20rpx;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  font-weight: normal;
+}
+
+.refresh-btn.loading {
+  background-color: #ccc;
+}
+
+.ai-suggestion-content {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  padding: 10rpx 0;
+  text-align: justify;
+}
+
+.ai-suggestion-footer {
+  margin-top: 20rpx;
+  text-align: right;
+}
+
+.ask-more {
+  font-size: 26rpx;
+  color: #4e8df7;
+  display: inline-block;
+}
+
 /* 过滤器 */
 .filter-title {
   font-size: 28rpx;

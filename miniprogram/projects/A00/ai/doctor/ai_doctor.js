@@ -15,6 +15,17 @@ Page({
   onLoad: function (options) {
     // 初始化聊天列表
     this.initChatList();
+    
+    // 如果有初始问题，自动发送
+    if (options.initialQuestion) {
+      // 延迟一下，确保欢迎消息已显示
+      setTimeout(() => {
+        const initialQuestion = decodeURIComponent(options.initialQuestion);
+        this.setData({ inputContent: initialQuestion }, () => {
+          this.sendMessage();
+        });
+      }, 500);
+    }
   },
 
   // 初始化聊天列表
