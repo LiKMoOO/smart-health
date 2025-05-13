@@ -398,34 +398,32 @@ module.exports = Behavior({
         
         if (result && result.code === 0) {
           console.log('[onSubmit] 云函数返回成功，result.code === 0');
-          pageHelper.showSuccToast('上传成功');
           
-          // 成功后询问是否要进行AI分析
+          // 修改AI分析流程，简化用户操作
           wx.showModal({
             title: '上传成功',
-            content: '是否需要对报告进行AI智能分析？',
-            confirmText: '进行分析',
+            content: '是否对报告进行AI智能分析？',
+            confirmText: '立即分析',
             cancelText: '暂不需要',
             success: res => {
-              console.log('[onSubmit] AI分析弹窗选择结果:', res);
               if (res.confirm) {
-                console.log('[onSubmit] 用户选择进行AI分析，跳转到详情页，reportId:', result.data.reportId);
+                console.log('[onSubmit] 用户选择进行AI分析，跳转到详情页');
+                // 跳转到详情页并自动触发分析
                 wx.navigateTo({
                   url: `/projects/A00/health/report/report_detail/report_detail?id=${result.data.reportId}&analyze=true`
                 });
               } else {
-                console.log('[onSubmit] 用户选择暂不进行AI分析，返回上一页');
-                setTimeout(() => wx.navigateBack(), 1000);
+                console.log('[onSubmit] 用户选择暂不进行AI分析，跳转到详情页');
+                // 跳转到详情页但不自动触发分析
+                wx.navigateTo({
+                  url: `/projects/A00/health/report/report_detail/report_detail?id=${result.data.reportId}`
+                });
               }
-            },
-            fail: (err) => {
-              console.error('[onSubmit] AI分析弹窗显示失败:', err);
-              setTimeout(() => wx.navigateBack(), 1000); // 即使弹窗失败也尝试返回
             }
           });
         } else {
           console.error('[onSubmit] 云函数返回失败或result.code !== 0，显示上传失败提示。Result:', result);
-          pageHelper.showModal( (result && result.msg) || '上传失败，请检查网络或联系管理员');
+          pageHelper.showModal((result && result.msg) || '上传失败，请检查网络或联系管理员');
         }
       } catch (err) {
         wx.hideLoading();

@@ -1,8 +1,13 @@
 {
   "permissions": {
     "openapi": [
+      "cloud.callFunction",
+      "wxacode.get",
+      "wxacode.getUnlimited",
       "ocr.printedText"
     ]
   },
-  "timeout": 20
+  "timeout": 60,
+  "memorySize": 512,
+  "triggers": []
 } 

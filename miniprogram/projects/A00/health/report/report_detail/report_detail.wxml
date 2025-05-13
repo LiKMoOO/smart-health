@@ -56,26 +56,21 @@
           <text class="toggle-icon">{{showAiResult ? '收起' : '展开'}}</text>
         </view>
         <view class="ai-content {{showAiResult ? 'show' : ''}}">
-          <view class="ai-header">
-            <view class="ai-risk">
-              <text class="risk-label">健康风险：</text>
-              <text class="risk-value {{report.aiAnalysis.riskLevel === '低' ? 'low' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'high')}}">
-                {{report.aiAnalysis.riskLevel || '未知'}}
-              </text>
-            </view>
-            <view class="ai-time" wx:if="{{report.aiAnalysisTime}}">
+          <view class="ai-header" wx:if="{{report.aiAnalysisTime}}">
+            <view class="ai-time">
               分析时间：{{formatDate(report.aiAnalysisTime)}}
             </view>
           </view>
           
-          <view class="ai-suggestion">
-            <view class="suggestion-title">健康建议</view>
-            <view class="suggestion-content">{{report.aiAnalysis.suggestion || '暂无健康建议'}}</view>
+          <view class="risk-level">
+            <view class="risk-label">健康风险评级：</view>
+            <view class="risk-value {{report.aiAnalysis.indexOf('高风险') >= 0 ? 'high' : (report.aiAnalysis.indexOf('中风险') >= 0 ? 'medium' : 'low')}}">
+              {{report.aiAnalysis.indexOf('高风险') >= 0 ? '高' : (report.aiAnalysis.indexOf('中风险') >= 0 ? '中' : '低')}}
+            </view>
           </view>
           
-          <view class="ai-details">
-            <view class="details-title">详细分析</view>
-            <view class="details-content">{{report.aiAnalysis.details || '暂无详细分析'}}</view>
+          <view class="ai-markdown">
+            <text user-select decode>{{report.aiAnalysis}}</text>
           </view>
         </view>
       </view>
@@ -128,35 +123,5 @@
   <view wx:elif="{{isLoad && !report}}" class="no-data">
     <image class="icon-empty" src="/projects/A00/skin/images/icon/empty.png"></image>
     <view class="hint">报告不存在或已被删除</view>
-  </view>
-
-  <!-- AI分析结果弹窗 -->
-  <view class="modal" wx:if="{{showAiResult && report.aiAnalysis}}">
-    <view class="modal-mask" bindtap="bindCloseAiResult"></view>
-    <view class="modal-content">
-      <view class="modal-header">
-        <view class="modal-title">AI 健康分析报告</view>
-        <view class="modal-close" bindtap="bindCloseAiResult">×</view>
-      </view>
-      <view class="modal-body">
-        <view class="ai-result-section">
-          <view class="ai-result-title">健康建议</view>
-          <view class="ai-result-content">{{report.aiAnalysis.suggestion}}</view>
-        </view>
-        <view class="ai-result-section">
-          <view class="ai-result-title">健康风险</view>
-          <view class="ai-result-content">
-            <text class="ai-risk-level {{report.aiAnalysis.riskLevel === '高' ? 'high' : (report.aiAnalysis.riskLevel === '中' ? 'medium' : 'low')}}">{{report.aiAnalysis.riskLevel}}</text>
-          </view>
-        </view>
-        <view class="ai-result-section">
-          <view class="ai-result-title">详细分析</view>
-          <view class="ai-result-content ai-details">{{report.aiAnalysis.details}}</view>
-        </view>
-      </view>
-      <view class="modal-footer">
-        <button class="btn-close" bindtap="bindCloseAiResult">关闭</button>
-      </view>
-    </view>
   </view>
 </view> 

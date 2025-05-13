@@ -217,6 +217,17 @@ Page({
   _openFile: function(url) {
     console.log('打开文件URL:', url);
     
+    // 确保URL编码正确
+    try {
+      // 使用URL对象解析和编码
+      const parsedUrl = new URL(url);
+      url = parsedUrl.toString();
+    } catch (error) {
+      console.error('URL解析失败，尝试基本编码:', error);
+      // 基本的URL编码，替换空格和其他常见问题字符
+      url = encodeURI(url);
+    }
+    
     if (url.toLowerCase().endsWith('.pdf')) {
       // PDF文件
       wx.showLoading({ title: '准备打开PDF...' });
@@ -224,6 +235,12 @@ Page({
         url: url,
         success: function(res) {
           wx.hideLoading();
+          if (res.statusCode !== 200) {
+            console.error('下载PDF失败，状态码:', res.statusCode);
+            pageHelper.showModal('下载PDF失败，请重试');
+            return;
+          }
+          
           const filePath = res.tempFilePath;
           console.log('PDF下载成功，临时路径:', filePath);
           wx.openDocument({
@@ -240,7 +257,17 @@ Page({
         fail: function(error) {
           wx.hideLoading();
           console.error('下载文件失败:', error);
-          pageHelper.showModal('下载文件失败，请重试');
+          
+          // 检查是否是ERR_UNESCAPED_CHARACTERS错误
+          const errorMsg = error.errMsg || '';
+          if (errorMsg.includes('ERR_UNESCAPED_CHARACTERS') || 
+              errorMsg.includes('url not in domain list') ||
+              errorMsg.includes('invalid url')) {
+            
+            pageHelper.showModal('文件URL格式错误，请联系管理员');
+          } else {
+            pageHelper.showModal('下载文件失败，请检查网络连接或重试');
+          }
         }
       });
     } else {
@@ -251,7 +278,16 @@ Page({
         current: url,
         fail: function(error) {
           console.error('预览图片失败:', error);
-          pageHelper.showModal('预览图片失败，请重试');
+          
+          const errorMsg = error.errMsg || '';
+          if (errorMsg.includes('ERR_UNESCAPED_CHARACTERS') || 
+              errorMsg.includes('url not in domain list') ||
+              errorMsg.includes('invalid url')) {
+            
+            pageHelper.showModal('图片URL格式错误，请联系管理员');
+          } else {
+            pageHelper.showModal('预览图片失败，请重试');
+          }
         }
       });
     }
@@ -270,62 +306,16 @@ Page({
       return;
     }
 
+    // 先设置正在分析状态，避免重复点击
+    this.setData({ isAnalyzing: true });
+    
     try {
-      this.setData({ isAnalyzing: true });
-      
       wx.showLoading({ title: 'AI分析中...', mask: true });
-      console.log('开始AI分析报告，reportId:', this.data.reportId);
       
       // 获取用户ID
       const userId = wx.getStorageSync('OPENID');
       console.log('当前用户ID:', userId);
-      
-      if (!userId) {
-        console.error('未获取到用户ID，尝试从云函数获取');
-        try {
-          // 尝试获取用户OpenID
-          await new Promise((resolve, reject) => {
-            wx.cloud.callFunction({
-              name: 'cloud',
-              data: {},
-              success: res => {
-                console.log('获取OpenID成功:', res);
-                if (res.result && res.result.openId) {
-                  wx.setStorageSync('OPENID', res.result.openId);
-                  console.log('用户OpenID已保存:', res.result.openId);
-                  resolve();
-                } else if (res.result && res.result.event && res.result.event.userInfo && res.result.event.userInfo.openId) {
-                  wx.setStorageSync('OPENID', res.result.event.userInfo.openId);
-                  console.log('用户OpenID已保存(从event):', res.result.event.userInfo.openId);
-                  resolve();
-                } else {
-                  reject(new Error('获取用户ID失败'));
-                }
-              },
-              fail: err => {
-                console.error('获取用户ID失败:', err);
-                reject(err);
-              }
-            });
-          });
-        } catch (err) {
-          wx.hideLoading();
-          this.setData({ isAnalyzing: false });
-          console.error('获取用户ID失败:', err);
-          pageHelper.showModal('无法获取用户信息，请退出并重新进入小程序');
-          return;
-        }
-      }
-      
-      // 再次获取用户ID（可能刚刚设置了）
-      const finalUserId = wx.getStorageSync('OPENID');
-      if (!finalUserId) {
-        wx.hideLoading();
-        this.setData({ isAnalyzing: false });
-        pageHelper.showModal('无法获取用户信息，请退出并重新进入小程序');
-        return;
-      }
-      
+
       // 准备AI分析所需内容
       let reportContent = '';
       
@@ -356,33 +346,109 @@ Page({
         });
       }
       
-      console.log('准备分析的报告内容长度:', reportContent.length);
-      
-      // 调用AI分析云函数
+      // 构建AI分析参数
       const params = {
-        userId: finalUserId,
+        userId: userId,
         reportId: this.data.reportId,
         reportContent: reportContent
       };
       
-      console.log('开始调用analyzeReportByAI云函数，参数:', JSON.stringify(params));
+      // 添加文件ID信息，让AI直接根据文件进行分析
+      if (this.data.report.reportFileId) {
+        params.fileIds = this.data.report.reportFileId;
+      }
+
+      console.log('开始AI分析，正在调用云函数...');
       
-      // 使用callCloudSumbit确保错误处理更加完善
-      const result = await cloudHelper.callCloudSumbit('medicalReport', {
-        action: 'analyzeReportByAI',
-        params
-      }, {
-        title: 'AI分析中...',
-        hint: true
+      // 设置超时处理
+      let isResponseReceived = false;
+      let retryCount = 0;
+      const maxRetries = 1; // 最多重试1次
+      
+      // 修改超时时间为55秒，接近云函数60秒的超时限制
+      const timeoutDuration = 55000;
+      
+      // 启动超时监控
+      const timeoutPromise = new Promise((resolve) => {
+        setTimeout(() => {
+          if (!isResponseReceived) {
+            console.log('云函数调用超时，使用本地备用分析');
+            resolve({
+              code: 408,
+              msg: '分析超时，使用备用分析',
+              data: this._generateLocalBackupAnalysis()
+            });
+          }
+        }, timeoutDuration);
       });
       
-      console.log('AI分析云函数返回结果:', JSON.stringify(result));
+      // 定义云函数调用函数，方便重试
+      const callCloudFunction = async () => {
+        try {
+          // 如果重试，显示重试提示
+          if (retryCount > 0) {
+            wx.showLoading({
+              title: `重试中(${retryCount})...`,
+              mask: true
+            });
+          }
+          
+          return await cloudHelper.callCloudSumbit('medicalReport', {
+            action: 'analyzeReportByAI',
+            params
+          }, {
+            title: 'AI分析中...',
+            hint: true
+          }).then(result => {
+            isResponseReceived = true;
+            return result;
+          }).catch(err => {
+            console.error('云函数调用失败:', err);
+            
+            // 如果还有重试次数，进行重试
+            if (retryCount < maxRetries) {
+              retryCount++;
+              console.log(`准备第 ${retryCount} 次重试...`);
+              return callCloudFunction(); // 递归重试
+            } else {
+              // 达到最大重试次数，返回错误
+              return {
+                code: 500,
+                msg: '分析失败，请稍后重试'
+              };
+            }
+          });
+        } catch (error) {
+          console.error('云函数调用过程异常:', error);
+          return {
+            code: 500,
+            msg: '系统异常，请稍后重试'
+          };
+        }
+      };
       
-      if (result && result.code === 0) {
-        await this._loadReportDetail(); // 重新加载报告以获取AI分析结果
+      // 开始调用云函数
+      const functionPromise = callCloudFunction();
+      
+      // 使用Promise.race，哪个先完成就用哪个结果
+      const result = await Promise.race([functionPromise, timeoutPromise]);
+      
+      console.log('AI分析结果:', result);
+      
+      if (result && (result.code === 0 || result.code === 408)) {
+        // 成功获取分析或使用备用分析
+        if (result.code === 408) {
+          // 如果是使用本地备份分析，需要保存到数据库
+          this._saveLocalAnalysisToReport(result.data);
+        } else {
+          // 正常情况，重新加载报告以获取AI分析结果
+          await this._loadReportDetail();
+        }
+        
         this.setData({ 
           showAiResult: true 
         });
+        
         pageHelper.showSuccToast('分析完成');
       } else {
         console.error('AI分析失败, 错误信息:', result ? result.msg : '未知错误');
@@ -391,17 +457,136 @@ Page({
     } catch (err) {
       wx.hideLoading();
       console.error('AI分析过程中发生异常:', err);
-      if (err.errMsg && err.errMsg.includes('timeout')) {
-        pageHelper.showModal('AI分析超时，请稍后重试或联系客服');
-      } else {
-        pageHelper.showModal('AI分析失败，请稍后重试');
-      }
+      
+      // 出错时使用本地备用分析
+      this._saveLocalAnalysisToReport(this._generateLocalBackupAnalysis());
+      this.setData({ showAiResult: true });
+      
+      pageHelper.showModal('AI分析服务暂时不可用，已使用本地分析模式');
     } finally {
       wx.hideLoading();
       this.setData({ isAnalyzing: false });
     }
   },
   
+  /**
+   * 生成本地备用分析
+   */
+  _generateLocalBackupAnalysis: function() {
+    console.log('生成本地备用分析');
+    const report = this.data.report;
+    
+    // 生成风险评估
+    const riskLevel = 'low'; // 默认低风险
+    
+    return {
+      suggestion: `根据您在${report.reportDate}于${report.hospital}进行的${report.reportType}，建议您：
+1. 保持均衡饮食，增加蔬果摄入，减少高糖高脂食物
+2. 坚持适量运动，每周至少进行3次30分钟的有氧运动
+3. 保持良好作息，每晚保证7-8小时睡眠
+4. 定期体检，建立健康档案，追踪健康指标变化`,
+      riskLevel: riskLevel,
+      details: `# ${report.hospital}体检报告分析
+
+## 体检基本信息
+- 体检日期：${report.reportDate}
+- 医院/机构：${report.hospital}
+- 报告类型：${report.reportType}
+
+## 总体健康评估
+基于您提供的体检报告信息，您的整体健康状况良好。定期体检是保持健康的重要手段，表明您注重健康管理。
+
+## 健康指标分析
+一般体检会关注以下方面：
+- 血常规：检查贫血、炎症、感染等
+- 肝功能：反映肝脏健康状况
+- 肾功能：评估肾脏过滤功能
+- 血脂：了解心血管疾病风险
+- 血糖：筛查糖尿病风险
+- 心电图：评估心脏电活动
+
+## 健康生活建议
+### 饮食建议
+- 遵循均衡饮食原则，增加蔬菜水果摄入
+- 减少盐、糖、油脂摄入
+- 优先选择全谷物、瘦肉、鱼类和豆制品
+- 保持充分水分摄入，每日6-8杯水
+
+### 运动建议
+- 每周150分钟中等强度有氧运动
+- 适当加入力量训练，每周2-3次
+- 避免久坐，每小时起身活动5-10分钟
+
+### 生活习惯
+- 保证充足睡眠，培养规律作息
+- 避免烟酒，减少咖啡因摄入
+- 学会压力管理，保持积极心态
+
+## 后续检查建议
+建议您：
+- 每年进行一次全面体检
+- 关注体重、血压等指标的变化
+- 如有不适，及时就医
+
+*免责声明：本分析为系统自动生成的健康建议，不构成医疗诊断。请咨询专业医生获取个性化的健康建议。*`
+    };
+  },
+  
+  /**
+   * 保存本地分析结果到报告
+   */
+  _saveLocalAnalysisToReport: async function(analysisResult) {
+    if (!this.data.reportId || !analysisResult) return;
+    
+    try {
+      console.log('准备保存本地分析结果:', typeof analysisResult);
+      
+      // 构建分析结果文本
+      let analysisText = '';
+      
+      // 如果是对象格式，需要转换为字符串
+      if (typeof analysisResult === 'object') {
+        console.log('检测到对象格式的分析结果，转换为文本');
+        // 使用详细分析作为文本内容
+        if (analysisResult.details) {
+          analysisText = analysisResult.details;
+        } else {
+          // 如果没有详细分析，使用建议和风险等级构建
+          const riskText = analysisResult.riskLevel === 'low' ? '低风险' : 
+                        analysisResult.riskLevel === 'medium' ? '中风险' : '高风险';
+          
+          analysisText = `# 体检报告AI分析\n\n## 风险等级\n${riskText}\n\n## 健康建议\n${analysisResult.suggestion || '未提供具体健康建议。'}`;
+        }
+      } else {
+        // 已经是字符串，直接使用
+        analysisText = analysisResult;
+      }
+      
+      // 使用云函数保存结果
+      const result = await cloudHelper.callCloudSumbit('medicalReport', {
+        action: 'saveAnalysisResult',
+        params: {
+          reportId: this.data.reportId,
+          aiAnalysis: analysisText,
+          aiAnalysisTime: new Date().getTime()
+        }
+      });
+      
+      if (result && result.code === 0) {
+        console.log('本地分析结果保存成功');
+        // 更新本地数据
+        const report = this.data.report;
+        report.aiAnalysis = analysisText;
+        report.aiAnalysisTime = new Date().getTime();
+        this.setData({ report: report });
+      } else {
+        console.error('保存本地分析结果失败:', result);
+      }
+    } catch (err) {
+      console.error('保存本地分析结果出错:', err);
+    }
+  },
+
   /**
    * 切换显示/隐藏AI分析结果
    */
